@@ -5,10 +5,12 @@ const fs = require('fs')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('manage/index', { title: 'Express' });
 });
 
-
+router.get('/drtk',function(req,res){
+	res.render('manage/drtk')
+})
 
 router.get('/importnew_',function(req,res){
 	console.log(__dirname)

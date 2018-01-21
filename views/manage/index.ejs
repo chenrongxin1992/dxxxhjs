@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="/favicon.ico"/>
+
+    <title>后台管理</title>
+
+
+    <!-- Bootstrap core CSS -->
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+
+    <!-- Custom styles for this template -->
+    <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/offcanvas.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="row" style="padding: 0 15px;">
+        <div class="col-12" style="min-height: 100px;background-color: #F08080;"></div>
+      </div>
+
+      <div class="row row-offcanvas row-offcanvas-left">
+        <div class="col-6 col-md-2 sidebar-offcanvas" id="sidebar">
+          <div class="list-group">
+            <a class="list-group-item active" id="drtk">导入题库</a>
+            <a class="list-group-item" id="drtk">导入题库</a>
+            <a class="list-group-item" id="drtk">导入题库</a>
+            <a class="list-group-item" id="drtk">导入题库</a>
+            <a class="list-group-item" id="drtk">导入题库</a>
+            <a class="list-group-item" id="drtk">导入题库</a>
+            <a class="list-group-item" id="drtk">导入题库</a>
+            <a class="list-group-item" id="drtk">导入题库</a>
+          </div>
+        </div><!--sidebar-->
+    <div class="row">
+          <div class="col-12">
+            <p class="float-left hidden-md-up">
+              <button type="button" class="btn btn-primary btn-sm" data-toggle="offcanvas">菜单</button>
+            </p>
+          </div>
+        </div>
+        <div class="col-12 col-md-10">
+          <div id="middle-container"></div>
+        </div><!--middle-container-->
+
+        
+      </div><!--/row-->
+
+      <hr style="height:1px;border:none;border-top:1px dashed #F08080;">
+
+      <footer>
+        <p class="text-center">2018 &copy; 深圳大学</p>
+      </footer>
+
+    </div><!--/.container-->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/javascripts/jquery-3.1.1.js"></script>
+    <script>window.jQuery || document.write('<script src="/javascripts/jquery-3.1.1.js"><\/script>')</script>
+    <script src="/javascripts/tether.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/javascripts/ie10-viewport-bug-workaround.js"></script>
+    <script type="text/javascript">
+    $(function(){
+      $('#middle-container').load('/manage/drtk',function(result){
+        $result = $(result)
+        $result.find("script").appendTo('#middle-container');
+      })
+      
+      $('.list-group-item').on('click',function(e){
+        'use strict'
+        let current_active_a_id = $('.list-group-item.active').attr('id'),
+            current_id = $(this).attr('id') 
+        $('#middle-container').load('/manage/'+current_id+'.html',function(result){
+          $('#'+current_active_a_id).toggleClass('active')
+          $('#'+current_id).toggleClass('active')
+          $result = $(result)
+          $result.find("script").appendTo('#middle-container')
+          $('.row-offcanvas').toggleClass('active')
+        })
+      })
+      $('[data-toggle="offcanvas"]').click(function () {
+        $('.row-offcanvas').toggleClass('active')
+      });
+     })
+    </script>
+  </body>
+</html>
