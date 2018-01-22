@@ -3,7 +3,7 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var bodyParser = require('body-parser');//express.bodyParser实际上包括了三部分：express.json, express.urlencoded, 和 express.multipart(就是处理了文件的部分)
 
 
 var index = require('./routes/manage/index');//后台管理路由

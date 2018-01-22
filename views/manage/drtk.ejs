@@ -1,37 +1,50 @@
 <div class="jumbotron">
-    <h1>导入题库</h1>
-    <p>导入题库</p>
-    <button type="button" class="layui-btn" id="uploadtk" lay-data="{url: '/manage/uploadtk', accept: 'file'}" name='uploadtk'>
+    <h3>导入题库</h3>
+    <button type="button" class="layui-btn" id="uploadtk" lay-data="{url: '/manage/uploadtk', exts: 'xlsx|xls'}" name='uploadtk'>
 	  <i class="layui-icon">&#xe67c;</i>导入题库
-	</button>
+	  </button>
+    <a href="/manage/download_tkmb" download=''>题库模板下载</a>
 </div>
 
 <script>
-layui.use('upload', function(){
-  var upload = layui.upload;
-   
+'use strict'
+layui.use(['upload','layer'], function(){
+  let uploading
+  let upload = layui.upload,
+      layer = layui.layer;
   //执行实例
   var uploadInst = upload.render({
     elem: '#uploadtk' //绑定元素
     //,url: '/manage/uploadtk' //上传接口
     ,before: function(obj){ 
-	 	layer.load(); //上传loading
-	 	obj.preview(function(index, file, result){
-	      console.log('文件索引-->',index); //得到文件索引
-	      console.log('文件对象-->',file); //得到文件对象
-	      console.log('文件base64编码-->',result); //得到文件base64编码，比如图片
-	      
-	      //这里还可以做一些 append 文件列表 DOM 的操作
-	      
-	      //obj.upload(index, file); //对上传失败的单个文件重新上传，一般在某个事件中使用
-	      //delete files[index]; //删除列表中对应的文件，一般在某个事件中使用
-	    });
-	}
+  	 	uploading = layer.load(); //上传loading
+  	 	obj.preview(function(index, file, result){
+  	      console.log('文件索引-->',index); //得到文件索引
+  	      console.log('文件对象-->',file); //得到文件对象
+  	      console.log('文件base64编码-->',result); //得到文件base64编码，比如图片
+  	      
+  	      //这里还可以做一些 append 文件列表 DOM 的操作
+  	      
+  	      //obj.upload(index, file); //对上传失败的单个文件重新上传，一般在某个事件中使用
+  	      //delete files[index]; //删除列表中对应的文件，一般在某个事件中使用
+  	  });
+	  }
     ,done: function(res, index, upload){
       //上传完毕回调
       //在上传接口请求完毕后触发，但文件不一定是上传成功的，只是接口的响应状态正常（200）。回调返回三/
       //个参数，分别为：服务端响应信息、当前文件的索引、重新上传的方法
    	  //let item = this.item;
+      console.log('服务端响应信息res-->',res)
+      console.log('当前文件的索引-->',index)
+      console.log('重新上传的方法-->',upload)
+      if(res.code === 0){
+        console.log('返回成功')
+        layer.close(uploading);   
+        layer.open({
+          title: '提示',
+          content: res.msg
+        });     
+      }
     }
     ,error: function(index, upload){
     //当上传失败时，你可以生成一个“重新上传”的按钮，点击该按钮时，执行 upload() 方法即可实现重新上传
