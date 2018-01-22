@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const ejsExcel = require('ejsexcel')
 const fs = require('fs')
+const multer = require('multer')({ dest: 'uploads/' })
+console.log('multer->',multer)
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -12,8 +14,13 @@ router.get('/drtk',function(req,res){
 	res.render('manage/drtk')
 })
 
-router.get('/importnew_',function(req,res){
-	console.log(__dirname)
+router.post('/uploadtk',function(req,res){
+	req.on('data',function(chunk){
+		console.log(chunk)
+		//console.log(req.files)
+	})
+	return false
+
     let exBuf=fs.readFileSync(__dirname+'/自动机与形语言_导入格式.xlsx');
 		ejsExcel.getExcelArr(exBuf).then(exlJson=>{
 		    console.log("---------------- read success:getExcelArr ----------------");
