@@ -1,17 +1,42 @@
-<div class="demoTable">
-    搜索题目：
+<form class="layui-form" action="">
+  <div class="layui-form-item">
     <div class="layui-inline">
+      <label class="layui-form-label" style="width:98px;">模块</label>
+      <div class="layui-input-inline">
+        <select name="catname" id="catname">
+          <option value="">请选择题目模块</option>
+          <% for(let i=0;i<catname.length;i++) { %>
+              <option value='<%=catname[i]%>'><%=catname[i]%></option>
+          <% } %>
+        </select>
+      </div>
+      <label class="layui-form-label" style="width:98px;">类型</label>
+      <div class="layui-input-inline">
+        <select name="leixing" id="leixing">
+          <option value="">请选择题目类型</option>
+            <option value="单选">单选</option>
+            <option value="判断">判断</option>
+            <option value="多选">多选</option>
+        </select>
+      </div>
+      <label class="layui-form-label" style="width:98px;">题目</label>
+      <div class="layui-input-inline">
         <input class="layui-input" name="timu" id="timu" autocomplete="off" placeholder="请输入关键字">
+      </div>
+      <button class="layui-btn" lay-submit="" lay-filter="search">搜索</button>
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
     </div>
-    <button class="layui-btn" data-type="reload">搜索</button>
-</div>
+  </div>  
+</form>
+
 <table id="cxtk_tb" lay-filter="test"></table>
 
 <script>
 'use strict'
-layui.use(['table','layer'], function(){
+layui.use(['table','layer','form'], function(){
   let table = layui.table,
-      layer = layui.layer;
+      layer = layui.layer,
+      form = layui.form;
   //执行实例
   table.render({
     elem: '#cxtk_tb'
@@ -43,11 +68,15 @@ layui.use(['table','layer'], function(){
   })
   let $ = layui.$, active = {
         reload: function(){
-            let timu = $('#timu');
+            let timu = $('#timu'),
+                catname = $('#catname option:selected'),
+                leixing = $('#leixing option:selected');
 
             table.reload('reload_tb', {
                 where: {
-                    timu: timu.val()
+                    timu: timu.val(),
+                    catname: catname.val(),
+                    leixing: leixing.val()
                 }
             });
         }
@@ -55,6 +84,20 @@ layui.use(['table','layer'], function(){
   $('.demoTable .layui-btn').on('click', function(){
     let type = $(this).data('type');
     active[type] ? active[type].call(this) : '';
+  });
+  form.on('submit(search)', function(data){
+    console.log('data-->',data)
+    table.reload('reload_tb', {
+      where: {
+          timu: $('#timu').val(),
+          catname: $('#catname option:selected').val(),
+          leixing: $('#leixing option:selected').val()
+      }
+    });
+    layer.alert(JSON.stringify(data.field), {
+      title: '最终的提交信息'
+    })
+    return false;
   });
 });
 </script>

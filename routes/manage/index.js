@@ -312,16 +312,28 @@ router.get('/download_tkmb',function(req, res, next){
 });
 //查看题库页面
 router.get('/cxtk',function(req,res){
-	res.render('manage/cxtk')
+	//返回题库模块，题目类型
+	let search = cat.distinct('catname',function(err,docs){
+		if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err.stack})
+			}
+			console.log('docs-->',docs)
+			return res.render('manage/cxtk',{'catname':docs})
+	})
 })
 //查看题库页面数据接口
 router.get('/cxtk_data',function(req,res){	
 	let page = req.query.page,
 		limit = req.query.limit,
-		timu = req.query.timu
+		timu = req.query.timu,
+		catname = req.query.catname,
+		leixing = req.query.leixing
 	page ? page : 1;//当前页
 	limit ? limit : 15;//每页数据
 	timu ? timu : null
+	catname ? catname : null
+	leixing ? leixing : null
 	async.waterfall([
 		function(cb){
 			let search = cat.find({}).count()
@@ -338,38 +350,44 @@ router.get('/cxtk_data',function(req,res){
 			let numSkip = (page-1)*limit
 			limit = parseInt(limit)
 			console.log('check -- >',limit,page,numSkip)
-			if(timu){
-				console.log('有搜索')
-				let qs = new RegExp(timu);
-				console.log('qs-->',qs)
+			if(timu || catname || leixing){
+				console.log('有搜索参数')
+				let qs_timu = new RegExp(timu),
+					qs_catname = new RegExp(catname),
+					qs_leixing = new RegExp(leixing)
+				console.log('qs_timu-->',qs_timu)
+				console.log('qs_catname-->',qs_catname)
+				console.log('qs_leixing-->',qs_leixing)
 
 				let search = cat.find({})
-				search.where('timu',qs)
-				search.limit(limit)
-				search.skip(numSkip)
-				search.exec(function(err,docs){
-					if(err){
-						console.log('search err-->',err.stack)
-						cb(err)
-					}
-					console.log('check docs-->',docs.length)
-					//total = docs.length
-					cb(null,docs,docs.length)
-				})
-			}else{
-				console.log('无搜索')
-				let search = cat.find({})
-				search.limit(limit)
-				search.skip(numSkip)
-				search.exec(function(err,docs){
-					if(err){
-						console.log('search err-->',err.stack)
-						cb(err)
-					}
-					console.log('check docs-->',docs)
-					cb(null,docs,total)
-				})
-			}
+					search.where('timu',qs_timu)
+					search.where('catname',qs_catname)
+					search.where('leixing',qs_leixing)
+					search.limit(limit)
+					search.skip(numSkip)
+					search.exec(function(err,docs){
+						if(err){
+							console.log('search err-->',err.stack)
+							cb(err)
+						}
+						console.log('check docs-->',docs.length)
+						//total = docs.length
+						cb(null,docs,docs.length)
+					})
+				}else{
+					console.log('无搜索参数')
+					let search = cat.find({})
+						search.limit(limit)
+						search.skip(numSkip)
+						search.exec(function(err,docs){
+							if(err){
+								console.log('search err-->',err.stack)
+								cb(err)
+							}
+							console.log('check docs-->',docs)
+							cb(null,docs,total)
+					})
+				}
 		},
 		function(docs,total,cb){
 			//重新封装数据

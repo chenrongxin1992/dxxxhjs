@@ -8,3 +8,12 @@ body {
 .demoTable{
 	padding-top:5px; 
 }
+*{
+	-webkit-box-sizing:inherit;
+	-moz-box-sizing:inherit;
+	box-sizing: inherit;
+}
+.layui-form-item{
+	margin-top: 8px;
+	margin-bottom: 0px;
+}
