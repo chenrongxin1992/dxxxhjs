@@ -1,0 +1,126 @@
+<div class="demoTable">
+    搜索题目：
+    <div class="layui-inline">
+        <input class="layui-input" name="timu" id="timu" autocomplete="off" placeholder="请输入关键字">
+    </div>
+    <button class="layui-btn" data-type="reload">搜索</button>
+</div>
+<table id="cxtk_tb" lay-filter="test"></table>
+
+<script>
+'use strict'
+layui.use(['table','layer'], function(){
+  let table = layui.table,
+      layer = layui.layer;
+  //执行实例
+  table.render({
+    elem: '#cxtk_tb'
+    ,height: 'full-200'//高度最大化
+    ,cellMinWidth: 80//列宽自动分配
+    ,url: '/manage/cxtk_data' //数据接口
+    ,page: true //开启分页
+    ,id: 'reload_tb'
+    ,cols:  [[ //标题栏
+      {type:'checkbox', rowspan: 2}
+      ,{field: 'catname', title: '题目分类', align: 'center', rowspan: 2} //rowspan即纵向跨越的单元格数
+      ,{field: 'inused', title: '是否启用', align: 'center', rowspan: 2}
+      ,{field: 'leixing', title: '题目类型', align: 'center', rowspan: 2}
+      ,{field: 'timu', title: '题目', align: 'center', rowspan: 2}
+      ,{field: 'fenzhi', title: '分值', align: 'center', rowspan: 2}
+      ,{field: 'zqda', title: '答案', align: 'center', rowspan: 2}
+      ,{align: 'center', title: '选项', colspan: 9} //colspan即横跨的单元格数，这种情况下不用设置field和width
+    ], [
+      {field: 'xuanxiang0', align: 'center', title: '选项A',templet: '#xuanxiang0Tpl'}
+      ,{field: 'xuanxiang1', align: 'center', title: '选项B',templet: '#xuanxiang1Tpl'}
+      ,{field: 'xuanxiang2', align: 'center', title: '选项C',templet: '#xuanxiang2Tpl'}
+      ,{field: 'xuanxiang3', align: 'center', title: '选项D',templet: '#xuanxiang3Tpl'}
+      ,{field: 'xuanxiang4', align: 'center', title: '选项E',templet: '#xuanxiang4Tpl'}
+      ,{field: 'xuanxiang5', align: 'center', title: '选项F',templet: '#xuanxiang5Tpl'}
+      ,{field: 'xuanxiang6', align: 'center', title: '选项G',templet: '#xuanxiang6Tpl'}
+      ,{field: 'xuanxiang7', align: 'center', title: '选项H',templet: '#xuanxiang7Tpl'}
+      ,{field: 'xuanxiang8', align: 'center', title: '选项I',templet: '#xuanxiang8Tpl'}
+    ]]
+  })
+  let $ = layui.$, active = {
+        reload: function(){
+            let timu = $('#timu');
+
+            table.reload('reload_tb', {
+                where: {
+                    timu: timu.val()
+                }
+            });
+        }
+  };
+  $('.demoTable .layui-btn').on('click', function(){
+    let type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+  });
+});
+</script>
+<script type="text/html" id="xuanxiang0Tpl">
+  {{#  if((d.xuanxiang0) && ((d.xuanxiang0.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang0 }}</span>
+  {{#  } else if(d.xuanxiang0) { }}
+    {{ d.xuanxiang0 }}
+  {{#  } else { }}
+    {{  }}
+  {{#  } }}
+
+</script>
+<script type="text/html" id="xuanxiang1Tpl">
+  {{#  if((d.xuanxiang1) && ((d.xuanxiang1.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang1 }}</span>
+  {{#  } else if(d.xuanxiang1){ }}
+    {{ d.xuanxiang1 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang2Tpl">
+  {{#  if((d.xuanxiang2) && ((d.xuanxiang2.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang2 }}</span>
+  {{#  } else  if(d.xuanxiang2){ }}
+    {{ d.xuanxiang2 }}
+  {{#  }else{} }}
+</script>
+<script type="text/html" id="xuanxiang3Tpl">
+  {{#  if((d.xuanxiang3) && ((d.xuanxiang3.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang3 }}</span>
+  {{#  } else if(d.xuanxiang3) { }}
+    {{ d.xuanxiang3 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang4Tpl">
+  {{#  if((d.xuanxiang4) && ((d.xuanxiang4.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang4 }}</span>
+  {{#  } else if(d.xuanxiang4) { }}
+    {{ d.xuanxiang4 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang5Tpl">
+  {{#  if((d.xuanxiang5) && ((d.xuanxiang5.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang5 }}</span>
+  {{#  } else if(d.xuanxiang5) { }}
+    {{ d.xuanxiang5 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang6Tpl">
+  {{#  if((d.xuanxiang6) && ((d.xuanxiang6.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang6 }}</span>
+  {{#  } else if(d.xuanxiang6) { }}
+    {{ d.xuanxiang6 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang7Tpl">
+  {{#  if((d.xuanxiang7) && ((d.xuanxiang7.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang7 }}</span>
+  {{#  } else if(d.xuanxiang7){ }}
+    {{ d.xuanxiang7 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang8Tpl">
+  {{#  if((d.xuanxiang8) && ((d.xuanxiang8.indexOf('true')) > 0)) { }}
+    <span style="color: #5FB878;">{{ d.xuanxiang8 }}</span>
+  {{#  } else if(d.xuanxiang8) { }}
+    {{ d.xuanxiang8 }}
+  {{#  } else{} }}
+</script>

@@ -172,6 +172,7 @@ router.post('/uploadtk',function(req,res){
 				    			leixing : item[1].trim(),
 				    			timu : item[2].trim(),
 				    			fenzhi : item[3].trim(),
+				    			zqda : item[4].trim(),
 				    			xuanxiang : arr_xuanxiang
 				    		})
 				    		new_cat.save(function(err){
@@ -212,6 +213,7 @@ router.post('/uploadtk',function(req,res){
 					    			leixing : item[1].trim(),
 					    			timu : item[2].trim(),
 					    			fenzhi : item[3].trim(),
+					    			zqda : item[4].trim(),
 					    			xuanxiang : arr_xuanxiang
 					    		})
 					    		new_cat.save(function(err){
@@ -249,6 +251,7 @@ router.post('/uploadtk',function(req,res){
 					    			leixing : item[1].trim(),
 					    			timu : item[2].trim(),
 					    			fenzhi : item[3].trim(),
+					    			zqda : item[4].trim(),
 					    			xuanxiang : arr_xuanxiang
 					    		})
 					    		new_cat.save(function(err){
@@ -267,12 +270,13 @@ router.post('/uploadtk',function(req,res){
 			    	if(err){
 			    		console.log('async err')
 			    		return res.json({'code':-1,'msg':err.stack})
+			    	}else{
+			    		//删除上传的文件
+						console.log('----- 删除上传文件 -----')
+						fs.unlinkSync(files.file[0].path)
+						return res.json({'code':0,'msg':'导入成功'})
 			    	}
 			    })//async
-			//删除上传的文件
-			console.log('----- 删除上传文件 -----')
-			fs.unlinkSync(files.file[0].path)
-			return res.json({'code':0,'msg':'导入成功'})
 		    }).catch(error=>{
 			    console.log("************** 读表 error!");
 			    console.log(error); 
@@ -306,4 +310,172 @@ router.get('/download_tkmb',function(req, res, next){
         }
     });
 });
+//查看题库页面
+router.get('/cxtk',function(req,res){
+	res.render('manage/cxtk')
+})
+//查看题库页面数据接口
+router.get('/cxtk_data',function(req,res){	
+	let page = req.query.page,
+		limit = req.query.limit,
+		timu = req.query.timu
+	page ? page : 1;//当前页
+	limit ? limit : 15;//每页数据
+	timu ? timu : null
+	async.waterfall([
+		function(cb){
+			let search = cat.find({}).count()
+				search.exec(function(err,total){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('记录总数-->',total)
+					cb(null,total)
+				})
+		},
+		function(total,cb){
+			let numSkip = (page-1)*limit
+			limit = parseInt(limit)
+			console.log('check -- >',limit,page,numSkip)
+			if(timu){
+				console.log('有搜索')
+				let qs = new RegExp(timu);
+				console.log('qs-->',qs)
+
+				let search = cat.find({})
+				search.where('timu',qs)
+				search.limit(limit)
+				search.skip(numSkip)
+				search.exec(function(err,docs){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('check docs-->',docs.length)
+					//total = docs.length
+					cb(null,docs,docs.length)
+				})
+			}else{
+				console.log('无搜索')
+				let search = cat.find({})
+				search.limit(limit)
+				search.skip(numSkip)
+				search.exec(function(err,docs){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('check docs-->',docs)
+					cb(null,docs,total)
+				})
+			}
+		},
+		function(docs,total,cb){
+			//重新封装数据
+			let data = []//最终数据
+			docs.forEach(function(item,index){
+				let tempdata = {}
+				console.log('item-->',item)
+				tempdata.inused = item.inused
+				tempdata.catname = item.catname
+				tempdata.leixing = item.leixing
+				tempdata.timu = item.timu
+				tempdata.fenzhi = item.fenzhi
+				tempdata.zqda = item.zqda
+				item.xuanxiang.forEach(function(it,ind){
+					console.log(it)
+					tempdata['xuanxiang' + ind] = it.content +'(' + it.is_correct + ')'
+					//tempdata['is_correct' + ind] = it.is_correct
+					console.log(tempdata)
+				})
+				data.push(tempdata)
+				delete tempdata
+			})
+			data.count = total
+			console.log('返回数据-->',data)
+			cb(null,data)
+		}
+	],function(error,result){
+		if(error){
+			console.log('search err-->',err.stack)
+			return res.json({'code':-1,'msg':err.stack,'count':0,'data':''})
+		}
+		let count = result.count
+		console.log('数据条数-->',count)
+		delete result.count
+		return res.json({'code':0,'msg':'获取数据成功','count':count,'data':result})
+	})
+
+})
+router.get('/cxtk_data_bk',function(req,res){	
+	let page = req.query.page,
+		limit = req.query.limit
+	page ? page : 1;//当前页
+	limit ? limit : 15;//每页数据
+	async.waterfall([
+		function(cb){
+			let search = cat.find({}).count()
+				search.exec(function(err,total){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('记录总数-->',total)
+					cb(null,total)
+				})
+		},
+		function(total,cb){
+			let numSkip = (page-1)*limit
+			limit = parseInt(limit)
+			console.log('check -- >',limit,page,numSkip)
+			let search = cat.find({})
+				search.limit(limit)
+				search.skip(numSkip)
+				search.exec(function(err,docs){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('check docs-->',docs)
+					cb(null,docs,total)
+				})
+		},
+		function(docs,total,cb){
+			//重新封装数据
+			let data = []//最终数据
+			docs.forEach(function(item,index){
+				let tempdata = {}
+				console.log('item-->',item)
+				tempdata.inused = item.inused
+				tempdata.catname = item.catname
+				tempdata.leixing = item.leixing
+				tempdata.timu = item.timu
+				tempdata.fenzhi = item.fenzhi
+				tempdata.zqda = item.zqda
+				item.xuanxiang.forEach(function(it,ind){
+					console.log(it)
+					tempdata['xuanxiang' + ind] = it.content +'(' + it.is_correct + ')'
+					//tempdata['is_correct' + ind] = it.is_correct
+					console.log(tempdata)
+				})
+				data.push(tempdata)
+				delete tempdata
+			})
+			data.count = total
+			console.log('返回数据-->',data)
+			cb(null,data)
+		}
+	],function(error,result){
+		if(error){
+			console.log('search err-->',err.stack)
+			return res.json({'code':-1,'msg':err.stack,'count':0,'data':''})
+		}
+		let count = result.count
+		console.log('数据条数-->',count)
+		delete result.count
+		return res.json({'code':0,'msg':'获取数据成功','count':count,'data':result})
+	})
+
+})
 module.exports = router;

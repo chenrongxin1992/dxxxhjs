@@ -43,7 +43,7 @@ var catSchema = new Schema({
     leixing : {type:String},//单选，多选，判断
     timu : {type:String},//题目(党章的意义是什么) 
     fenzhi : {type:Number },//该题分值(5,4)
-    //zqda : {type : String},//正确答案(A,B,C,D,E,F / AB,AD / 1,2)
+    zqda : {type : String},//正确答案(A,B,C,D,E,F / AB,AD / 1,2)
     xuanxiang : [{
         id : {type:Number},//选项id
         content : {type:String,default:null},//选项内容
