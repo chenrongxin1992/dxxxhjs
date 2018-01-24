@@ -381,6 +381,7 @@ router.get('/cxtk_data',function(req,res){
 					search.where('timu',qs_timu)
 					search.where('catname',qs_catname)
 					search.where('leixing',qs_leixing)
+					search.sort({'id':1})
 					search.limit(limit)
 					search.skip(numSkip)
 					search.exec(function(err,docs){
@@ -395,6 +396,7 @@ router.get('/cxtk_data',function(req,res){
 				}else{
 					console.log('无搜索参数')
 					let search = cat.find({})
+					search.sort({'id':1})
 						search.limit(limit)
 						search.skip(numSkip)
 						search.exec(function(err,docs){
@@ -470,25 +472,12 @@ router.get('/iframe_mb',function(req,res){
 				return res.josn({'code':-1,'msg':err.stack})
 			}
 			console.log('doc-->',doc)
-			//重新封装数据
-			// let tempdata = {}
-
-			// 	tempdata._id = doc._id
-			// 	tempdata.catid = doc.id
-			// 	tempdata.inused = doc.inused
-			// 	tempdata.catname = doc.catname
-			// 	tempdata.leixing = doc.leixing
-			// 	tempdata.timu = doc.timu
-			// 	tempdata.fenzhi = doc.fenzhi
-			// 	tempdata.zqda = doc.zqda
-			// 	doc.xuanxiang.forEach(function(it,ind){
-			// 		console.log(it)
-			// 		tempdata['xuanxiang' + ind] = it.content
-			// 		tempdata['is_correct' + ind] = it.is_correct ? '是' : '否'
-			// 		console.log(tempdata)
-			// 	})
-			// console.log('返回数据-->',tempdata)
 			return res.render('manage/iframe_mb',{'detail':doc})
 		})
+})
+
+router.get('/sjsz',function(req,res){
+	console.log('sjsz')
+	res.render('manage/sjsz')
 })
 module.exports = router;

@@ -3,7 +3,7 @@
     <div class="layui-inline">
       <label class="layui-form-label" style="width:98px;">模块</label>
       <div class="layui-input-inline">
-        <select name="catname" id="catname">
+        <select name="catname" id="catname" lay-filter="catname">
           <option value="">请选择题目模块</option>
           <% for(let i=0;i<catname.length;i++) { %>
               <option value='<%=catname[i]%>'><%=catname[i]%></option>
@@ -12,7 +12,7 @@
       </div>
       <label class="layui-form-label" style="width:98px;">类型</label>
       <div class="layui-input-inline">
-        <select name="leixing" id="leixing">
+        <select name="leixing" id="leixing" lay-filter="leixing">
           <option value="">请选择题目类型</option>
             <option value="单选">单选</option>
             <option value="判断">判断</option>
@@ -78,6 +78,31 @@ $(function(){
         ,{field: 'xuanxiang8', align: 'center', title: '选项I',templet: '#xuanxiang8Tpl'}
       ]]
     })
+    //监听下拉框
+    form.on('select(catname)', function(data){
+      console.log('监听下拉框-->catname',data)
+      table.reload('reload_tb', {
+        where: {
+            timu: $('#timu').val(),
+            catname: $('#catname option:selected').val(),
+            leixing: $('#leixing option:selected').val()
+        }
+      });
+      //form.render('select')
+      return false;
+    })
+    form.on('select(leixing)', function(data){
+      console.log('监听下拉框-->leixing',data)
+      table.reload('reload_tb', {
+        where: {
+            timu: $('#timu').val(),
+            catname: $('#catname option:selected').val(),
+            leixing: $('#leixing option:selected').val()
+        }
+      });
+      //form.render('select')
+      return false;
+    })
     //搜索
     form.on('submit(search)', function(data){
       console.log('data-->',data)
@@ -105,15 +130,16 @@ $(function(){
         console.log('监听详情-->',data.catid)
         console.log('能取到_id吗-->',data._id)
         //layer.msg('ID：'+ data.catid + ' 的查看操作');
-        layer.open({
+       let if_index = layer.open({
           type: 2,
-          title: '编辑',
+          title: '查看',
           shadeClose: true,
           shade: false,
           maxmin: true, //开启最大化最小化按钮
-          area: ['900px', '770px'],
+          area: ['900px', '600px'],
           content: '/manage/iframe_mb?_id=' + data._id
         }); 
+        layer.iframeAuto(if_index);
       } 
       else if(obj.event === 'del'){
         console.log('监听删除-->',data.catid)
