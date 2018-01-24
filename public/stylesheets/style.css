@@ -17,3 +17,10 @@ body {
 	margin-top: 8px;
 	margin-bottom: 0px;
 }
+legend{
+	width:auto;
+}
+/* label宽度改大一点80to100 */
+.label_big{
+	width:100px;
+}

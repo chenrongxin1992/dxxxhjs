@@ -1,57 +1,80 @@
-  <div class="col-md-12" style="margin-top:15px;">  
+ 
     <fieldset class="layui-elem-field">
       <legend>试卷设置</legend>
       <div class="layui-field-box">
-        <form class="layui-form" action="">
+        <form class="layui-form layui-form-pane" action="">
           <div class="layui-form-item">
-            <div class="layui-inline">
-              <label class="layui-form-label">所属模块</label>
-              <div class="layui-input-inline">
-                <input type="text" name="catname" id="catname" class="layui-input" disabled >
-              </div>
-            </div>
-            <div class="layui-inline">
-              <label class="layui-form-label">是否启用</label>
-              <div class="layui-input-inline">
-                <input type="text" name="inused" id="inused" class="layui-input" disabled >
-              </div>
-            </div>
-          </div>
-
-          <div class="layui-form-item">
-            <label class="layui-form-label">题干</label>
+            <label class="layui-form-label label_big">考试主题</label>
             <div class="layui-input-block">
-              <input type="text" name="timu" id="timu" class="layui-input" disabled >
+              <input type="text" name="ksname" id="ksname" class="layui-input" placeholder="如党章模块测试" lay-verify="required">
             </div>
           </div>
 
           <div class="layui-form-item">
             <div class="layui-inline">
-              <label class="layui-form-label">类型</label>
+              <label class="layui-form-label label_big">考试日期</label>
               <div class="layui-input-inline">
-                <input type="text" name="leixing" id="leixing" class="layui-input" disabled >
+                <input type="text" name="ksriqi" id="ksriqi" class="layui-input" placeholder="yyyy-MM-dd" lay-verify="date">
               </div>
             </div>
             <div class="layui-inline">
-              <label class="layui-form-label">该题分值</label>
+              <label class="layui-form-label label_big">考试时间</label>
               <div class="layui-input-inline">
-                <input type="text" name="feizhi" id="fenzhi" class="layui-input" disabled >
+                <input type="text" name="ksshijian" id="ksshijian" class="layui-input" placeholder="单位为分钟" lay-verify="required|number">
               </div>
             </div>
           </div>
 
           <div class="layui-form-item">
             <div class="layui-inline">
-              <label class="layui-form-label">答案</label>
+              <label class="layui-form-label label_big">单选题数</label>
               <div class="layui-input-inline">
-                <input type="text" name="zqda" id="zqda" class="layui-input" disabled >
+                <input type="text" name="danxuan_num" id="danxuan_num" class="layui-input" placeholder="填写单选题数" lay-verify="required|number">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">多选题数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="duoxuan_num" id="duoxuan_num" class="layui-input" placeholder="填写多选题数" lay-verify="required|number">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">判断题数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="panduan_num" id="panduan_num" class="layui-input" placeholder="填写判断题数" lay-verify="required|number">
               </div>
             </div>
           </div>
-
           
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-submit="" lay-filter="tijiao">提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
         </form>
       </div>
     </fieldset>
-  </div>
 
+<script>
+'use strict'
+$(function(){
+  layui.use(['form', 'laydate'], function(){
+    let laydate = layui.laydate,
+        form = layui.form;
+
+    //日期
+    laydate.render({
+      elem: '#ksriqi'
+    });
+
+    //监听提交
+    form.on('submit(tijiao)', function(data){
+      layer.alert(JSON.stringify(data.field), {
+        title: '最终的提交信息'
+      })
+      return false;
+    });
+  });
+})
+</script>
