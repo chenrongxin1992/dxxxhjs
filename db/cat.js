@@ -7,9 +7,9 @@
     const mongoose = require('mongoose')
     mongoose.Promise = global.Promise;
     //服务器上
-    const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
+    //const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
     //本地
-    //const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
+    const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
     mongoose.connect(DB_URL)
 
     /**
@@ -38,6 +38,7 @@
     moment = require('moment')
 
 var catSchema = new Schema({ 
+    id : {type:Number},
     catname : {type:String},//分类名:如党章、十九大         
     inused : {type:Boolean,default:true},//该类别是否在用
     leixing : {type:String},//单选，多选，判断
@@ -54,4 +55,18 @@ var catSchema = new Schema({
     createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
 })
 
-module.exports = mongoose.model('catinfo',catSchema);
+//试卷设置
+var sjszSchema = new Schema({ 
+    id : {type:Number},//试卷设置记录
+    ksname : {type:String},//该次考试主题(比如第一单元，第二单元) 
+    ksshijian : {type:String},//考试时间
+    ksriqi : {type:String},//考试日期
+    danxuan_num : {type:Number},
+    panduan_num : {type:Number},
+    duoxuan_num : {type:Number},
+    peopleinfo : {type:String,default:null},//录入人员信息
+    createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+    createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+})
+//module.exports = mongoose.model('catinfo',catSchema);
+exports.catinfo = mongoose.model('catinfo',catSchema);

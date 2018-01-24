@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/stylesheets/layui.css" media="all">
+  </head>
+
+  <body>
+    <fieldset class="layui-elem-field">
+      <legend>该题详情</legend>
+      <div class="layui-field-box">
+        <form class="layui-form" action="">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">所属模块</label>
+              <div class="layui-input-inline">
+                <input type="text" name="catname" id="catname" class="layui-input" disabled value="<%=detail.catname%>">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">是否启用</label>
+              <div class="layui-input-inline">
+                <input type="text" name="inused" id="inused" class="layui-input" disabled value="<%=detail.inused%>">
+              </div>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <label class="layui-form-label">题干</label>
+            <div class="layui-input-block">
+              <input type="text" name="timu" id="timu" class="layui-input" disabled value="<%=detail.timu%>">
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">类型</label>
+              <div class="layui-input-inline">
+                <input type="text" name="leixing" id="leixing" class="layui-input" disabled value="<%=detail.leixing%>">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">该题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="feizhi" id="fenzhi" class="layui-input" disabled value="<%=detail.fenzhi%>">
+              </div>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">答案</label>
+              <div class="layui-input-inline">
+                <input type="text" name="zqda" id="zqda" class="layui-input" disabled value="<%=detail.zqda%>">
+              </div>
+            </div>
+          </div>
+
+          <% var tem_i = 65;%>
+          <% detail.xuanxiang.forEach(function(item,index){ %>
+            <% var tem_str=''; tem_str='选项' + ' ' +String.fromCharCode(tem_i); tem_i++; %>
+              <div class="layui-form-item">
+                <label class="layui-form-label"><%=tem_str%></label>
+                <div class="layui-input-block">
+                  <input type="text" name="<%=tem_str%>" class="layui-input" disabled value="<%=item.content%>">
+                </div>
+              </div>
+            <% }) %>
+        </form>
+      </div>
+    </fieldset>
+
+<script src="/javascripts/jquery-3.1.1.js"></script>
+<script src="/javascripts/layui.js"></script>
+<script>
+'use strict'
+$(function(){
+
+  layui.use(['layer','form'], function(){
+    let layer = layui.layer,
+        form = layui.form;
+
+    //搜索
+    form.on('submit(search)', function(data){
+      console.log('data-->',data)
+      table.reload('reload_tb', {
+        where: {
+            timu: $('#timu').val(),
+            catname: $('#catname option:selected').val(),
+            leixing: $('#leixing option:selected').val()
+        }
+      });
+      return false;
+    });
+  });
+})
+
+</script>
+  </body>
+</html>

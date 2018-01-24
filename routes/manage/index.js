@@ -5,7 +5,7 @@ const fs = require('fs')
 const multiparty = require('multiparty')
 const path = require('path')
 const async = require('async')
-const cat = require('../../db/cat')
+const cat = require('../../db/cat').catinfo
 const uploadDir = path.resolve(__dirname, '../../uploads');
 const urlencode = require('urlencode')
 
@@ -138,145 +138,163 @@ router.post('/uploadtk',function(req,res){
 			    let workBook=exlJson;
 			    let workSheets=workBook[0];//第一个工作表
 
-			    let count = 0;//计数，排除第一行
-			    async.eachLimit(workSheets,1,function(item,cb){
-			    	if(count === 0){
-			    		count++
-			    		cb()
-			    	}else{
-			    		console.log('check item-->',item.length)
-				    	if(item[1].trim() === '多选'){
-				    		console.log('-----该题是多选，去获取对应答案id-----')
-				    		let daid_arr = getdaan_duoxuan(item[4])
-				    		let arr_xuanxiang = []
-				    		for(let i=0;i<item.length-5;i++){
-				    			let obj_xuanxiang = {}
-				    			//console.log('i-->',i);
-				    			if(inarr(daid_arr,i)){
-					    			obj_xuanxiang.is_correct = true
-					    			obj_xuanxiang.id = 5+i
-								    obj_xuanxiang.content = item[5+i].trim()
-								    arr_xuanxiang.push(obj_xuanxiang)
-								    delete obj_xuanxiang
-					    		}else{
-					    			obj_xuanxiang.is_correct = false
-					    			obj_xuanxiang.id = 5+i
-								    obj_xuanxiang.content = item[5+i].trim()
-								    arr_xuanxiang.push(obj_xuanxiang)
-								    delete obj_xuanxiang
-					    		}
-				    		}
-				    		console.log('check arr_xuanxiang-->',arr_xuanxiang)
-				    		let	new_cat = new cat({
-				    			catname : item[0].trim(),
-				    			leixing : item[1].trim(),
-				    			timu : item[2].trim(),
-				    			fenzhi : item[3].trim(),
-				    			zqda : item[4].trim(),
-				    			xuanxiang : arr_xuanxiang
-				    		})
-				    		new_cat.save(function(err){
-				    			if(err){
-				    				console.log('save err ------单选')
-				    				cb(err)
-				    			}
-				    			console.log('save success ------多选')
-				    			cb()
-				    		})
-				    	}else{
-				    		console.log('-----该题是单选或者判断，去获取对应答案id-----')
-				    		let daid = getdaan_danxuan(item[4])
-				    		//构造选项对象数组
-				    		if(item[1].trim() === '单选'){
-				    			console.log('----- 单选&&答案是-->',daid)
-				    			let arr_xuanxiang = []
-					    		for(let i=0;i<item.length-5;i++){
-					    			let obj_xuanxiang = {}
-					    			if(daid == i){
-					    				obj_xuanxiang.is_correct = true
-					    				obj_xuanxiang.id = 5+i
-								    	obj_xuanxiang.content = item[5+i].trim()
-								    	arr_xuanxiang.push(obj_xuanxiang)
-								    	delete obj_xuanxiang
-					    			}else{
-					    				obj_xuanxiang.is_correct = false
-					    				obj_xuanxiang.id = 5+i
-								    	obj_xuanxiang.content = item[5+i].trim()
-								    	arr_xuanxiang.push(obj_xuanxiang)
-								    	delete obj_xuanxiang
-					    			}
-					    		}
-					    		console.log('check arr_xuanxiang-->',arr_xuanxiang)
-					    		console.log('check arr_xuanxiang-->',arr_xuanxiang)
-					    		let	new_cat = new cat({
-					    			catname : item[0].trim(),
-					    			leixing : item[1].trim(),
-					    			timu : item[2].trim(),
-					    			fenzhi : item[3].trim(),
-					    			zqda : item[4].trim(),
-					    			xuanxiang : arr_xuanxiang
-					    		})
-					    		new_cat.save(function(err){
-					    			if(err){
-					    				console.log('save err ------单选')
-					    				cb(err)
-					    			}
-					    			console.log('save success ------单选')
-					    			cb()
-					    		})
-				    		}else{
-				    			console.log('----- 判断 -----')
-				    			
-					    		let	arr_xuanxiang = []
-				    			for(let i=0;i<2;i++){
-				    				let obj_xuanxiang = {}
-				    				if(daid == i){
-					    				obj_xuanxiang.is_correct = true
-					    				obj_xuanxiang.id = 5+i
-								    	obj_xuanxiang.content = item[5+i].trim()
-								    	arr_xuanxiang.push(obj_xuanxiang)
-								    	delete obj_xuanxiang
-					    			}else{
-					    				obj_xuanxiang.is_correct = false
-					    				obj_xuanxiang.id = 5+i
-								    	obj_xuanxiang.content = item[5+i].trim()
-								    	arr_xuanxiang.push(obj_xuanxiang)
-								    	delete obj_xuanxiang
-					    			}
-				    			}
-				    			console.log('check arr_xuanxiang-->',arr_xuanxiang)
-				    			console.log('check arr_xuanxiang-->',arr_xuanxiang)
-					    		let	new_cat = new cat({
-					    			catname : item[0].trim(),
-					    			leixing : item[1].trim(),
-					    			timu : item[2].trim(),
-					    			fenzhi : item[3].trim(),
-					    			zqda : item[4].trim(),
-					    			xuanxiang : arr_xuanxiang
-					    		})
-					    		new_cat.save(function(err){
-					    			if(err){
-					    				console.log('save err ------判断')
-					    				cb(err)
-					    			}
-					    			console.log('save success ------判断')
-					    			cb()
-					    		})
-				    		}
-				    	}//单选或选择
-				    	//cb()
-			    	}//排除第一行
-			    },function(err){
-			    	if(err){
-			    		console.log('async err')
-			    		return res.json({'code':-1,'msg':err.stack})
-			    	}else{
-			    		//删除上传的文件
-						console.log('----- 删除上传文件 -----')
-						fs.unlinkSync(files.file[0].path)
-						return res.json({'code':0,'msg':'导入成功'})
-			    	}
-			    })//async
+			    let count = 0,//计数，排除第一行
+			    	catid = 0;//cat id
+			    let search = cat.find({},{'id':1})
+			    	search.sort({'id':-1})
+			    	search.limit(1)
+			    	search.exec(function(err,docs){
+			    		if(err){
+			    			console.log('search err',err.stack)
+			    			return res.json({'code':-1,'msg':err.stack})
+			    		}
+			    		if(docs && docs.length != 0){
+			    			catid = docs[0].id
+			    		}
+			    		async.eachLimit(workSheets,1,function(item,cb){
+					    	if(count === 0){
+					    		count++
+					    		cb()
+					    	}else{
+					    		catid++
+					    		console.log('check item-->',item.length)
+						    	if(item[1].trim() === '多选'){
+						    		console.log('-----该题是多选，去获取对应答案id-----')
+						    		let daid_arr = getdaan_duoxuan(item[4])
+						    		let arr_xuanxiang = []
+						    		for(let i=0;i<item.length-5;i++){
+						    			let obj_xuanxiang = {}
+						    			//console.log('i-->',i);
+						    			if(inarr(daid_arr,i)){
+							    			obj_xuanxiang.is_correct = true
+							    			obj_xuanxiang.id = 5+i
+										    obj_xuanxiang.content = item[5+i].trim()
+										    arr_xuanxiang.push(obj_xuanxiang)
+										    delete obj_xuanxiang
+							    		}else{
+							    			obj_xuanxiang.is_correct = false
+							    			obj_xuanxiang.id = 5+i
+										    obj_xuanxiang.content = item[5+i].trim()
+										    arr_xuanxiang.push(obj_xuanxiang)
+										    delete obj_xuanxiang
+							    		}
+						    		}
+						    		console.log('check arr_xuanxiang-->',arr_xuanxiang)
+						    		let	new_cat = new cat({
+						    			id : catid,
+						    			catname : item[0].trim(),
+						    			leixing : item[1].trim(),
+						    			timu : item[2].trim(),
+						    			fenzhi : item[3].trim(),
+						    			zqda : item[4].trim(),
+						    			xuanxiang : arr_xuanxiang
+						    		})
+						    		new_cat.save(function(err){
+						    			if(err){
+						    				console.log('save err ------单选')
+						    				cb(err)
+						    			}
+						    			console.log('save success ------多选')
+						    			cb()
+						    		})
+						    	}else{
+						    		console.log('-----该题是单选或者判断，去获取对应答案id-----')
+						    		let daid = getdaan_danxuan(item[4])
+						    		//构造选项对象数组
+						    		if(item[1].trim() === '单选'){
+						    			console.log('----- 单选&&答案是-->',daid)
+						    			let arr_xuanxiang = []
+							    		for(let i=0;i<item.length-5;i++){
+							    			let obj_xuanxiang = {}
+							    			if(daid == i){
+							    				obj_xuanxiang.is_correct = true
+							    				obj_xuanxiang.id = 5+i
+										    	obj_xuanxiang.content = item[5+i].trim()
+										    	arr_xuanxiang.push(obj_xuanxiang)
+										    	delete obj_xuanxiang
+							    			}else{
+							    				obj_xuanxiang.is_correct = false
+							    				obj_xuanxiang.id = 5+i
+										    	obj_xuanxiang.content = item[5+i].trim()
+										    	arr_xuanxiang.push(obj_xuanxiang)
+										    	delete obj_xuanxiang
+							    			}
+							    		}
+							    		console.log('check arr_xuanxiang-->',arr_xuanxiang)
+							    		console.log('check arr_xuanxiang-->',arr_xuanxiang)
+							    		let	new_cat = new cat({
+							    			id : catid,
+							    			catname : item[0].trim(),
+							    			leixing : item[1].trim(),
+							    			timu : item[2].trim(),
+							    			fenzhi : item[3].trim(),
+							    			zqda : item[4].trim(),
+							    			xuanxiang : arr_xuanxiang
+							    		})
+							    		new_cat.save(function(err){
+							    			if(err){
+							    				console.log('save err ------单选')
+							    				cb(err)
+							    			}
+							    			console.log('save success ------单选')
+							    			cb()
+							    		})
+						    		}else{
+						    			console.log('----- 判断 -----')
+						    			
+							    		let	arr_xuanxiang = []
+						    			for(let i=0;i<2;i++){
+						    				let obj_xuanxiang = {}
+						    				if(daid == i){
+							    				obj_xuanxiang.is_correct = true
+							    				obj_xuanxiang.id = 5+i
+										    	obj_xuanxiang.content = item[5+i].trim()
+										    	arr_xuanxiang.push(obj_xuanxiang)
+										    	delete obj_xuanxiang
+							    			}else{
+							    				obj_xuanxiang.is_correct = false
+							    				obj_xuanxiang.id = 5+i
+										    	obj_xuanxiang.content = item[5+i].trim()
+										    	arr_xuanxiang.push(obj_xuanxiang)
+										    	delete obj_xuanxiang
+							    			}
+						    			}
+						    			console.log('check arr_xuanxiang-->',arr_xuanxiang)
+						    			console.log('check arr_xuanxiang-->',arr_xuanxiang)
+							    		let	new_cat = new cat({
+							    			id : catid,
+							    			catname : item[0].trim(),
+							    			leixing : item[1].trim(),
+							    			timu : item[2].trim(),
+							    			fenzhi : item[3].trim(),
+							    			zqda : item[4].trim(),
+							    			xuanxiang : arr_xuanxiang
+							    		})
+							    		new_cat.save(function(err){
+							    			if(err){
+							    				console.log('save err ------判断')
+							    				cb(err)
+							    			}
+							    			console.log('save success ------判断')
+							    			cb()
+							    		})
+						    		}
+						    	}//单选或选择
+						    	//cb()
+					    	}//排除第一行
+					    },function(err){
+					    	if(err){
+					    		console.log('async err')
+					    		return res.json({'code':-1,'msg':err.stack})
+					    	}else{
+					    		//删除上传的文件
+								console.log('----- 删除上传文件 -----')
+								fs.unlinkSync(files.file[0].path)
+								return res.json({'code':0,'msg':'导入成功'})
+					    	}
+					    })//async
+			    	})
+			    
 		    }).catch(error=>{
 			    console.log("************** 读表 error!");
 			    console.log(error); 
@@ -395,6 +413,8 @@ router.get('/cxtk_data',function(req,res){
 			docs.forEach(function(item,index){
 				let tempdata = {}
 				console.log('item-->',item)
+				tempdata._id = item._id
+				tempdata.catid = item.id
 				tempdata.inused = item.inused
 				tempdata.catname = item.catname
 				tempdata.leixing = item.leixing
@@ -426,74 +446,49 @@ router.get('/cxtk_data',function(req,res){
 	})
 
 })
-router.get('/cxtk_data_bk',function(req,res){	
-	let page = req.query.page,
-		limit = req.query.limit
-	page ? page : 1;//当前页
-	limit ? limit : 15;//每页数据
-	async.waterfall([
-		function(cb){
-			let search = cat.find({}).count()
-				search.exec(function(err,total){
-					if(err){
-						console.log('search err-->',err.stack)
-						cb(err)
-					}
-					console.log('记录总数-->',total)
-					cb(null,total)
-				})
-		},
-		function(total,cb){
-			let numSkip = (page-1)*limit
-			limit = parseInt(limit)
-			console.log('check -- >',limit,page,numSkip)
-			let search = cat.find({})
-				search.limit(limit)
-				search.skip(numSkip)
-				search.exec(function(err,docs){
-					if(err){
-						console.log('search err-->',err.stack)
-						cb(err)
-					}
-					console.log('check docs-->',docs)
-					cb(null,docs,total)
-				})
-		},
-		function(docs,total,cb){
-			//重新封装数据
-			let data = []//最终数据
-			docs.forEach(function(item,index){
-				let tempdata = {}
-				console.log('item-->',item)
-				tempdata.inused = item.inused
-				tempdata.catname = item.catname
-				tempdata.leixing = item.leixing
-				tempdata.timu = item.timu
-				tempdata.fenzhi = item.fenzhi
-				tempdata.zqda = item.zqda
-				item.xuanxiang.forEach(function(it,ind){
-					console.log(it)
-					tempdata['xuanxiang' + ind] = it.content +'(' + it.is_correct + ')'
-					//tempdata['is_correct' + ind] = it.is_correct
-					console.log(tempdata)
-				})
-				data.push(tempdata)
-				delete tempdata
-			})
-			data.count = total
-			console.log('返回数据-->',data)
-			cb(null,data)
+router.post('/delete_item',function(req,res){
+	let _id = req.body._id
+	console.log('_id-->',_id)
+	cat.remove({'_id':_id},function(err){
+		if(err){
+			console.log('delete err',err.stack)
+			return res.json({'code':-1,'msg':err.stack})
 		}
-	],function(error,result){
-		if(error){
-			console.log('search err-->',err.stack)
-			return res.json({'code':-1,'msg':err.stack,'count':0,'data':''})
-		}
-		let count = result.count
-		console.log('数据条数-->',count)
-		delete result.count
-		return res.json({'code':0,'msg':'获取数据成功','count':count,'data':result})
+		console.log('delete success',_id)
+		return res.json({'code':0,'msg':'delete success'})
 	})
+})
 
+router.get('/iframe_mb',function(req,res){
+	let _id = req.query._id
+	console.log('_id-->',_id)
+	let search = cat.findOne({})
+		search.where('_id').equals(_id)
+		search.exec(function(err,doc){
+			if(err){
+				console.log('err-->',err)
+				return res.josn({'code':-1,'msg':err.stack})
+			}
+			console.log('doc-->',doc)
+			//重新封装数据
+			// let tempdata = {}
+
+			// 	tempdata._id = doc._id
+			// 	tempdata.catid = doc.id
+			// 	tempdata.inused = doc.inused
+			// 	tempdata.catname = doc.catname
+			// 	tempdata.leixing = doc.leixing
+			// 	tempdata.timu = doc.timu
+			// 	tempdata.fenzhi = doc.fenzhi
+			// 	tempdata.zqda = doc.zqda
+			// 	doc.xuanxiang.forEach(function(it,ind){
+			// 		console.log(it)
+			// 		tempdata['xuanxiang' + ind] = it.content
+			// 		tempdata['is_correct' + ind] = it.is_correct ? '是' : '否'
+			// 		console.log(tempdata)
+			// 	})
+			// console.log('返回数据-->',tempdata)
+			return res.render('manage/iframe_mb',{'detail':doc})
+		})
 })
 module.exports = router;
