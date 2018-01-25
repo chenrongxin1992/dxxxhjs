@@ -132,15 +132,22 @@ $(function(){
         console.log('能取到_id吗-->',data._id)
         //layer.msg('ID：'+ data.catid + ' 的查看操作');
        let if_index = layer.open({
+          skin: 'layui-layer-molv',
           type: 2,
           title: '查看',
-          shadeClose: true,
-          shade: false,
+          shadeClose: false,
+          shade: [0.8, '#393D49'],
+          offset: '10px',
           maxmin: true, //开启最大化最小化按钮
-          area: ['900px', '600px'],
-          content: '/manage/iframe_mb?_id=' + data._id
+          area: '850px',
+          maxHeight:'900px',
+          content: '/manage/iframe_mb?_id=' + data._id,
+          success: function(layero, index) {
+            console.log('layero-->',layero)
+            console.log('index-->',index)
+            layer.iframeAuto(index);
+          }
         }); 
-        layer.iframeAuto(if_index);
       } 
       else if(obj.event === 'del'){
         console.log('监听删除-->',data.catid)

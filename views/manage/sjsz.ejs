@@ -144,6 +144,7 @@ $(function(){
           console.log('err-->',err.stack)
         }
       });//ajax
+      return false;
     })//form
 
     //执行实例
@@ -158,7 +159,7 @@ $(function(){
          {field: 'id', title: 'id', align: 'center'} //rowspan即纵向跨越的单元格数
         ,{field: 'ksname', title: '试卷主题', align: 'center'} //rowspan即纵向跨越的单元格数
         ,{field: 'ksriqi', title: '考试日期', align: 'center'}
-        ,{field: 'ksshijian', title: '考试时间', align: 'center'}
+        ,{field: 'ksshijian', title: '考试时间(分钟)', align: 'center'}
         ,{field: 'danxuan_num', title: '单选题', align: 'center'}
         ,{field: 'duoxuan_num', title: '多选题', align: 'center'}
         ,{field: 'panduan_num', title: '判断题', align: 'center'}

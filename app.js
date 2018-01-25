@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');//express.bodyParser实际上包括了�
 
 
 var index = require('./routes/manage/index');//后台管理路由
+var front = require('./routes/front/front')//前端路由
 var users = require('./routes/users');
 
 var app = express();
@@ -26,7 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/manage', index);//后台路由
-//app.use('/users', users);
+app.use('/front', front);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

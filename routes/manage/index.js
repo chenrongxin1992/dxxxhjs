@@ -501,11 +501,12 @@ function random_str() {
     return str
 }
 
-const baselink = 'localhost:3000/ks/'
+const baselink = 'localhost:3000/front/ks?code='
 router.get('/sjsz',function(req,res){
 	console.log('sjsz')
 	res.render('manage/sjsz')
 }).post('/sjsz',function(req,res){
+	console.log('post sjsz')
 	let ksname = req.body.ksname,
 		ksriqi = req.body.ksriqi,
 		ksshijian = req.body.ksshijian,
@@ -519,7 +520,7 @@ router.get('/sjsz',function(req,res){
 		sjsz_id = 1
 	console.log('randomStr-->',randomStr)
 	let search = sjsz.find({},{'id':1})
-		search.sort({'id':1})
+		search.sort({'id':-1})
 		search.limit(1)
 		search.exec(function(err,doc){
 			if(err){
@@ -529,6 +530,7 @@ router.get('/sjsz',function(req,res){
 			if(doc && doc.length != 0){
 				sjsz_id = doc[0].id + 1
 			}
+
 			let sjsz_new = new sjsz({
 				id:sjsz_id,
 				ksname:ksname,
@@ -605,4 +607,5 @@ router.post('/delete_sjlbitem',function(req,res){
 		return res.json({'code':0,'msg':'delete success'})
 	})
 })
+
 module.exports = router;
