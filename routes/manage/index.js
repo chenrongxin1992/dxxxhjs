@@ -8,6 +8,8 @@ const async = require('async')
 const cat = require('../../db/cat').catinfo
 const uploadDir = path.resolve(__dirname, '../../uploads');
 const urlencode = require('urlencode')
+const moment = require('moment')
+const sjsz = require('../../db/cat').sjsz
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -446,7 +448,6 @@ router.get('/cxtk_data',function(req,res){
 		delete result.count
 		return res.json({'code':0,'msg':'获取数据成功','count':count,'data':result})
 	})
-
 })
 router.post('/delete_item',function(req,res){
 	let _id = req.body._id
@@ -475,9 +476,133 @@ router.get('/iframe_mb',function(req,res){
 			return res.render('manage/iframe_mb',{'detail':doc})
 		})
 })
+router.get('/iframe_mbbj',function(req,res){
+	let _id = req.query._id
+	console.log('_id-->',_id)
+	let search = sjsz.findOne({})
+		search.where('_id').equals(_id)
+		search.exec(function(err,doc){
+			if(err){
+				console.log('err-->',err)
+				return res.josn({'code':-1,'msg':err.stack})
+			}
+			console.log('doc-->',doc)
+			return res.render('manage/iframe_mbbj',{'detail':doc})
+		})
+})
 
+//随机生成字符串
+/*
+*js生成随即字符串原来如此简单
+*toString() radix argument must be between 2 and 36
+*/
+function random_str() {
+	let str =  Math.random().toString(36).substring(5, 9)//4位长度
+    return str
+}
+
+const baselink = 'localhost:3000/ks/'
 router.get('/sjsz',function(req,res){
 	console.log('sjsz')
 	res.render('manage/sjsz')
+}).post('/sjsz',function(req,res){
+	let ksname = req.body.ksname,
+		ksriqi = req.body.ksriqi,
+		ksshijian = req.body.ksshijian,
+		danxuan_num = req.body.danxuan_num,
+		duoxuan_num = req.body.duoxuan_num,
+		panduan_num = req.body.panduan_num
+	let temp_timeStamp = moment().format('X'),
+		temp_num = temp_timeStamp.substring(6),
+		temp_randomStr = random_str(),
+		randomStr = temp_num + temp_randomStr,
+		sjsz_id = 1
+	console.log('randomStr-->',randomStr)
+	let search = sjsz.find({},{'id':1})
+		search.sort({'id':1})
+		search.limit(1)
+		search.exec(function(err,doc){
+			if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err,stack})
+			}
+			if(doc && doc.length != 0){
+				sjsz_id = doc[0].id + 1
+			}
+			let sjsz_new = new sjsz({
+				id:sjsz_id,
+				ksname:ksname,
+				ksriqi:ksriqi,
+				ksshijian:ksshijian,
+				danxuan_num:danxuan_num,
+				duoxuan_num:duoxuan_num,
+				panduan_num:panduan_num,
+				randomStr:randomStr,
+				kslianjie:baselink+randomStr
+			})
+			sjsz_new.save(function(err){
+				if(err){
+					console.log('save err-->',err.stack)
+					return res.json({'code':-1,'msg':err,stack})
+				}
+				return res.json({'code':0,'msg':'设置成功'})
+			})
+		})
+})
+
+router.get('/sjlb_data',function(req,res){
+	let page = req.query.page,
+		limit = req.query.limit
+	page ? page : 1;//当前页
+	limit ? limit : 15;//每页数据
+	console.log(page,limit)
+	async.waterfall([
+		function(cb){
+			let search = sjsz.find({}).count()
+				search.exec(function(err,total){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('记录总数-->',total)
+					cb(null,total)
+				})
+		},
+		function(total,cb){
+			let numSkip = (page-1)*limit
+			limit = parseInt(limit)
+			console.log('check -- >',limit,page,numSkip)
+			let search = sjsz.find({})
+				search.sort({'id':1})
+				search.limit(limit)
+				search.skip(numSkip)
+				search.exec(function(err,docs){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('check docs-->',docs)
+					cb(null,docs)
+				})
+		}
+	],function(error,result){
+		if(error){
+			console.log('search err-->',err.stack)
+			return res.json({'code':-1,'msg':err.stack,'count':0,'data':''})
+		}
+		return res.json({'code':0,'msg':'获取数据成功','count':result.length,'data':result})
+	})
+})
+router.post('/delete_sjlbitem',function(req,res){
+	let _id = req.body._id
+	console.log('_id-->',_id)
+	sjsz.remove({'_id':_id},function(err){
+		if(err){
+			console.log('delete err-->',err)
+			return res.json({'code':-1,'msg':err.stack})
+		}
+		console.log('delete success')
+		return res.json({'code':0,'msg':'delete success'})
+	})
 })
 module.exports = router;

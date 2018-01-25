@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/stylesheets/layui.css" media="all">
+  </head>
+
+  <body>
+    <fieldset class="layui-elem-field">
+      <legend>试卷设置详情</legend>
+      <div class="layui-field-box">
+        <form class="layui-form" action="">
+          <div class="layui-form-item">
+            <label class="layui-form-label">试卷主题</label>
+            <div class="layui-input-block">
+              <input type="text" name="ksname" id="ksname" class="layui-input" value="<%=detail.ksname%>">
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">考试日期</label>
+              <div class="layui-input-inline">
+                <input type="text" name="ksriqi" id="ksriqi" class="layui-input" value="<%=detail.ksriqi%>">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">考试时间</label>
+              <div class="layui-input-inline">
+                <input type="text" name="ksshijian" id="ksshijian" class="layui-input" value="<%=detail.ksshijian%>">
+              </div>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">单选题数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="danxuan_num" id="danxuan_num" class="layui-input" value="<%=detail.danxuan_num%>">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">多选题数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="duoxuan_num" id="duoxuan_num" class="layui-input" value="<%=detail.duoxuan_num%>">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">判断题数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="panduan_num" id="panduan_num" class="layui-input" value="<%=detail.panduan_num%>">
+              </div>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <label class="layui-form-label">考试链接</label>
+            <div class="layui-input-block">
+              <input type="text" name="kslianjie" id="kslianjie" class="layui-input" value="<%=detail.kslianjie%>">
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-submit="" lay-filter="tijiao">提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+          
+        </form>
+      </div>
+    </fieldset>
+
+<script src="/javascripts/jquery-3.1.1.js"></script>
+<script src="/javascripts/layui.js"></script>
+<script>
+'use strict'
+$(function(){
+
+  layui.use(['layer','form'], function(){
+    let layer = layui.layer,
+        form = layui.form;
+
+    
+  });
+})
+
+</script>
+  </body>
+</html>

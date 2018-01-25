@@ -1,36 +1,37 @@
-<form class="layui-form" action="">
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label" style="width:98px;">模块</label>
-      <div class="layui-input-inline">
-        <select name="catname" id="catname" lay-filter="catname">
-          <option value="">请选择题目模块</option>
-          <% for(let i=0;i<catname.length;i++) { %>
-              <option value='<%=catname[i]%>'><%=catname[i]%></option>
-          <% } %>
-        </select>
+<div class="col-12">
+  <form class="layui-form" action="">
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label" style="width:98px;">模块</label>
+        <div class="layui-input-inline">
+          <select name="catname" id="catname" lay-filter="catname">
+            <option value="">请选择题目模块</option>
+            <% for(let i=0;i<catname.length;i++) { %>
+                <option value='<%=catname[i]%>'><%=catname[i]%></option>
+            <% } %>
+          </select>
+        </div>
+        <label class="layui-form-label" style="width:98px;">类型</label>
+        <div class="layui-input-inline">
+          <select name="leixing" id="leixing" lay-filter="leixing">
+            <option value="">请选择题目类型</option>
+              <option value="单选">单选</option>
+              <option value="判断">判断</option>
+              <option value="多选">多选</option>
+          </select>
+        </div>
+        <label class="layui-form-label" style="width:98px;">题目</label>
+        <div class="layui-input-inline">
+          <input class="layui-input" name="timu" id="timu" autocomplete="off" placeholder="请输入关键字">
+        </div>
+        <button class="layui-btn" lay-submit="" lay-filter="search">搜索</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
       </div>
-      <label class="layui-form-label" style="width:98px;">类型</label>
-      <div class="layui-input-inline">
-        <select name="leixing" id="leixing" lay-filter="leixing">
-          <option value="">请选择题目类型</option>
-            <option value="单选">单选</option>
-            <option value="判断">判断</option>
-            <option value="多选">多选</option>
-        </select>
-      </div>
-      <label class="layui-form-label" style="width:98px;">题目</label>
-      <div class="layui-input-inline">
-        <input class="layui-input" name="timu" id="timu" autocomplete="off" placeholder="请输入关键字">
-      </div>
-      <button class="layui-btn" lay-submit="" lay-filter="search">搜索</button>
-      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-    </div>
-  </div>  
-</form>
+    </div>  
+  </form>
 
-<table id="cxtk_tb" lay-filter="cxtk_table"></table>
-
+  <table id="cxtk_tb" lay-filter="cxtk_table"></table>
+</div>
 
 <script type="text/html" id="toolbar">
   <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" >查看</a>
