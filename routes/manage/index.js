@@ -162,21 +162,21 @@ router.post('/uploadtk',function(req,res){
 					    		console.log('check item-->',item.length)
 						    	if(item[1].trim() === '多选'){
 						    		console.log('-----该题是多选，去获取对应答案id-----')
-						    		let daid_arr = getdaan_duoxuan(item[4])
+						    		let daid_arr = getdaan_duoxuan(item[3])
 						    		let arr_xuanxiang = []
-						    		for(let i=0;i<item.length-5;i++){
+						    		for(let i=0;i<item.length-4;i++){
 						    			let obj_xuanxiang = {}
 						    			//console.log('i-->',i);
 						    			if(inarr(daid_arr,i)){
 							    			obj_xuanxiang.is_correct = true
-							    			obj_xuanxiang.id = 5+i
-										    obj_xuanxiang.content = item[5+i].trim()
+							    			obj_xuanxiang.id = 4+i
+										    obj_xuanxiang.content = item[4+i].trim()
 										    arr_xuanxiang.push(obj_xuanxiang)
 										    delete obj_xuanxiang
 							    		}else{
 							    			obj_xuanxiang.is_correct = false
-							    			obj_xuanxiang.id = 5+i
-										    obj_xuanxiang.content = item[5+i].trim()
+							    			obj_xuanxiang.id = 4+i
+										    obj_xuanxiang.content = item[4+i].trim()
 										    arr_xuanxiang.push(obj_xuanxiang)
 										    delete obj_xuanxiang
 							    		}
@@ -187,13 +187,12 @@ router.post('/uploadtk',function(req,res){
 						    			catname : item[0].trim(),
 						    			leixing : item[1].trim(),
 						    			timu : item[2].trim(),
-						    			fenzhi : item[3].trim(),
-						    			zqda : item[4].trim(),
+						    			zqda : item[3].trim(),
 						    			xuanxiang : arr_xuanxiang
 						    		})
 						    		new_cat.save(function(err){
 						    			if(err){
-						    				console.log('save err ------单选')
+						    				console.log('save err ------多选')
 						    				cb(err)
 						    			}
 						    			console.log('save success ------多选')
@@ -201,23 +200,23 @@ router.post('/uploadtk',function(req,res){
 						    		})
 						    	}else{
 						    		console.log('-----该题是单选或者判断，去获取对应答案id-----')
-						    		let daid = getdaan_danxuan(item[4])
+						    		let daid = getdaan_danxuan(item[3])
 						    		//构造选项对象数组
 						    		if(item[1].trim() === '单选'){
 						    			console.log('----- 单选&&答案是-->',daid)
 						    			let arr_xuanxiang = []
-							    		for(let i=0;i<item.length-5;i++){
+							    		for(let i=0;i<item.length-4;i++){
 							    			let obj_xuanxiang = {}
 							    			if(daid == i){
 							    				obj_xuanxiang.is_correct = true
-							    				obj_xuanxiang.id = 5+i
-										    	obj_xuanxiang.content = item[5+i].trim()
+							    				obj_xuanxiang.id = 4+i
+										    	obj_xuanxiang.content = item[4+i].trim()
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}else{
 							    				obj_xuanxiang.is_correct = false
-							    				obj_xuanxiang.id = 5+i
-										    	obj_xuanxiang.content = item[5+i].trim()
+							    				obj_xuanxiang.id = 4+i
+										    	obj_xuanxiang.content = item[4+i].trim()
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}
@@ -229,8 +228,7 @@ router.post('/uploadtk',function(req,res){
 							    			catname : item[0].trim(),
 							    			leixing : item[1].trim(),
 							    			timu : item[2].trim(),
-							    			fenzhi : item[3].trim(),
-							    			zqda : item[4].trim(),
+							    			zqda : item[3].trim(),
 							    			xuanxiang : arr_xuanxiang
 							    		})
 							    		new_cat.save(function(err){
@@ -249,14 +247,14 @@ router.post('/uploadtk',function(req,res){
 						    				let obj_xuanxiang = {}
 						    				if(daid == i){
 							    				obj_xuanxiang.is_correct = true
-							    				obj_xuanxiang.id = 5+i
-										    	obj_xuanxiang.content = item[5+i].trim()
+							    				obj_xuanxiang.id = 4+i
+										    	obj_xuanxiang.content = item[4+i].trim()
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}else{
 							    				obj_xuanxiang.is_correct = false
-							    				obj_xuanxiang.id = 5+i
-										    	obj_xuanxiang.content = item[5+i].trim()
+							    				obj_xuanxiang.id = 4+i
+										    	obj_xuanxiang.content = item[4+i].trim()
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}
@@ -268,8 +266,7 @@ router.post('/uploadtk',function(req,res){
 							    			catname : item[0].trim(),
 							    			leixing : item[1].trim(),
 							    			timu : item[2].trim(),
-							    			fenzhi : item[3].trim(),
-							    			zqda : item[4].trim(),
+							    			zqda : item[3].trim(),
 							    			xuanxiang : arr_xuanxiang
 							    		})
 							    		new_cat.save(function(err){
@@ -423,7 +420,6 @@ router.get('/cxtk_data',function(req,res){
 				tempdata.catname = item.catname
 				tempdata.leixing = item.leixing
 				tempdata.timu = item.timu
-				tempdata.fenzhi = item.fenzhi
 				tempdata.zqda = item.zqda
 				item.xuanxiang.forEach(function(it,ind){
 					console.log(it)
@@ -512,7 +508,10 @@ router.get('/sjsz',function(req,res){
 		ksshijian = req.body.ksshijian,
 		danxuan_num = req.body.danxuan_num,
 		duoxuan_num = req.body.duoxuan_num,
-		panduan_num = req.body.panduan_num
+		panduan_num = req.body.panduan_num,
+		danxuan_fenzhi = req.body.danxuan_fenzhi,
+		duoxuan_fenzhi = req.body.duoxuan_fenzhi,
+		panduan_fenzhi = req.body.panduan_fenzhi
 	let temp_timeStamp = moment().format('X'),
 		temp_num = temp_timeStamp.substring(6),
 		temp_randomStr = random_str(),
@@ -540,7 +539,10 @@ router.get('/sjsz',function(req,res){
 				duoxuan_num:duoxuan_num,
 				panduan_num:panduan_num,
 				randomStr:randomStr,
-				kslianjie:baselink+randomStr
+				kslianjie:baselink+randomStr,
+				danxuan_fenzhi:danxuan_fenzhi,
+				duoxuan_fenzhi:duoxuan_num,
+				panduan_fenzhi:panduan_fenzhi
 			})
 			sjsz_new.save(function(err){
 				if(err){

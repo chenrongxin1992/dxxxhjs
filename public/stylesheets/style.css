@@ -22,5 +22,5 @@ legend{
 }
 /* label宽度改大一点80to100 */
 .label_big{
-	width:100px;
+	width:130px!important;
 }
