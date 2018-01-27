@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/stylesheets/layui.css" media="all">
+  </head>
+
+  <body>
+  <div class="col-md-3 col-sm-12 col-xs-12">
+    <fieldset class="layui-elem-field">
+      <legend>试卷设置</legend>
+      <div class="layui-field-box">
+        <form class="layui-form layui-form-pane" action="" id="second_step">
+          <div class="layui-form-item">
+            <label class="layui-form-label">考试主题</label>
+            <div class="layui-input-block">
+              <input type="text" name="ksname" id="ksname" lay-verify="ksname" placeholder="如党章测试" class="layui-input">
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">考试日期</label>
+              <div class="layui-input-inline">
+                <input type="text" name="ksriqi" id="ksriqi" class="layui-input" placeholder="yyyy-MM-dd" lay-verify="ksriqi">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">考试时间</label>
+              <div class="layui-input-inline">
+                <input type="text" name="ksshijian" id="ksshijian" class="layui-input" placeholder="单位为分钟" lay-verify="ksshijian">
+              </div>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">单选题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="danxuan_fenzhi" id="danxuan_fenzhi" class="layui-input" placeholder="填写每道单选题分值" lay-verify="danxuan_fenzhi">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">单选题道数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="danxuan_num" id="danxuan_num" class="layui-input" placeholder="填写单选题道数" lay-verify="danxuan_num">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">多选题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="duoxuan_fenzhi" id="duoxuan_fenzhi" class="layui-input" placeholder="填写每道多选题分值" lay-verify="duoxuan_fenzhi">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">多选题道数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="duoxuan_num" id="duoxuan_num" class="layui-input" placeholder="填写多选题道数" lay-verify="pandaun_num">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">判断题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="panduan_fenzhi" id="panduan_fenzhi" class="layui-input" placeholder="填写每道判断题分值" lay-verify="panduan_fenzhi">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">判断题道数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="panduan_num" id="panduan_num" class="layui-input" placeholder="填写判断题道数" lay-verify="panduan_num">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">试卷总分</label>
+              <div class="layui-input-inline">
+                <input type="text" name="sjfz" id="sjfz" class="layui-input" disabled style="color:red;" value='0'>
+              </div>
+            </div>
+          </div>
+          
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-filter="shangyibu">上一步</button>
+              <button class="layui-btn" lay-submit="" lay-filter="tijiao">提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </fieldset>
+  </div>
+<script src="/javascripts/jquery-3.1.1.js"></script>
+<script src="/javascripts/layui.js"></script>
+<script>
+'use strict'
+$(function(){
+  function setCookie (name, value)
+  { 
+    //设置名称为name,值为value的Cookie
+    var expdate = new Date();   //初始化时间
+    expdate.setTime(expdate.getTime() + 5 * 60 * 1000);   //时间 5分钟
+    document.cookie = name+"="+value+";expires="+expdate.toGMTString()+";path=http://localhost:3000/manage/new_firststep";
+    //即document.cookie= name+"="+value+";path=/";   时间可以不要，但路径(path)//必须要填写，因为JS的默认路径是当前页，如果不填，此cookie只在当前页面生效！~
+  }
+  function getCookie(c_name)
+  {
+    if (document.cookie.length>0)
+    {
+      c_start=document.cookie.indexOf(c_name + "=")
+      console.log('check c_start-->',c_start)
+      if (c_start!=-1)
+      {
+        c_start=c_start + c_name.length+1 
+        c_end=document.cookie.indexOf(";",c_start)
+        if (c_end==-1) c_end=document.cookie.length
+        console.log('check arg-->',unescape(document.cookie.substring(c_start,c_end)))
+        return unescape(document.cookie.substring(c_start,c_end))
+      }
+    }
+    return ""
+  }
+
+  layui.use(['form', 'laydate','layer','table'], function(){
+    let laydate = layui.laydate,
+        layer = layui.layer,
+        form = layui.form,
+        table = layui.table
+
+    let date = new Date(),
+        year = date.getFullYear(),
+        month = date.getMonth(),
+        day = date.getDay()
+        date = year + '-' + month + '-' + day
+
+        //日期
+        laydate.render({
+          elem: '#ksriqi'
+          ,min: date
+          ,max: '2020-01-01'
+        });
+
+        //自定义验证规则  
+        form.verify({  
+              ksshijian: function(value){  
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '考试时间必须是大于0的整数';  
+                }  
+              } ,
+              danxuan_num: function(value){  
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '题目数量必须是大于0的整数';  
+                }  
+              } ,
+              duoxuan_num: function(value){  
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '题目数量必须是大于0的整数';  
+                }  
+              } ,
+              panduan_num: function(value){  
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '题目数量必须是大于0的整数';  
+                }  
+              } ,
+              danxuan_fenzhi: function(value){
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '分值必须是大于0的整数';  
+                } 
+              },
+              duoxuan_fenzhi: function(value){
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '分值必须是大于0的整数';  
+                } 
+              },
+              panduan_fenzhi: function(value){
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '分值必须是大于0的整数';  
+                } 
+              }
+        });  
+
+        $('input').on('input propertychange',function(data){
+          let temp1 = $('#danxuan_fenzhi').val() ? $('#danxuan_fenzhi').val() : 0,
+              temp2 = $('#danxuan_num').val() ? $('#danxuan_num').val() : 0,
+              temp3 = temp1 * temp2,
+              temp4 = $('#duoxuan_fenzhi').val() ? $('#duoxuan_fenzhi').val() : 0,
+              temp5 = $('#duoxuan_num').val() ? $('#duoxuan_num').val() : 0,
+              temp6 = temp4 * temp5,
+              temp7 = $('#panduan_fenzhi').val() ? $('#panduan_fenzhi').val() : 0,
+              temp8 = $('#panduan_num').val() ? $('#panduan_num').val() : 0,
+              temp9 = temp7 * temp8
+          let sjfz = temp3 + temp6 + temp9
+          console.log('试卷分值-->',sjfz)
+          $('#sjfz').attr("value",sjfz)
+        })
+
+
+        //监听下一步
+        form.on('submit(xiayibu)', function(data){
+          let temp1 = $('#danxuan_fenzhi').val() * $('#danxuan_num').val(),
+              temp2 = $('#duoxuan_num').val() * $('#duoxuan_fenzhi').val(),
+              temp3 = $('#panduan_num').val() * $('#panduan_fenzhi').val()
+          if((temp1+temp2+temp3)!==100){
+            layer.open({
+                  title: '提示',
+                  content: '试题总分不是100分，请检查'
+                }); 
+            return false;
+          }
+          let if_index = layer.open({
+            skin: 'layui-layer-molv',
+            type: 2,
+            title: '请填写试题内容',
+            shadeClose: false,
+            shade: [0.8, '#393D49'],
+            offset: '80px',
+            maxmin: true, //开启最大化最小化按钮
+            area: '850px',
+            maxHeight:'900px',
+            content: '/manage/new_secondstep',
+            success: function(layero, index) {
+              console.log('layero-->',layero)
+              console.log('index-->',index)
+              console.log(layer.iframeAuto)
+              layer.iframeAuto(index);
+            }
+          }); 
+          return false;
+        })//form
+  })
+})
+</script>
+  </body>
+</html>

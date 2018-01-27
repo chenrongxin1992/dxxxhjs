@@ -609,5 +609,20 @@ router.post('/delete_sjlbitem',function(req,res){
 		return res.json({'code':0,'msg':'delete success'})
 	})
 })
-
+//新增试卷
+router.get('/new_firststep',function(req,res){
+	//返回题库模块，题目类型
+	let search = cat.distinct('catname',function(err,docs){
+		if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err.message})
+			}
+			console.log('docs-->',docs)
+			return res.render('manage/new_firststep',{'catname':docs})
+	})
+	//return res.render('manage/new_firststep')
+})
+router.get('/new_secondstep',function(req,res){
+	return res.render('manage/new_secondstep')
+})
 module.exports = router;
