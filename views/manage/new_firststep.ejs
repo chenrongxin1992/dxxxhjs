@@ -74,7 +74,7 @@
             <div class="layui-inline">
               <label class="layui-form-label label_big">试卷总分</label>
               <div class="layui-input-inline">
-                <input type="text" name="sjfz" id="sjfz" class="layui-input" disabled style="color:red;" value='0'>
+                <input type="text" name="sjfz" id="sjfz" class="layui-input" lay-verify="sjfz" value='0' style="color: red;" disabled="">
               </div>
             </div>
           </div>
@@ -95,16 +95,22 @@
             <div class="layui-form-item">
               <label class="layui-form-label"><%=item%></label>
               <div class="layui-input-block">
-                <input type="text" name="<%=item%>" id="<%=item%>" placeholder="请输入模块所占题目的百分比(整数)" class="layui-input" lay-verify="<%=item%>" value=''>
+                <input type="text" name="<%=index%>" id="<%=index%>" placeholder="请输入模块所占题目的百分比(整数)" class="layui-input" lay-verify="<%=index%>" value=''>
               </div>
             </div>
           <%})%>
+            <div class="layui-form-item">
+              <label class="layui-form-label">百分比之和</label>
+              <div class="layui-input-block">
+                <input type="text" name="all_percent" id="all_percent" placeholder="" class="layui-input" value='0' style="color: red;" disabled>
+              </div>
+            </div>
 
           <div class="layui-form-item">
             <div class="layui-input-block">
               <button class="layui-btn" lay-submit="" lay-filter="shangyibu">上一步</button>
               <button class="layui-btn" lay-submit="" lay-filter="tijiao">提交</button>
-              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              <button type="reset" class="layui-btn layui-btn-primary" id="clear_per">重置</button>
             </div>
           </div>
         </form>
@@ -145,14 +151,13 @@ $(function(){
           $('#duoxuan_num').val(duoxuan_num)
           $('#panduan_fenzhi').val(panduan_fenzhi)
           $('#panduan_num').val(panduan_num)
-          $('#sjfz').val(sjfz)
-
+          //$('#sjfz').val(sjfz)
 
   function setCookie (name, value)
   { 
     //设置名称为name,值为value的Cookie
     var expdate = new Date();   //初始化时间
-    expdate.setTime(expdate.getTime() + 5 * 60 * 1000);   //时间 5分钟
+    expdate.setTime(expdate.getTime() + 2 * 60 * 1000);   //时间 5分钟
     document.cookie = name+"="+value+";expires="+expdate.toGMTString()+";path=http://localhost:3000/manage/new_firststep";
     //即document.cookie= name+"="+value+";path=/";  // 时间可以不要，但路径(path)//必须要填写，因为JS的默认路径是当前页，如果不填，此cookie只在当前页面生效！~
   }
@@ -198,6 +203,13 @@ $(function(){
 
         //自定义验证规则  
         form.verify({  
+          <%catname.forEach(function(item,index){%>
+            <%=index%>:function(value){
+              if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                    return '必须是大于0的整数';  
+                  }
+            },
+            <%})%>
               ksshijian: function(value){  
                 if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
                   return '考试时间必须是大于0的整数';  
@@ -234,7 +246,8 @@ $(function(){
                 } 
               }
         });  
-
+        var all_percent = 0,
+            temp_choose = ''
         $('input').on('input propertychange',function(data){
           let temp1 = $('#danxuan_fenzhi').val() ? $('#danxuan_fenzhi').val() : 0,
               temp2 = $('#danxuan_num').val() ? $('#danxuan_num').val() : 0,
@@ -247,10 +260,114 @@ $(function(){
               temp9 = temp7 * temp8
           let sjfz = temp3 + temp6 + temp9
           console.log('试卷分值-->',sjfz)
+          console.log('sjsz-->',$('#sjfz').attr("value"))
           $('#sjfz').attr("value",sjfz)
+          let all_percent_1 = 0
+          <%for(let i=0;i<catname.length;i++){%>
+            
+            temp_choose = '#' + <%=i%>
+            console.log('temp_choose-->',temp_choose)
+            if($(temp_choose).val()){
+              if(typeof(parseInt($(temp_choose).val()))==='number'){
+                console.log(typeof(parseInt($(temp_choose).val())))
+                console.log($(temp_choose).val())
+                all_percent_1 += parseInt($(temp_choose).val())
+                console.log('all_percent_1-->',all_percent_1)
+                console.log(<%=i%>)
+              }else{
+                console.log('没有值')
+                console.log(typeof(parseInt($(temp_choose).val())))
+              }
+            }
+            console.log('dddd-->',all_percent_1)
+            console.log('ffff-->',parseInt($(temp_choose).val()))
+          <%}%>
+          $('#all_percent').attr("value",all_percent_1)
         })
 
+        //监听提交
+        form.on('submit(tijiao)', function(data){
+          
+          //获取所有的值
+          let ksname = $('#ksname').val(),
+              ksriqi = $('#ksriqi').val(),
+              ksshijian = $('#ksshijian').val(),
+              danxuan_fenzhi = $('#danxuan_fenzhi').val(),
+              danxuan_num = $('#danxuan_num').val(),
+              duoxuan_fenzhi = $('#duoxuan_fenzhi').val(),
+              duoxuan_num = $('#duoxuan_num').val(),
+              panduan_fenzhi = $('#panduan_fenzhi').val(),
+              panduan_num = $('#panduan_num').val(),
+              obj = {},
+              tem_arr = [],
+              tem_choose = ''
+          
+          <%catname.forEach(function(item,index){%>
+              console.log('item,index-->')
+              obj.id = <%=index%>
+              obj.name = '<%=item%>'
+              tem_choose = '#' + <%=index%>
+              console.log('tem_choose$-->',tem_choose)
+              obj.percent = $(tem_choose).val()
+              all_percent += parseInt($(tem_choose).val())
+              console.log('all_percent-->',all_percent)
+              tem_arr.push(obj)
+              obj = {}
+          <%})%>
+          console.log(typeof(all_percent))
+          if(all_percent!==100){
+            layer.open({
+                  title: '提示',
+                  content: '模块百分比之和需为100%',
+                  end:function(){
+                    all_percent = 0
+                    $('#all_percent').attr('value',0)
+                    $('#clear_per').click()
+                  }
+                }); 
+            
+            return false
+          }
+          
+          console.log('all args-->',ksname,ksriqi,ksshijian,danxuan_num,danxuan_fenzhi,duoxuan_num,duoxuan_fenzhi,panduan_num,panduan_fenzhi,tem_arr)
+          console.log('tem_arr-->',tem_arr)
+          $.ajax({
+            url:'/manage/new_firststep',
+            method:'post',
+            data:{
+              ksname : ksname,
+              ksriqi : ksriqi,
+              ksshijian : ksshijian,
+              danxuan_fenzhi : danxuan_fenzhi,
+              danxuan_num : danxuan_num,
+              duoxuan_fenzhi : duoxuan_fenzhi,
+              duoxuan_num : duoxuan_num,
+              panduan_fenzhi : panduan_fenzhi,
+              panduan_num : panduan_num,
+              modal_arr : JSON.stringify(tem_arr)
+            },
+            success:function(res){
+              if(res.code === 0){
+                console.log(res.msg)
+                layer.open({
+                  title: '提示',
+                  content: '试卷设置成功',
+                  end:function(){
+                    parent.parent.layer.closeAll()
+                    //layer.closeAll('iframe')
+                  }
+                }); 
 
+              }else{
+                console.log('试卷设置成功')
+              }
+            },
+            error:function(err){
+              console.log('delete err',err)
+            }
+          }) 
+          return false
+        })
         //监听下一步
         form.on('submit(xiayibu)', function(data){
           let temp1 = $('#danxuan_fenzhi').val() * $('#danxuan_num').val(),

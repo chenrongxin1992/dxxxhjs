@@ -63,6 +63,12 @@ $(function(){
             console.log('index-->',index)
             console.log(layer.iframeAuto)
             layer.iframeAuto(index);
+          },
+          end:function(){
+            table.reload('reload_tb', {
+              where: {
+              }
+            });
           }
         }); 
     })

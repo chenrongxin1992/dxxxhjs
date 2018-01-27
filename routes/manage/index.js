@@ -621,8 +621,76 @@ router.get('/new_firststep',function(req,res){
 			return res.render('manage/new_firststep',{'catname':docs})
 	})
 	//return res.render('manage/new_firststep')
+}).post('/new_firststep',function(req,res){
+	let ksname = req.body.ksname,
+        ksriqi = req.body.ksriqi,
+        ksshijian = req.body.ksshijian,
+        danxuan_fenzhi = req.body.danxuan_fenzhi,
+        danxuan_num = req.body.danxuan_num,
+        duoxuan_fenzhi = req.body.duoxuan_fenzhi,
+        duoxuan_num = req.body.duoxuan_num,
+        panduan_fenzhi = req.body.panduan_fenzhi,
+        panduan_num = req.body.panduan_num,
+        per_of_modal = req.body.modal_arr
+    console.log('per_of_modal-->',JSON.parse(per_of_modal))
+    //console.log('req.body-->',req.body)
+    //console.log('req.body-->',JSON.parse(req.body))
+    //return false
+    let temp_timeStamp = moment().format('X'),
+		temp_num = temp_timeStamp.substring(6),
+		temp_randomStr = random_str(),
+		randomStr = temp_num + temp_randomStr
+
+    let tem_arr = [],
+    	fuck = JSON.parse(per_of_modal)
+
+    fuck.forEach(function(item,index){
+    	let temp_per_of_modal = {}
+    	console.log('item-->',item)
+    	temp_per_of_modal.id = item.id
+    	temp_per_of_modal.name = item.name,
+    	temp_per_of_modal.percent = item.percent
+    	tem_arr.push(temp_per_of_modal)
+    	delete temp_per_of_modal
+    	console.log('tem_arr-->',tem_arr)
+    })
+
+    let sjsz_id = 1
+    let search = sjsz.find({},{'id':1})
+		search.sort({'id':-1})
+		search.limit(1)
+		search.exec(function(err,doc){
+			if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err,stack})
+			}
+			if(doc && doc.length != 0){
+				sjsz_id = doc[0].id + 1
+			}
+
+			let new_sjsz = new sjsz({
+				id : sjsz_id,
+		    	ksname : req.body.ksname,
+		        ksriqi : req.body.ksriqi,
+		        ksshijian : req.body.ksshijian,
+		        danxuan_fenzhi : req.body.danxuan_fenzhi,
+		        danxuan_num : req.body.danxuan_num,
+		        duoxuan_fenzhi : req.body.duoxuan_fenzhi,
+		        duoxuan_num : req.body.duoxuan_num,
+		        panduan_fenzhi : req.body.panduan_fenzhi,
+		        panduan_num : req.body.panduan_num,
+		        per_of_modal : tem_arr,
+		        kslianjie:baselink+randomStr
+		    })
+		    console.log('new_sjsz-->',new_sjsz)
+			new_sjsz.save(function(err){
+				if(err){
+					console.log('save err-->',err)
+					return res.json({'code':-1,'msg':err})
+				}
+				return res.json({'code':0,'msg':'设置成功'})
+			})
+		})
 })
-router.get('/new_secondstep',function(req,res){
-	return res.render('manage/new_secondstep')
-})
+
 module.exports = router;

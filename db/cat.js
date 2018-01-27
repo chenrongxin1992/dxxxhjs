@@ -7,9 +7,9 @@
     const mongoose = require('mongoose')
     mongoose.Promise = global.Promise;
     //服务器上
-    //const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
+    const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
     //本地
-    const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
+    //const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
     mongoose.connect(DB_URL)
 
     /**
@@ -67,6 +67,11 @@ var sjszSchema = new Schema({
     panduan_fenzhi : {type:Number},//每道判断题分值
     duoxuan_num : {type:Number},
     duoxuan_fenzhi : {type:Number},
+    per_of_modal : [{
+        id:{type:Number},
+        name:{type:String},
+        percent:{type:Number}
+    }],
     randomStr : {type:String},
     kslianjie : {type:String},
     peopleinfo : {type:String,default:null},//录入人员信息
