@@ -50,6 +50,7 @@ var catSchema = new Schema({
         content : {type:String,default:null},//选项内容
         is_correct : {type:Boolean,default:false}//是否为正确选项0错
     }],
+    random:{type:Number,default:parseInt(Math.random()*100000)},
     peopleinfo : {type:String,default:null},//录入人员信息
     createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
     createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
@@ -70,7 +71,10 @@ var sjszSchema = new Schema({
     per_of_modal : [{
         id:{type:Number},
         name:{type:String},
-        percent:{type:Number}
+        percent:{type:Number},
+        num_danxuan:{type:Number,default:0},
+        num_duoxuan:{type:Number,default:0},
+        num_panduan:{type:Number,default:0}
     }],
     randomStr : {type:String},
     kslianjie : {type:String},

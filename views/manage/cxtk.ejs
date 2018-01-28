@@ -107,6 +107,7 @@ $(function(){
     form.on('submit(search)', function(data){
       console.log('data-->',data)
       table.reload('reload_tb', {
+        page:1,
         where: {
             timu: $('#timu').val(),
             catname: $('#catname option:selected').val(),

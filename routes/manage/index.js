@@ -188,7 +188,8 @@ router.post('/uploadtk',function(req,res){
 						    			leixing : item[1].trim(),
 						    			timu : item[2].trim(),
 						    			zqda : item[3].trim(),
-						    			xuanxiang : arr_xuanxiang
+						    			xuanxiang : arr_xuanxiang,
+						    			random : parseInt((Math.random()+0.01)*50)
 						    		})
 						    		new_cat.save(function(err){
 						    			if(err){
@@ -229,7 +230,8 @@ router.post('/uploadtk',function(req,res){
 							    			leixing : item[1].trim(),
 							    			timu : item[2].trim(),
 							    			zqda : item[3].trim(),
-							    			xuanxiang : arr_xuanxiang
+							    			xuanxiang : arr_xuanxiang,
+							    			random : parseInt((Math.random()+0.01)*50)
 							    		})
 							    		new_cat.save(function(err){
 							    			if(err){
@@ -267,7 +269,8 @@ router.post('/uploadtk',function(req,res){
 							    			leixing : item[1].trim(),
 							    			timu : item[2].trim(),
 							    			zqda : item[3].trim(),
-							    			xuanxiang : arr_xuanxiang
+							    			xuanxiang : arr_xuanxiang,
+							    			random : parseInt((Math.random()+0.01)*50)
 							    		})
 							    		new_cat.save(function(err){
 							    			if(err){
@@ -680,12 +683,37 @@ router.get('/new_firststep',function(req,res){
     	let temp_per_of_modal = {}
     	console.log('item-->',item)
     	temp_per_of_modal.id = item.id
-    	temp_per_of_modal.name = item.name,
+    	temp_per_of_modal.name = item.name
     	temp_per_of_modal.percent = item.percent
+    	//计算各模块对应题型的抽取数量
+    	temp_per_of_modal.num_danxuan = Math.round(danxuan_num*item.percent/100)
+    	temp_per_of_modal.num_duoxuan = Math.round(duoxuan_num*item.percent/100)
+    	temp_per_of_modal.num_panduan = Math.round(panduan_num*item.percent/100)
     	tem_arr.push(temp_per_of_modal)
     	delete temp_per_of_modal
-    	console.log('tem_arr-->',tem_arr)
+    	//console.log('tem_arr-->',tem_arr)
     })
+    let check_danxuan = 0,
+    	check_duoxuan = 0,
+    	check_panduan = 0
+    tem_arr.forEach(function(item,index){
+    	check_danxuan += item.num_danxuan
+    	check_duoxuan += item.num_duoxuan
+    	check_panduan += item.num_panduan
+    	if(check_danxuan>danxuan_num){
+    		console.log('danxuan超过咯')
+    		item.num_danxuan = item.num_danxuan - 1
+    	}
+    	if(check_duoxuan>duoxuan_num){
+    		console.log('duoxuan超过咯')
+    		item.num_duoxuan = item.num_duoxuan - 1
+    	}
+    	if(check_panduan>panduan_num){
+    		console.log('panduan超过咯')
+    		item.num_panduan = item.num_panduan - 1
+    	}
+    })
+    console.log('tem_arr-->',tem_arr)
 
     let sjsz_id = 1
     let search = sjsz.find({},{'id':1})

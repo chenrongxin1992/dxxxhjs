@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const sjsz = require('../../db/cat').sjsz
+const cat = require('../../db/cat').catinfo
 const moment = require('moment')
 const async = require('async')
 /*
@@ -18,6 +19,14 @@ router.get('/ks',function(req,res){
 	if(!randomStr){
 		return res.json({'code':-5,'msg':'url有误'})
 	}
+	let search_data = [],//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
+		danxuan_arr = [],
+		duoxuan_arr = [],
+		panduan_arr = [],
+		random = parseInt((Math.random()+0.01) * 50)
+		if(random > 35 || random < 15){
+			random = 25
+		}
 	//1.该考试是否存在，存在时是否已经过了日期
 	async.waterfall([
 		function(cb){
@@ -49,26 +58,89 @@ router.get('/ks',function(req,res){
 					}
 				})
 		},
-		function(doc,cb){
-			let danxuan_num = doc.danxuan_num,
-				duoxuan_num = doc.duoxuan_num,
-				panduan_num = doc.panduan_num,
-				danxuan_fenzhi = doc.danxuan_fenzhi,
-				duoxuan_fenzhi = doc.duoxuan_fenzhi,
-				panduan_fenzhi = doc.panduan_fenzhi
-			console.log('试题设置参数(单选，多选，判断)-->',danxuan_num,duoxuan_num,panduan_num)
-			console.log('题型分值(单选，多选，判断)-->',danxuan_fenzhi,duoxuan_fenzhi,panduan_fenzhi)
-			//每个模块对应题型要取多少道，默认题库数量足够
-			//最后返回数据结构[{'单选':{...}},{'多选':{...}},{'判断':{...}}]
-			let search_data = []//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
-			//第一步，计算对应题型所取模块题目条数
+		function(doc,cb){//第一次循环找单选题
 			doc.per_of_modal.forEach(function(item,index){
-				console.log(item.name,item.percent)
-				let num_danxuan = Math.round(danxuan_num * item.percent / 100 ),//四舍五入
-					num_duoxuan = Math.round(duoxuan_num * item.percent / 100 ),
-					num_panduan = Math.round(panduan_num * item.percent / 100 )
-				console.log('num_danxuan,num_duoxuan,num_panduan',num_danxuan,num_duoxuan,num_panduan)
+				let search = cat.find({})
+					search.where('catname').equals(item.name)
+					search.where('leixing').equals('单选')
+					search.where('random').gte(random)
+					search.limit(item.num_danxuan)
+					search.exec(function(e,d){
+						if(e){
+							console.log('第一次forEach err-->',e)
+							return res.json({'code':-1,'msg':err.message})
+						}
+						console.log('第一次forEach docs-->',d.length)
+						danxuan_arr.push(d)
+						if(danxuan_arr.length == doc.per_of_modal.length){
+							console.log('danxuan_arr-->',danxuan_arr,danxuan_arr.length)
+							cb(null,doc)
+						}
+					})
 			})
+		},
+		function(doc,cb){
+			//第二次循环找多选题
+			console.log('第二次循环')
+			random = parseInt((Math.random()+0.01) * 50)
+			if(random > 35 || random < 15){
+				random = 25
+			}
+			console.log('random 2-->',random)
+			doc.per_of_modal.forEach(function(item,index){
+				let search = cat.find({})
+					search.where('catname').equals(item.name)
+					search.where('leixing').equals('多选')
+					search.where('random').gte(random)
+					search.limit(item.num_duoxuan)
+					search.exec(function(e,d){
+						if(e){
+							console.log('第二次forEach err-->',e)
+							return res.json({'code':-1,'msg':err.message})
+						}
+						console.log('第二次forEach docs-->',d.length)
+						duoxuan_arr.push(d)
+						if(duoxuan_arr.length == doc.per_of_modal.length){
+							console.log('duoxuan_arr-->',duoxuan_arr,duoxuan_arr.length)
+							cb(null,doc)
+						}
+					})
+			})
+		},
+		function(doc,cb){
+			//第三次循环找判断题
+			console.log('第三次循环找判断题')
+			random = parseInt((Math.random()+0.01) * 50)
+			if(random > 35 || random < 15){
+				random = 25
+			}
+			console.log('random 3-->',random)
+			doc.per_of_modal.forEach(function(item,index){
+				let search = cat.find({})
+					search.where('catname').equals(item.name)
+					search.where('leixing').equals('判断')
+					search.where('random').gte(random)
+					search.limit(item.num_panduan)
+					search.exec(function(e,d){
+						if(e){
+							console.log('第三次forEach err-->',e)
+							return res.json({'code':-1,'msg':err.message})
+						}
+						console.log('第三次forEach docs-->',d.length)
+						console.log('第三次 判断 num-->',item.num_panduan)
+						panduan_arr.push(d)
+						if(panduan_arr.length == doc.per_of_modal.length){
+							console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
+							console.log('找齐咯')
+							cb(null)
+						}
+					})
+			})
+		},
+		function(cb){
+			console.log('check---->',danxuan_arr[0].length,danxuan_arr[1].length,danxuan_arr[2].length)
+			console.log('check---->',duoxuan_arr[0].length,duoxuan_arr[1].length,duoxuan_arr[2].length)
+			console.log('check---->',panduan_arr[0].length,panduan_arr[1].length,panduan_arr[2].length)
 		}
 	],function(err,result){
 		if(err){
