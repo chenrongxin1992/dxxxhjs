@@ -4,7 +4,7 @@ const sjsz = require('../../db/cat').sjsz
 const moment = require('moment')
 const async = require('async')
 /*
-//code:{-1:数据库出错或其它错误，-2：结果为空，-3：考试日期已过，-4：考试尚未开始}
+//code:{-1:数据库出错或其它错误，-2：结果为空，-3：考试日期已过，-4：考试尚未开始，-5：url有误}
  */
 
 /* GET home page. */
@@ -15,6 +15,9 @@ router.get('/', function(req, res, next) {
 router.get('/ks',function(req,res){
 	let randomStr = req.query.code
 	console.log('check randomStr-->',randomStr)
+	if(!randomStr){
+		return res.json({'code':-5,'msg':'url有误'})
+	}
 	//1.该考试是否存在，存在时是否已经过了日期
 	async.waterfall([
 		function(cb){
@@ -49,9 +52,23 @@ router.get('/ks',function(req,res){
 		function(doc,cb){
 			let danxuan_num = doc.danxuan_num,
 				duoxuan_num = doc.duoxuan_num,
-				panduan_num = doc.panduan_num
+				panduan_num = doc.panduan_num,
+				danxuan_fenzhi = doc.danxuan_fenzhi,
+				duoxuan_fenzhi = doc.duoxuan_fenzhi,
+				panduan_fenzhi = doc.panduan_fenzhi
 			console.log('试题设置参数(单选，多选，判断)-->',danxuan_num,duoxuan_num,panduan_num)
-				
+			console.log('题型分值(单选，多选，判断)-->',danxuan_fenzhi,duoxuan_fenzhi,panduan_fenzhi)
+			//每个模块对应题型要取多少道，默认题库数量足够
+			//最后返回数据结构[{'单选':{...}},{'多选':{...}},{'判断':{...}}]
+			let search_data = []//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
+			//第一步，计算对应题型所取模块题目条数
+			doc.per_of_modal.forEach(function(item,index){
+				console.log(item.name,item.percent)
+				let num_danxuan = Math.round(danxuan_num * item.percent / 100 ),//四舍五入
+					num_duoxuan = Math.round(duoxuan_num * item.percent / 100 ),
+					num_panduan = Math.round(panduan_num * item.percent / 100 )
+				console.log('num_danxuan,num_duoxuan,num_panduan',num_danxuan,num_duoxuan,num_panduan)
+			})
 		}
 	],function(err,result){
 		if(err){
@@ -61,5 +78,7 @@ router.get('/ks',function(req,res){
 
 	})
 })
-
+router.get('/test',function(req,res){
+	res.render('front/test')
+})
 module.exports = router;

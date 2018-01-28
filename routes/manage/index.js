@@ -588,6 +588,38 @@ router.get('/sjlb_data',function(req,res){
 					console.log('check docs-->',docs)
 					cb(null,docs)
 				})
+		},
+		function(docs,cb){
+			//重新封装数据
+			//重新封装数据
+			let data = []//最终数据
+			docs.forEach(function(item,index){
+				let tempdata = {}
+					console.log('item-->',item)
+					tempdata._id = item._id
+					tempdata.id = item.id
+					tempdata.ksname = item.ksname
+					tempdata.ksriqi = item.ksriqi
+					tempdata.ksshijian = item.ksshijian
+					tempdata.danxuan_fenzhi = item.danxuan_fenzhi
+					tempdata.danxuan_num = item.danxuan_num
+					tempdata.duoxuan_num = item.duoxuan_num
+					tempdata.duoxuan_fenzhi = item.duoxuan_fenzhi
+					tempdata.panduan_fenzhi = item.panduan_fenzhi
+					tempdata.panduan_num = item.panduan_num
+					tempdata.kslianjie = item.kslianjie
+					item.per_of_modal.forEach(function(it,ind){
+						console.log(it)
+						tempdata['mokuai' + ind] = it.name +' (' + it.percent + '%)'
+						//tempdata['is_correct' + ind] = it.is_correct
+						console.log(tempdata)
+					})
+					data.push(tempdata)
+					delete tempdata
+				})
+				//data.count = total
+				console.log('返回数据-->',data)
+				cb(null,data)
 		}
 	],function(error,result){
 		if(error){
@@ -680,7 +712,8 @@ router.get('/new_firststep',function(req,res){
 		        panduan_fenzhi : req.body.panduan_fenzhi,
 		        panduan_num : req.body.panduan_num,
 		        per_of_modal : tem_arr,
-		        kslianjie:baselink+randomStr
+		        kslianjie:baselink+randomStr,
+		        randomStr:randomStr
 		    })
 		    console.log('new_sjsz-->',new_sjsz)
 			new_sjsz.save(function(err){

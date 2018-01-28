@@ -33,15 +33,22 @@ $(function(){
       ,page: true //开启分页
       ,id: 'reload_tb'
       ,cols:  [[ //标题栏
-         {field: 'id', title: 'id', align: 'center'} //rowspan即纵向跨越的单元格数
-        ,{field: 'ksname', title: '试卷主题', align: 'center'} //rowspan即纵向跨越的单元格数
-        ,{field: 'ksriqi', title: '考试日期', align: 'center'}
-        ,{field: 'ksshijian', title: '考试时间(分钟)', align: 'center'}
-        ,{field: 'danxuan_num', title: '单选题', align: 'center'}
-        ,{field: 'duoxuan_num', title: '多选题', align: 'center'}
-        ,{field: 'panduan_num', title: '判断题', align: 'center'}
-        ,{field: 'kslianjie', title: '考试链接', align: 'center'}
+         {field: 'id', title: 'id', align: 'center',rowspan: 2} //rowspan即纵向跨越的单元格数
+        ,{field: 'ksname', title: '试卷主题', align: 'center',rowspan: 2} 
+        ,{field: 'ksriqi', title: '考试日期', align: 'center',rowspan: 2}
+        ,{field: 'ksshijian', title: '考试时间(分钟)', align: 'center',rowspan: 2}
+        ,{field: 'danxuan_num', title: '单选题', align: 'center',rowspan: 2}
+        ,{field: 'duoxuan_num', title: '多选题', align: 'center',rowspan: 2}
+        ,{field: 'panduan_num', title: '判断题', align: 'center',rowspan: 2}
+        ,{field: 'kslianjie', title: '考试链接', align: 'center',rowspan: 2}
+        ,{align: 'center', title: '模块比例', colspan: 9}
         ,{align: 'center',field:'caozuo', title: '操作', width:180,toolbar:"#toolbar" ,rowspan: 2}
+      ],
+      [
+        {field: 'mokuai0', align: 'center', title: '模块1',templet: '#mokuai0Tpl'}
+        ,{field: 'mokuai1', align: 'center', title: '模块2',templet: '#mokuai1Tpl'}
+        ,{field: 'mokuai2', align: 'center', title: '模块3',templet: '#mokuai2Tpl'}
+        ,{field: 'mokuai3', align: 'center', title: '模块4',templet: '#mokuai3Tpl'}
       ]]
     })//table
 
@@ -129,11 +136,39 @@ $(function(){
             scrollbar: false,
             maxmin: true, //开启最大化最小化按钮
             area: ['900px', '600px'],
-            content: '/manage/iframe_mbbj?_id=' + data._id
+            content: '/manage/iframe_mbbj?_id=' + data._id//模板编辑
           }); 
         layer.iframeAuto(if_index);
       }
     });//工具条
   });
 })
+</script>
+<script type="text/html" id="mokuai0Tpl">
+  {{# if(d.mokuai0) { }}
+    {{ d.mokuai0 }}
+  {{#  } else { }}
+    {{ '暂无' }}
+  {{#  } }}
+</script>
+<script type="text/html" id="mokuai1Tpl">
+  {{# if(d.mokuai1) { }}
+    {{ d.mokuai1 }}
+  {{#  } else { }}
+    {{ '暂无' }}
+  {{#  } }}
+</script>
+<script type="text/html" id="mokuai2Tpl">
+  {{# if(d.mokuai2) { }}
+    {{ d.mokuai2 }}
+  {{#  } else { }}
+    {{ '暂无' }}
+  {{#  } }}
+</script>
+<script type="text/html" id="mokuai3Tpl">
+  {{# if(d.mokuai3) { }}
+    {{ d.mokuai3 }}
+  {{#  } else { }}
+    {{ '暂无' }}
+  {{#  } }}
 </script>

@@ -42,9 +42,21 @@
               </div>
             </div>
             <div class="layui-inline">
+              <label class="layui-form-label">单选题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="danxuan_fenzhi" id="danxuan_fenzhi" class="layui-input" value="<%=detail.danxuan_fenzhi%>分">
+              </div>
+            </div>
+            <div class="layui-inline">
               <label class="layui-form-label">多选题数</label>
               <div class="layui-input-inline">
                 <input type="text" name="duoxuan_num" id="duoxuan_num" class="layui-input" value="<%=detail.duoxuan_num%>">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">多选题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="duoxuan_fenzhi" id="duoxuan_fenzhi" class="layui-input" value="<%=detail.duoxuan_fenzhi%>分">
               </div>
             </div>
             <div class="layui-inline">
@@ -53,6 +65,23 @@
                 <input type="text" name="panduan_num" id="panduan_num" class="layui-input" value="<%=detail.panduan_num%>">
               </div>
             </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">判断题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="panduan_fenzhi" id="panduan_fenzhi" class="layui-input" value="<%=detail.panduan_fenzhi%>分">
+              </div>
+            </div>
+          </div>
+          
+          <div class="layui-form-item">
+          <%detail.per_of_modal.forEach(function(item,index){%>
+              <div class="layui-inline">
+                <label class="layui-form-label"><%=item.name%></label>
+                <div class="layui-input-inline">
+                  <input type="text" name="<%=item.name%>" id="<%=item.name%>" class="layui-input" value="<%=item.percent%>%">
+                </div>
+              </div>
+          <%})%>
           </div>
 
           <div class="layui-form-item">
@@ -82,8 +111,6 @@ $(function(){
   layui.use(['layer','form'], function(){
     let layer = layui.layer,
         form = layui.form;
-
-    
   });
 })
 
