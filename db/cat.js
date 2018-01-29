@@ -7,9 +7,9 @@
     const mongoose = require('mongoose')
     mongoose.Promise = global.Promise;
     //服务器上
-    const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
+    //const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
     //本地
-    //const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
+    const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
     mongoose.connect(DB_URL)
 
     /**
