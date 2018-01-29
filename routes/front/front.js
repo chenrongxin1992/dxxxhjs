@@ -216,6 +216,9 @@ router.get('/ks',function(req,res){
 					danxuan_arr.forEach(function(item,index){
 						if(item.length!=0){
 							item.forEach(function(it,ind){
+								console.log('it.xuanxiang---->单选',ind,it.xuanxiang)
+								it.xuanxiang = it.xuanxiang.sort(randomsort)
+								console.log('单选答案乱序it.xuanxiang---->',it.xuanxiang)
 								res_danxuan_arr.push(it)
 							})
 						}
@@ -229,6 +232,9 @@ router.get('/ks',function(req,res){
 					duoxuan_arr.forEach(function(item,index){
 						if(item.length!=0){
 							item.forEach(function(it,ind){
+								console.log('it.xuanxiang---->多选',ind,it.xuanxiang)
+								it.xuanxiang = it.xuanxiang.sort(randomsort)
+								console.log('多选答案乱序it.xuanxiang---->',it.xuanxiang)
 								res_duoxuan_arr.push(it)
 							})
 						}
@@ -242,6 +248,9 @@ router.get('/ks',function(req,res){
 					panduan_arr.forEach(function(item,index){
 						if(item.length!=0){
 							item.forEach(function(it,ind){
+								console.log('it.xuanxiang---->判断',ind,it.xuanxiang)
+								it.xuanxiang = it.xuanxiang.sort(randomsort)
+								console.log('判断答案乱序it.xuanxiang---->',it.xuanxiang)
 								res_panduan_arr.push(it)
 							})
 						}
@@ -272,8 +281,8 @@ router.get('/ks',function(req,res){
 			return res.json({'code':-1,'msg':err.message})
 		}
 		console.timeEnd('countdown')
-		return res.render('front/ks')
-		//return res.json({'code':-0,'msg':result})
+		//return res.render('front/ks')
+		return res.json({'code':-0,'msg':result})
 	})
 })
 function randomsort(a, b) {
