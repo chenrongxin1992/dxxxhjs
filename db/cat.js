@@ -7,9 +7,9 @@
     const mongoose = require('mongoose')
     mongoose.Promise = global.Promise;
     //服务器上
-    const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
+    //const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
     //本地
-    //const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
+    const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
     mongoose.connect(DB_URL)
 
     /**
@@ -43,7 +43,6 @@ var catSchema = new Schema({
     inused : {type:Boolean,default:true},//该类别是否在用
     leixing : {type:String},//单选，多选，判断
     timu : {type:String},//题目(党章的意义是什么) 
-    fenzhi : {type:Number },//该题分值(5,4)
     zqda : {type : String},//正确答案(A,B,C,D,E,F / AB,AD / 1,2)
     xuanxiang : [{
         id : {type:Number},//选项id
@@ -82,6 +81,69 @@ var sjszSchema = new Schema({
     createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
     createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
 })
+
+var stu_examSchema = new Schema({
+    gonghao : {type:String},
+    xingming : {type:String},
+    id : {type:Number},
+    ksname : {type:String},//该次考试主题(比如第一单元，第二单元) 
+    ksshijian : {type:Number},//考试时间
+    ksriqi : {type:String},//考试日期
+    danxuan_num : {type:Number},
+    danxuan_fenzhi : {type:Number},//每道单选题分值
+    panduan_num : {type:Number},
+    panduan_fenzhi : {type:Number},//每道判断题分值
+    duoxuan_num : {type:Number},
+    duoxuan_fenzhi : {type:Number},
+    randomStr : {type:String},
+    kslianjie : {type:String},
+    res_danxuan_arr : [{
+        id : {type:Number},
+        catname : {type:String},//分类名:如党章、十九大         
+        leixing : {type:String},//单选，多选，判断
+        timu : {type:String},//题目(党章的意义是什么) 
+        xuanxiang : [{
+            id : {type:Number},//选项id
+            content : {type:String,default:null},//选项内容
+            is_correct : {type:Boolean,default:false}//是否为正确选项0错
+        }],
+        peopleinfo : {type:String,default:null},//录入人员信息
+        createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+        createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+    }],
+    res_duoxuan_arr : [{
+        id : {type:Number},
+        catname : {type:String},//分类名:如党章、十九大         
+        leixing : {type:String},//单选，多选，判断
+        timu : {type:String},//题目(党章的意义是什么) 
+        xuanxiang : [{
+            id : {type:Number},//选项id
+            content : {type:String,default:null},//选项内容
+            is_correct : {type:Boolean,default:false}//是否为正确选项0错
+        }],
+        peopleinfo : {type:String,default:null},//录入人员信息
+        createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+        createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+    }],
+    res_panduan_arr : [{
+        id : {type:Number},
+        catname : {type:String},//分类名:如党章、十九大         
+        leixing : {type:String},//单选，多选，判断
+        timu : {type:String},//题目(党章的意义是什么) 
+        xuanxiang : [{
+            id : {type:Number},//选项id
+            content : {type:String,default:null},//选项内容
+            is_correct : {type:Boolean,default:false}//是否为正确选项0错
+        }],
+        peopleinfo : {type:String,default:null},//录入人员信息
+        createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+        createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+    }],
+    peopleinfo : {type:String,default:null},//录入人员信息
+    createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+    createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+})
 //module.exports = mongoose.model('catinfo',catSchema);
+exports.stu_exam = mongoose.model('stu_exam',stu_examSchema);
 exports.catinfo = mongoose.model('catinfo',catSchema);
 exports.sjsz = mongoose.model('sjsz',sjszSchema)

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const sjsz = require('../../db/cat').sjsz
 const cat = require('../../db/cat').catinfo
+const stu_exam = require('../../db/cat').stu_exam
 const moment = require('moment')
 const async = require('async')
 /*
@@ -23,6 +24,7 @@ router.get('/ks',function(req,res){
 		danxuan_arr = [],
 		duoxuan_arr = [],
 		panduan_arr = [],
+		ksinfo = {},
 		random = parseInt((Math.random()+0.01) * 50)
 		if(random > 35 || random < 15){
 			random = 25
@@ -48,6 +50,8 @@ router.get('/ks',function(req,res){
 							return res.json({'code':-3,'msg':'考试日期已过'})
 						}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
 							console.log('考试日期有效')
+							//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
+							ksinfo = doc
 							cb(null,doc)
 						}else{
 							console.log('考试尚未开始')
@@ -272,7 +276,32 @@ router.get('/ks',function(req,res){
 					back.res_duoxuan_arr = res_duoxuan_arr,
 					back.res_panduan_arr = res_panduan_arr
 				console.log('check back-->',back)
-				cb(null,back)
+				//保存到数据库
+				let new_stu_exam = new stu_exam({
+					gonghao : '2011150178',
+					xingming : 'test',
+					ksname : ksinfo.ksname,
+					ksshijian : ksinfo.ksshijian,
+					ksriqi : ksinfo.ksriqi,
+					danxuan_num : ksinfo.danxuan_num,
+					danxuan_fenzhi : ksinfo.danxuan_fenzhi,
+					duoxuan_num : ksinfo.duoxuan_num,
+					duoxuan_fenzhi : ksinfo.duoxuan_fenzhi,
+					panduan_num : ksinfo.panduan_num,
+					panduan_fenzhi : ksinfo.panduan_fenzhi,
+					randomStr : ksinfo.randomStr,
+					kslianjie : ksinfo.kslianjie,
+					res_danxuan_arr : res_danxuan_arr,
+					res_duoxuan_arr : res_duoxuan_arr,
+					res_panduan_arr : res_panduan_arr
+				})
+				new_stu_exam.save(function(err){
+					if(err){
+						console.log('new_stu_exam save err---->',err)
+						cb(err)
+					}
+					cb(null,back)
+				})
 			})
 		}
 	],function(err,result){
@@ -281,8 +310,8 @@ router.get('/ks',function(req,res){
 			return res.json({'code':-1,'msg':err.message})
 		}
 		console.timeEnd('countdown')
-		//return res.render('front/ks')
-		return res.json({'code':-0,'msg':result})
+		return res.render('front/ks',{'result':result,'ksinfo':ksinfo})
+		//return res.json({'code':-0,'msg':result})
 	})
 })
 function randomsort(a, b) {
