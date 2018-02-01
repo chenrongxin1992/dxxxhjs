@@ -330,4 +330,18 @@ router.get('/test',function(req,res){
 	// }
 	res.render('front/test')
 })
+router.get('/test1',function(req,res){
+	// let search = cat.find({})
+	// 	search.where('catname').equals('党史')
+	// 	search.where('leixing').equals('判断')
+	// 	search.where('random').gte(20)
+	// 	search.exec(function(err,doc){
+	// 		console.log('doc length',doc.length)
+	// 	})
+	// for(let i=0;i<100;i++){
+	// 	console.log(Math.round((Math.random()) *50))
+	// }
+	res.render('front/test1')
+})
+
 module.exports = router;

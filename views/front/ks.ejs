@@ -1,126 +1,187 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
 
-    <link rel="stylesheet" href="/stylesheets/layui.css" media="all">
+    <title></title>
+
+    <!-- Bootstrap -->
+    <link rel='stylesheet' href='/stylesheets/bootstrap.css' />
+    <link rel='stylesheet' href='/stylesheets/bootstrapValidator.css' />
+    <link href="/flat/blue.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+      <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
     <style type="text/css">
-      .test{
-        border: 1px dotted red;
+      .has-success .form-control-feedback{
+        display: none;
+        color: #333!important;
       }
-      .layui-input-block-canclemargin {
-        margin-left: 20px;
-      }
-      .layui-form-item-bgc {
-        background-color: #f2f2f2;
+       .has-success{
+        color: red!important;
       }
     </style>
   </head>
 
   <body>
-    <div class="layui-container">
-      <div class="layui-row">
-        <div class="layui-col-xs12 layui-col-sm12 layui-col-md8 layui-col-md-offset2">
-          <form class="layui-form" action="">
-            <%if(result.res_danxuan_arr.length != 0){%>
-                <blockquote class="layui-elem-quote">一、单选题(该处共有<%=result.res_danxuan_arr.length%>小题,每小题<%=ksinfo.danxuan_fenzhi%>分)</blockquote>
-                <%result.res_danxuan_arr.forEach(function(item,index){%>
-                  <div class="layui-form-item layui-form-item-bgc">
-                    <%=index+1%>、<%=item.timu%>
-                    <%item.xuanxiang.forEach(function(it,ind){%>
-                      <div class="layui-input-block layui-input-block-canclemargin">
-                        <%var chooseitem = ''%>
-                        <%if(ind == 0){chooseitem = 'A. '}%>
-                        <%if(ind == 1){chooseitem = 'B. '}%>
-                        <%if(ind == 2){chooseitem = 'C. '}%>
-                        <%if(ind == 3){chooseitem = 'D. '}%>
-                        <%if(ind == 4){chooseitem = 'E. '}%>
-                        <%if(ind == 5){chooseitem = 'F. '}%>
-                        <%if(ind == 6){chooseitem = 'G. '}%>
-                        <%if(ind == 7){chooseitem = 'H. '}%>
-                        <%if(ind == 8){chooseitem = 'I. '}%>
-                        <input type="radio" name="<%=item._id%>" value="<%=it._id%>" title="<%=chooseitem%><%=it.content%>">
+    <div class="container">
+        <div class="row">
+            <!-- form: -->
+            <section>
+                <div class="col-lg-8 col-lg-offset-2">
+                    
+                    <form id="defaultForm" method="post" class="" action="">
+                      <div class="page-header">
+                        <h4>一、单选(该处共有<%=result.res_danxuan_arr.length%>小题,每小题<%=ksinfo.danxuan_fenzhi%>分)</h4>
                       </div>
-                    <%})%>
-                  </div>
-                <%})%>
-            <%}%>
-            <%if(result.res_duoxuan_arr.length != 0){%>
-                <blockquote class="layui-elem-quote">二、多选题(该处共有<%=result.res_duoxuan_arr.length%>小题,每小题<%=ksinfo.duoxuan_fenzhi%>分)</blockquote>
-                <%result.res_duoxuan_arr.forEach(function(item,index){%>
-                  <div class="layui-form-item layui-form-item-bgc">
-                    <%=index+1%>、<%=item.timu%>
-                    <%item.xuanxiang.forEach(function(it,ind){%>
-                      <div class="layui-input-block layui-input-block-canclemargin">
-                        <%var chooseitem = ''%>
-                        <%if(ind == 0){chooseitem = 'A. '}%>
-                        <%if(ind == 1){chooseitem = 'B. '}%>
-                        <%if(ind == 2){chooseitem = 'C. '}%>
-                        <%if(ind == 3){chooseitem = 'D. '}%>
-                        <%if(ind == 4){chooseitem = 'E. '}%>
-                        <%if(ind == 5){chooseitem = 'F. '}%>
-                        <%if(ind == 6){chooseitem = 'G. '}%>
-                        <%if(ind == 7){chooseitem = 'H. '}%>
-                        <%if(ind == 8){chooseitem = 'I. '}%>
-                        <input type="checkbox" name="<%=item._id%>" value="<%=it._id%>" lay-skin="primary" title="<%=chooseitem%><%=it.content%>" lay-verify="required">
+                      <%result.res_danxuan_arr.forEach(function(item,index){%>
+                        <div class="form-group">
+                              <label class="col-12 control-label"><%=index+1%>、<%=item.timu%></label>
+                              <div class="col-12">
+                                  <%item.xuanxiang.forEach(function(it,ind){%>
+                                    <%var chooseitem = ''%>
+                                    <%if(ind == 0){chooseitem = 'A. '}%>
+                                    <%if(ind == 1){chooseitem = 'B. '}%>
+                                    <%if(ind == 2){chooseitem = 'C. '}%>
+                                    <%if(ind == 3){chooseitem = 'D. '}%>
+                                    <%if(ind == 4){chooseitem = 'E. '}%>
+                                    <%if(ind == 5){chooseitem = 'F. '}%>
+                                    <%if(ind == 6){chooseitem = 'G. '}%>
+                                    <%if(ind == 7){chooseitem = 'H. '}%>
+                                    <%if(ind == 8){chooseitem = 'I. '}%>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="<%=item._id%>" value="<%=it._id%>" data-bv-notempty
+                                            data-bv-notempty-message="请选择选项"/> &nbsp;<%=chooseitem%><%=it.content%>
+                                        </label>
+                                    </div>
+                                  <%})%>
+                              </div>
+                        </div>
+                      <%})%>
+
+                      <div class="page-header">
+                        <h4>二、多选(该处共有<%=result.res_duoxuan_arr.length%>小题,每小题<%=ksinfo.duoxuan_fenzhi%>分)</h4>
                       </div>
-                    <%})%>
-                  </div>
-                <%})%>
-            <%}%>
-            <%if(result.res_panduan_arr.length != 0){%>
-                <blockquote class="layui-elem-quote">三、判断题(该处共有<%=result.res_panduan_arr.length%>小题,每小题<%=ksinfo.panduan_fenzhi%>分)</blockquote>
-                <%result.res_panduan_arr.forEach(function(item,index){%>
-                  <div class="layui-form-item layui-form-item-bgc">
-                    <%=index+1%>、<%=item.timu%>
-                    <%item.xuanxiang.forEach(function(it,ind){%>
-                      <div class="layui-input-block layui-input-block-canclemargin">
-                        <%var chooseitem = ''%>
-                        <%if(ind == 0){chooseitem = 'A. '}%>
-                        <%if(ind == 1){chooseitem = 'B. '}%>
-                        <%if(ind == 2){chooseitem = 'C. '}%>
-                        <%if(ind == 3){chooseitem = 'D. '}%>
-                        <%if(ind == 4){chooseitem = 'E. '}%>
-                        <%if(ind == 5){chooseitem = 'F. '}%>
-                        <%if(ind == 6){chooseitem = 'G. '}%>
-                        <%if(ind == 7){chooseitem = 'H. '}%>
-                        <%if(ind == 8){chooseitem = 'I. '}%>
-                        <input type="radio" name="<%=item._id%>" value="<%=it._id%>" title="<%=chooseitem%><%=it.content%>" lay-verify="required">
+                      <%result.res_duoxuan_arr.forEach(function(item,index){%>
+                        <div class="form-group">
+                          <label class="col-12 control-label"><%=index+1%>、<%=item.timu%></label>
+                            <div class="col-12">
+                                <%item.xuanxiang.forEach(function(it,ind){%>
+                                  <%var chooseitemdx = ''%>
+                                  <%if(ind == 0){chooseitemdx = 'A. '}%>
+                                  <%if(ind == 1){chooseitemdx = 'B. '}%>
+                                  <%if(ind == 2){chooseitemdx = 'C. '}%>
+                                  <%if(ind == 3){chooseitemdx = 'D. '}%>
+                                  <%if(ind == 4){chooseitemdx = 'E. '}%>
+                                  <%if(ind == 5){chooseitemdx = 'F. '}%>
+                                  <%if(ind == 6){chooseitemdx = 'G. '}%>
+                                  <%if(ind == 7){chooseitemdx = 'H. '}%>
+                                  <%if(ind == 8){chooseitemdx = 'I. '}%>
+                                  <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="<%=item._id%>" value="<%=it._id%>" data-bv-notempty
+                                            data-bv-notempty-message="请选择选项"/> &nbsp;<%=chooseitemdx%><%=it.content%>
+                                    </label>
+                                  </div>
+                                  <%})%>
+                            </div>
+                        </div>
+                      <%})%>
+                      
+                      <div class="page-header">
+                        <h4>三、判断(该处共有<%=result.res_panduan_arr.length%>小题,每小题<%=ksinfo.panduan_fenzhi%>分)</h4>
                       </div>
-                    <%})%>
-                  </div>
-                <%})%>
-            <%}%>
-            <div class="layui-form-item">
-              <div class="layui-input-block">
-                <button class="layui-btn" lay-submit="" lay-filter="tijiao">提交</button>
+                      <%result.res_panduan_arr.forEach(function(item,index){%>
+                        <div class="form-group">
+                              <label class="col-12 control-label"><%=index+1%>、<%=item.timu%></label>
+                              <div class="col-12">
+                                  <%item.xuanxiang.forEach(function(it,ind){%>
+                                    <%var chooseitempd = ''%>
+                                    <%if(ind == 0){chooseitempd = 'A. '}%>
+                                    <%if(ind == 1){chooseitempd = 'B. '}%>
+                                    <%if(ind == 2){chooseitempd = 'C. '}%>
+                                    <%if(ind == 3){chooseitempd = 'D. '}%>
+                                    <%if(ind == 4){chooseitempd = 'E. '}%>
+                                    <%if(ind == 5){chooseitempd = 'F. '}%>
+                                    <%if(ind == 6){chooseitempd = 'G. '}%>
+                                    <%if(ind == 7){chooseitempd = 'H. '}%>
+                                    <%if(ind == 8){chooseitempd = 'I. '}%>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="<%=item._id%>" value="<%=it._id%>" data-bv-notempty
+                                            data-bv-notempty-message="请选择选项"/> &nbsp;<%=chooseitempd%><%=it.content%>
+                                        </label>
+                                    </div>
+                                  <%})%>
+                              </div>
+                        </div>
+                      <%})%>
+
+                      <div class="form-group">
+                            <div class="col-lg-9 col-lg-offset-3">
+                                <button type="submit" class="btn btn-primary" name="signup" value="Sign up">Sign up</button>
+                                <button type="button" class="btn btn-info" id="validateBtn">Manual validate</button>
+                                <button type="button" class="btn btn-info" id="resetBtn">Reset form</button>
+                            </div>
+                      </div>
+                    </form>
               </div>
-            </div>
-          </form>
-        </div>
+          </section>
       </div>
-    </div><!-- container -->
+    </div>
+                
 
-
-<script src="/javascripts/jquery-3.1.1.js"></script>
-<script src="/javascripts/layui.js"></script>
+<script src="/javascripts/jquery-1.10.2.min.js"></script>
+<script src="/javascripts/bootstrap.min.js"></script>
+<script src='/javascripts/bootstrapValidator.min.js' ></script>
+<script src='/javascripts/icheck.js' ></script>
 <script>
 'use strict'
-$(function(){
+$(document).ready(function() {
+    // $('input').iCheck({
+    //   checkboxClass: 'icheckbox_flat',
+    //   radioClass: 'iradio_flat'
+    // });
+    // Generate a simple captcha
+    function randomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    };
+    $('#captchaOperation').html([randomNumber(1, 100), '+', randomNumber(1, 200), '='].join(' '));
 
-  layui.use('form', function(){
-  var form = layui.form;
-      form.render()
-  
-  //监听提交
-  form.on('submit(tijiao)', function(data){
-    console.log('data---->',data.field)
-    layer.msg(JSON.stringify(data.field));
-    return false;
-  });
-})
-})
+    $('#defaultForm').bootstrapValidator({
+        //live: 'disabled',
+        message: '请选择选项',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            
+        }
+    }).on('success.form.bv', function (e) {
+        e.preventDefault();
+        console.log('e---->',$(e.target).data('bootstrapValidator'),$(e.target).serialize())
+        //提交逻辑
+    });
+
+    // Validate the form manually
+    $('#validateBtn').click(function() {
+        $('#defaultForm').bootstrapValidator('validate');
+    });
+
+    $('#resetBtn').click(function() {
+        $('#defaultForm').data('bootstrapValidator').resetForm(true);
+    });
+});
 </script>
   </body>
 </html>
