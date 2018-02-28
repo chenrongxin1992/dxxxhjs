@@ -52,7 +52,30 @@ router.get('/ks',function(req,res){
 							console.log('考试日期有效')
 							//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
 							ksinfo = doc
-							cb(null,doc)
+							//看是否已有试卷，有的话直接返回
+							let search_sj = stu_exam.findOne({})
+								search_sj.where('randomStr').equals(randomStr)
+								search_sj.where('gonghao').equals('2011150178')
+								//search_sj.where('is_end').equals(0)
+								search_sj.exec(function(errr,docc){
+									if(errr){
+										console.log('search_sj errr')
+										return resjson({'code':-1,'msg':err.message})
+									}
+									if(docc && docc.is_end == 0){
+										console.log('docc---->',docc)
+										console.log('试卷存在，尚未结束，直接返回试卷继续')
+										return res.render('front/ks',{'result':docc,'ksinfo':ksinfo})
+									}
+									if(docc && docc.is_end == 1){
+										console.log('该试卷已经提交')
+										return res.render('front/ksdone',{'result':docc,'ksinfo':ksinfo})
+									}
+									if(!docc){
+										console.log('考试日期有效，还没生成试卷')
+										cb(null,doc)
+									}
+								})
 						}else{
 							console.log('考试尚未开始')
 							return res.json({'code':-4,'msg':'考试尚未开始'})
@@ -342,6 +365,273 @@ router.get('/test1',function(req,res){
 	// 	console.log(Math.round((Math.random()) *50))
 	// }
 	res.render('front/test1')
+})
+router.post('/checkks',function(req,res){
+	let randomStr = req.body.randomStr,
+		danxuan_arr = JSON.parse(req.body.danxuan_arr),
+		duoxuan_arr = JSON.parse(req.body.duoxuan_arr),
+		panduan_arr = JSON.parse(req.body.panduan_arr),
+		shijuan = null,
+		danxuan_fenzhi = 0,
+		danxuan_defen = 0,
+		duoxuan_fenzhi = 0,
+		duoxuan_defen = 0,
+		panduan_fenzhi = 0,
+		panduan_defen = 0,
+		danxuan_dadui = 0,
+		danxuan_dacuo = 0,
+		panduan_dadui = 0,
+		panduan_dacuo = 0,
+		duoxuan_dadui = 0,
+		duoxuan_dacuo = 0
+	console.log('check randomStr---->',randomStr)
+	console.log('check danxuan_arr---->',danxuan_arr)
+	console.log('check duoxuan_arr---->',duoxuan_arr)
+	console.log('check panduan_arr---->',panduan_arr)
+
+
+	async.waterfall([
+		function(cb){
+			let search = stu_exam.findOne({})
+				search.where('randomStr').equals(randomStr)
+				search.where('gonghao').equals('2011150178')
+				search.exec(function(err,doc){
+					if(err){
+						console.log('查找试卷错误',err)
+						cb(err)
+					}
+					if(doc){
+						console.log('找到试卷')
+						shijuan = doc
+						danxuan_fenzhi = doc.danxuan_fenzhi
+						duoxuan_fenzhi = doc.duoxuan_fenzhi
+						panduan_fenzhi = doc.panduan_fenzhi
+						cb(null)
+					}
+				})
+		},
+		function(cb){
+			console.log('检查单选')
+			async.eachLimit(danxuan_arr,1,function(item,callback){
+				console.log('item---->',item)
+				let temp = item.split(':'),
+					timuid = temp[0],
+					timuda = temp[1]
+				console.log('题目id-->',timuid)
+				console.log('对应答案-->',timuda)
+				async.eachLimit(shijuan.res_danxuan_arr,1,function(ite,callback1){
+					if(ite._id == timuid){
+						console.log('找到该题,下面判断该题答案是否正确',ite)
+						async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+							if(it._id == timuda && it.is_correct == true){
+								console.log('该题答对了,该题是',it)
+								danxuan_defen += danxuan_fenzhi 
+								danxuan_dadui++
+								console.log('danxuan_defen',danxuan_defen)
+								callback2()
+							}
+							else{
+								console.log('该题答错了')
+								callback2()
+							}
+						},function(e){
+							if(e){
+								console.log('xuanxiang eachLimit e',e)
+								callback1(e)
+							}
+							callback1()
+						})
+					}
+					else{
+						console.log('还在循环找题')
+						callback1()
+					}
+				},function(er){
+					if(er){
+						console.log('shijuan.res_danxuan_arr eachLimit er',er)
+						callback(er)
+					}
+					callback()
+				})
+				//callback()
+			},function(err){
+				if(err){
+					console.log('eachLimit danxuan_arr err-->',err)
+					cb(err)
+				}
+				else{
+					console.log('单选检查结束,每道题分值,答对,共得分',danxuan_fenzhi,danxuan_dadui,danxuan_defen)
+					console.log()
+					console.log()
+					console.log()
+					cb()
+				}
+			})
+		},
+		function(cb){
+			console.log('检查判断')
+			async.eachLimit(panduan_arr,1,function(item,callback){
+				console.log('item---->',item)
+				let temp = item.split(':'),
+					timuid = temp[0],
+					timuda = temp[1]
+				console.log('题目id-->',timuid)
+				console.log('对应答案-->',timuda)
+				async.eachLimit(shijuan.res_panduan_arr,1,function(ite,callback1){
+					if(ite._id == timuid){
+						console.log('找到该题,下面判断该题答案是否正确',ite)
+						async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+							if(it._id == timuda && it.is_correct == true){
+								console.log('该题答对了,该题是',it)
+								panduan_defen += panduan_fenzhi 
+								panduan_dadui++
+								console.log('panduan_defen',panduan_defen)
+								callback2()
+							}
+							else{
+								console.log('该题答错了')
+								callback2()
+							}
+						},function(e){
+							if(e){
+								console.log('xuanxiang eachLimit e',e)
+								callback1(e)
+							}
+							callback1()
+						})
+					}
+					else{
+						console.log('还在循环找题')
+						callback1()
+					}
+				},function(er){
+					if(er){
+						console.log('shijuan.res_danxuan_arr eachLimit er',er)
+						callback(er)
+					}
+					callback()
+				})
+				//callback()
+			},function(err){
+				if(err){
+					console.log('eachLimit panduan_arr err-->',err)
+					cb(err)
+				}
+				else{
+					console.log('判断检查结束,每道题分值,答对,共得分',panduan_fenzhi,panduan_dadui,panduan_defen)
+					console.log()
+					console.log()
+					console.log()
+					cb()
+				}
+			})
+		},
+		function(cb){
+			console.log('检查多选')
+			async.eachLimit(duoxuan_arr,1,function(item,callback){
+				console.log('item---->',item)
+				let temp = item.split(':'),
+					timuid = temp[0],
+					timuda_str = temp[1]
+				let timuda_arr = timuda_str.split(','),
+					timuda_duibi = timuda_arr.sort().toString(),
+					zhengque_arr = []
+				console.log('题目id-->',timuid)
+				console.log('对应答案-->',timuda_arr)
+				async.eachLimit(shijuan.res_duoxuan_arr,1,function(ite,callback1){
+					if(ite._id == timuid){
+						console.log('找到该题,下面判断该题答案是否正确',ite)
+						async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+							if(it.is_correct == true){
+								console.log('找到一个正确答案',it)
+								zhengque_arr.push(it._id)
+								console.log('zhengque_arr-->',zhengque_arr)
+								callback2()
+							}else{
+								callback2()
+							}
+							// if(it._id == timuda && it.is_correct == true){
+							// 	console.log('该题答对了,该题是',it)
+							// 	panduan_defen += panduan_fenzhi 
+							// 	panduan_dadui++
+							// 	console.log('panduan_defen',panduan_defen)
+							// 	callback2()
+							// }
+							// else{
+							// 	console.log('该题答错了')
+							// 	callback2()
+							// }
+						},function(e){
+							if(e){
+								console.log('xuanxiang eachLimit e',e)
+								callback1(e)
+							}
+							zhengque_arr = zhengque_arr.sort().toString()
+							if(timuda_duibi == zhengque_arr){
+								console.log('该题答对了')
+								duoxuan_defen += duoxuan_fenzhi 
+								duoxuan_dadui++
+								console.log('duoxuan_defen',duoxuan_defen)
+								callback1()
+							}
+							else{
+								console.log('该题错了')
+								callback1()
+							}
+						})
+					}
+					else{
+						console.log('还在循环找题')
+						callback1()
+					}
+				},function(er){
+					if(er){
+						console.log('shijuan.res_duoxuan_arr eachLimit er',er)
+						callback(er)
+					}
+					callback()
+				})
+				//callback()
+			},function(err){
+				if(err){
+					console.log('eachLimit duoxuan_arr err-->',err)
+					cb(err)
+				}
+				else{
+					console.log('多选检查结束,每道题分值,答对,共得分',duoxuan_fenzhi,duoxuan_dadui,duoxuan_defen)
+					console.log()
+					console.log()
+					console.log()
+					cb()
+				}
+			})
+		},
+		function(cb){
+			let tempresult = {}
+				tempresult.danxuan_dadui = danxuan_dadui
+				tempresult.danxuan_defen = danxuan_defen
+				tempresult.panduan_dadui = panduan_dadui
+				tempresult.panduan_defen = panduan_defen
+				tempresult.duoxuan_dadui = duoxuan_dadui
+				tempresult.duoxuan_defen = duoxuan_defen
+				tempresult.zongfen = danxuan_defen + panduan_defen + duoxuan_defen
+				console.log('该次考试总分-->',tempresult.zongfen)
+				stu_exam.update({'_id':shijuan._id},{'zongfen':tempresult.zongfen,'is_end':1},function(err){
+					if(err){
+						console.log('插入分数出错',err)
+						cb(err)
+					}
+					console.log('插入分数-->',tempresult.zongfen)
+					cb(null,tempresult)
+				})
+		}
+	],function(error,result){
+		if(error){
+			console.log('waterfall error',error)
+		}
+		
+		console.log('waterfall success',result)
+	})
 })
 
 module.exports = router;

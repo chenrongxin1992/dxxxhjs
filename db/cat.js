@@ -83,6 +83,8 @@ var sjszSchema = new Schema({
 })
 
 var stu_examSchema = new Schema({
+    is_end : {type:Number,default:0},
+    zongfen : {type:Number,default:0},
     gonghao : {type:String},
     xingming : {type:String},
     id : {type:Number},
