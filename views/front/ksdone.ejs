@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
 
-    <title></title>
+    <title><%=ksinfo.ksname%></title>
 
     <!-- Bootstrap -->
     <link rel='stylesheet' href='/stylesheets/bootstrap.css' />
@@ -24,14 +24,28 @@
         display: none;
         color: #333!important;
       }
-       .has-success{
+      .has-success{
         color: red!important;
+      }
+      .info{
+        text-align: center;
       }
     </style>
   </head>
 
   <body>
     <div class="container">
+        <div class="row">
+          <div class="col-12 info">
+            <h3><%=ksinfo.ksname%></h3>
+          </div>
+          <div class="col-12 info">
+            <h4>本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分</h4>
+          </div>
+          <div class="col-12 pull-right">
+            姓名:<span>123</span>,单位:<span>321</span>
+          </div>
+        </div>
         <div class="row">
             <!-- form: -->
             <section>
@@ -43,7 +57,7 @@
                       </div>
                       <%result.res_danxuan_arr.forEach(function(item,index){%>
                         <div class="form-group">
-                              <label class="col-12 control-label"><%=index+1%>、<%=item.timu%></label>
+                              <label class="col-12 control-label"><%=index+1%>、<%=item.timu%>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: blue;">(<%=item.choose%>)</span></label>
                               <div class="col-12">
                                   <%item.xuanxiang.forEach(function(it,ind){%>
                                     <%var chooseitem = ''%>
@@ -58,7 +72,11 @@
                                     <%if(ind == 8){chooseitem = 'I. '}%>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="<%=item._id%>" value="<%=it._id%>" /> &nbsp;<%=chooseitem%><%=it.content%>
+                                            <%if(it.is_correct==true){%>
+                                              <input type="radio" name="<%=item._id%>" value="<%=it._id%>" checked="checked" disabled/> &nbsp;<span style="color: red;"><%=chooseitem%><%=it.content%></span>
+                                            <%}else{%>
+                                              <input type="radio" name="<%=item._id%>" value="<%=it._id%>" disabled/> &nbsp;<%=chooseitem%><%=it.content%></span>
+                                            <%}%>
                                         </label>
                                     </div>
                                   <%})%>
@@ -71,7 +89,7 @@
                       </div>
                       <%result.res_duoxuan_arr.forEach(function(item,index){%>
                         <div class="form-group">
-                          <label class="col-12 control-label"><%=index+1%>、<%=item.timu%></label>
+                          <label class="col-12 control-label"><%=index+1%>、<%=item.timu%>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: blue;">(<%=item.choose%>)</span></label>
                             <div class="col-12">
                                 <%item.xuanxiang.forEach(function(it,ind){%>
                                   <%var chooseitemdx = ''%>
@@ -86,7 +104,11 @@
                                   <%if(ind == 8){chooseitemdx = 'I. '}%>
                                   <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" name="<%=item._id%>" value="<%=it._id%>" /> &nbsp;<%=chooseitemdx%><%=it.content%>
+                                      <%if(it.is_correct==true){%>
+                                        <input type="checkbox" name="<%=item._id%>" value="<%=it._id%>" checked="checked" disabled/> &nbsp;<span style="color: red;"><%=chooseitemdx%><%=it.content%></span>
+                                      <%}else{%>
+                                        <input type="checkbox" name="<%=item._id%>" value="<%=it._id%>" disabled/> &nbsp;<%=chooseitemdx%><%=it.content%>
+                                      <%}%>
                                     </label>
                                   </div>
                                   <%})%>
@@ -99,7 +121,7 @@
                       </div>
                       <%result.res_panduan_arr.forEach(function(item,index){%>
                         <div class="form-group">
-                              <label class="col-12 control-label"><%=index+1%>、<%=item.timu%></label>
+                              <label class="col-12 control-label"><%=index+1%>、<%=item.timu%>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: blue;">(<%=item.choose%>)</span></label>
                               <div class="col-12">
                                   <%item.xuanxiang.forEach(function(it,ind){%>
                                     <%var chooseitempd = ''%>
@@ -114,7 +136,11 @@
                                     <%if(ind == 8){chooseitempd = 'I. '}%>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="panduanti<%=item._id%>" value="<%=it._id%>" /> &nbsp;<%=chooseitempd%><%=it.content%>
+                                          <%if(it.is_correct==true){%>
+                                            <input type="radio" name="panduanti<%=item._id%>" value="<%=it._id%>" checked="checked" disabled/> &nbsp;<span style="color: red;"><%=chooseitempd%><%=it.content%>
+                                          <%}else{%>
+                                            <input type="radio" name="panduanti<%=item._id%>" value="<%=it._id%>" disabled/> &nbsp;<%=chooseitempd%><%=it.content%>
+                                          <%}%>
                                         </label>
                                     </div>
                                   <%})%>
@@ -124,15 +150,20 @@
 
                       <div class="form-group">
                             <div class="col-lg-9 col-lg-offset-3">
-                                <button type="submit" class="btn btn-primary" name="signup" value="Sign up">Sign up</button>
+                                <!-- button type="submit" class="btn btn-primary" name="signup" value="Sign up">Sign up</button>
                                 <button type="button" class="btn btn-info" id="validateBtn">Manual validate</button>
-                                <button type="button" class="btn btn-info" id="resetBtn">Reset form</button>
+                                <button type="button" class="btn btn-info" id="resetBtn">Reset form</button> -->
                             </div>
                       </div>
                     </form>
               </div>
           </section>
       </div>
+      <hr style="height:1px;border:none;border-top:1px dashed #F08080;">
+
+      <footer>
+        <p class="text-center">2018 &copy; 深圳大学</p>
+      </footer>
     </div>
                 
 
@@ -143,125 +174,7 @@
 <script>
 'use strict'
 $(document).ready(function() {
-    // $('input').iCheck({
-    //   checkboxClass: 'icheckbox_flat',
-    //   radioClass: 'iradio_flat'
-    // });
-    // Generate a simple captcha
-    function randomNumber(min, max) {
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    };
-    $('#captchaOperation').html([randomNumber(1, 100), '+', randomNumber(1, 200), '='].join(' '));
-
-    $('#defaultForm').bootstrapValidator({
-        //live: 'disabled',
-        message: '请选择选项',
-        feedbackIcons: {
-            valid: 'glyphicon glyphicon-ok',
-            invalid: 'glyphicon glyphicon-remove',
-            validating: 'glyphicon glyphicon-refresh'
-        },
-        fields: {
-            
-        }
-    }).on('success.form.bv', function (e) {
-        e.preventDefault();
-        let temp_danxuan = [],
-            temp_duoxuan = [],
-            temp_panduan = [],
-            danxuan_num = '<%=result.res_danxuan_arr.length%>',
-            duoxuan_num = '<%=result.res_duoxuan_arr.length%>',
-            panduan_num = '<%=result.res_panduan_arr.length%>'
-        console.log('danxuan_num-->',danxuan_num)
-        console.log('duoxuan_num-->',duoxuan_num)
-        console.log('panduan_num-->',panduan_num)
-        $('input:radio:checked').each(function(){
-          //提交答案格式 timu_id:daan_id  d.xuanxiang2.indexOf('true')) > 0
-          console.log($(this).attr('name').indexOf('panduanti'))
-          if($(this).attr('name').indexOf('panduanti') > -1){
-            console.log('---判断题---')
-            temp_panduan.push(($(this).attr('name').substring(9)) + ':' + $(this).val())
-            console.log('temp_panduan--',temp_panduan)
-          }else{
-            console.log('---单选题---')
-            temp_danxuan.push($(this).attr('name') + ':' + $(this).val())
-            console.log('temp_danxuan---->',temp_danxuan)
-          }
-        });
-        let temp_duoxuan_arr =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
-            duoxuan_arr = JSON.parse(temp_duoxuan_arr),
-            temp_name = ''
-        for(let i=0;i<duoxuan_arr.length;i++){
-            temp_name = duoxuan_arr[i]._id
-            console.log('temp_name--->',temp_name)
-            let temp_arr = []
-            console.log('看看是什么--->',$('input[name=' + temp_name + ']:checked').length)
-            let obj = document.getElementsByName(temp_name)
-            for(let k in obj){
-              if(obj[k].checked)
-                temp_arr.push(obj[k].value);
-            }
-            // for(let j=0;j<$('input[name=' + temp_name + ']:checked').length;j++){
-            //   temp_arr.push($('input[name=' + temp_name + ']:checked').val())
-            //   console.log('temp_arr--->',temp_arr)
-            // }
-            temp_duoxuan.push(temp_name + ':' + temp_arr)
-            console.log('check temp_duoxuan--->',temp_duoxuan)
-            temp_arr = []
-        }
-        if((danxuan_num==temp_danxuan.length) && (duoxuan_num==temp_duoxuan.length) && (panduan_num==temp_panduan.length)){
-          console.log('ajax 了')
-          let randomStr = GetQueryString('code')
-          console.log('check randomStr-->',randomStr)
-          $.ajax({
-            url:'/front/checkks',
-            method:'post',
-            data:{
-              randomStr : randomStr,
-              danxuan_arr : JSON.stringify(temp_danxuan),
-              duoxuan_arr : JSON.stringify(temp_duoxuan),
-              panduan_arr : JSON.stringify(temp_panduan)
-            },
-            success:function(res){
-              if(res.code === 0){
-                console.log(res.msg)
-                // layer.open({
-                //   title: '提示',
-                //   content: '试卷设置成功',
-                //   end:function(){
-                //     parent.parent.layer.closeAll()
-                //     //layer.closeAll('iframe')
-                //   }
-                // }); 
-
-              }else{
-                //console.log('试卷设置成功')
-              }
-            },
-            error:function(err){
-              console.log('err',err)
-            }
-          }) 
-        }else{
-          console.log('题目没有选齐')
-        }
-    })//on
-
-
-    // Validate the form manually
-    $('#validateBtn').click(function() {
-        $('#defaultForm').bootstrapValidator('validate');
-    });
-
-    $('#resetBtn').click(function() {
-        $('#defaultForm').data('bootstrapValidator').resetForm(true);
-    });
-    function GetQueryString(name)
-    {
-         var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-         var r = window.location.search.substr(1).match(reg);
-         if(r!=null)return  unescape(r[2]); return null;
-    }
+    
 });
 </script>
   </body>

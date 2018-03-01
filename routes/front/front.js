@@ -416,7 +416,8 @@ router.post('/checkks',function(req,res){
 				console.log('item---->',item)
 				let temp = item.split(':'),
 					timuid = temp[0],
-					timuda = temp[1]
+					timuda = temp[1],
+					choose = temp[2]
 				console.log('题目id-->',timuid)
 				console.log('对应答案-->',timuda)
 				async.eachLimit(shijuan.res_danxuan_arr,1,function(ite,callback1){
@@ -439,6 +440,9 @@ router.post('/checkks',function(req,res){
 								console.log('xuanxiang eachLimit e',e)
 								callback1(e)
 							}
+							ite.choose = choose
+							console.log('检查选择的答案-->',choose)
+							console.log('检查ite-->',ite)
 							callback1()
 						})
 					}
@@ -461,10 +465,18 @@ router.post('/checkks',function(req,res){
 				}
 				else{
 					console.log('单选检查结束,每道题分值,答对,共得分',danxuan_fenzhi,danxuan_dadui,danxuan_defen)
-					console.log()
-					console.log()
-					console.log()
-					cb()
+					//这里更新一下试卷
+					stu_exam.update({'_id':shijuan._id},{'res_danxuan_arr':shijuan.res_danxuan_arr},function(err){
+						if(err){
+							console.log('update shijuan.res_danxuan_arr err',err)
+							cb(err)
+						}
+						console.log('update shijuan.res_danxuan_arr success')
+						console.log()
+						console.log()
+						console.log()
+						cb()
+					})
 				}
 			})
 		},
@@ -474,7 +486,8 @@ router.post('/checkks',function(req,res){
 				console.log('item---->',item)
 				let temp = item.split(':'),
 					timuid = temp[0],
-					timuda = temp[1]
+					timuda = temp[1],
+					choose = temp[2]
 				console.log('题目id-->',timuid)
 				console.log('对应答案-->',timuda)
 				async.eachLimit(shijuan.res_panduan_arr,1,function(ite,callback1){
@@ -497,6 +510,9 @@ router.post('/checkks',function(req,res){
 								console.log('xuanxiang eachLimit e',e)
 								callback1(e)
 							}
+							ite.choose = choose
+							console.log('检查选择的答案-->',choose)
+							console.log('检查ite-->',ite)
 							callback1()
 						})
 					}
@@ -506,7 +522,7 @@ router.post('/checkks',function(req,res){
 					}
 				},function(er){
 					if(er){
-						console.log('shijuan.res_danxuan_arr eachLimit er',er)
+						console.log('shijuan.res_panduan_arr eachLimit er',er)
 						callback(er)
 					}
 					callback()
@@ -519,10 +535,18 @@ router.post('/checkks',function(req,res){
 				}
 				else{
 					console.log('判断检查结束,每道题分值,答对,共得分',panduan_fenzhi,panduan_dadui,panduan_defen)
-					console.log()
-					console.log()
-					console.log()
-					cb()
+					//这里更新一下试卷
+					stu_exam.update({'_id':shijuan._id},{'res_panduan_arr':shijuan.res_panduan_arr},function(err){
+						if(err){
+							console.log('update shijuan.res_panduan_arr err',err)
+							cb(err)
+						}
+						console.log('update shijuan.res_panduan_arr success')
+						console.log()
+						console.log()
+						console.log()
+						cb()
+					})
 				}
 			})
 		},
@@ -532,7 +556,8 @@ router.post('/checkks',function(req,res){
 				console.log('item---->',item)
 				let temp = item.split(':'),
 					timuid = temp[0],
-					timuda_str = temp[1]
+					timuda_str = temp[1],
+					timuda_choose = temp[2]
 				let timuda_arr = timuda_str.split(','),
 					timuda_duibi = timuda_arr.sort().toString(),
 					zhengque_arr = []
@@ -550,17 +575,6 @@ router.post('/checkks',function(req,res){
 							}else{
 								callback2()
 							}
-							// if(it._id == timuda && it.is_correct == true){
-							// 	console.log('该题答对了,该题是',it)
-							// 	panduan_defen += panduan_fenzhi 
-							// 	panduan_dadui++
-							// 	console.log('panduan_defen',panduan_defen)
-							// 	callback2()
-							// }
-							// else{
-							// 	console.log('该题答错了')
-							// 	callback2()
-							// }
 						},function(e){
 							if(e){
 								console.log('xuanxiang eachLimit e',e)
@@ -572,10 +586,16 @@ router.post('/checkks',function(req,res){
 								duoxuan_defen += duoxuan_fenzhi 
 								duoxuan_dadui++
 								console.log('duoxuan_defen',duoxuan_defen)
+								ite.choose = timuda_choose
+								console.log('检查选择的答案-->',timuda_choose)
+								console.log('检查ite-->',ite)
 								callback1()
 							}
 							else{
 								console.log('该题错了')
+								ite.choose = timuda_choose
+								console.log('检查选择的答案-->',timuda_choose)
+								console.log('检查ite-->',ite)
 								callback1()
 							}
 						})
@@ -599,10 +619,18 @@ router.post('/checkks',function(req,res){
 				}
 				else{
 					console.log('多选检查结束,每道题分值,答对,共得分',duoxuan_fenzhi,duoxuan_dadui,duoxuan_defen)
-					console.log()
-					console.log()
-					console.log()
-					cb()
+					//这里更新一下试卷
+					stu_exam.update({'_id':shijuan._id},{'res_duoxuan_arr':shijuan.res_duoxuan_arr},function(err){
+						if(err){
+							console.log('update shijuan.res_duoxuan_arr err',err)
+							cb(err)
+						}
+						console.log('update shijuan.res_duoxuan_arr success')
+						console.log()
+						console.log()
+						console.log()
+						cb()
+					})
 				}
 			})
 		},
@@ -628,9 +656,10 @@ router.post('/checkks',function(req,res){
 	],function(error,result){
 		if(error){
 			console.log('waterfall error',error)
+			return res.json({'code':-1,'msg':error})
 		}
-		
 		console.log('waterfall success',result)
+		return res.json({'code':0,'result':result})
 	})
 })
 

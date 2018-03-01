@@ -83,6 +83,7 @@ var sjszSchema = new Schema({
 })
 
 var stu_examSchema = new Schema({
+    kaoshiyongshi:{type:Number},
     is_end : {type:Number,default:0},
     zongfen : {type:Number,default:0},
     gonghao : {type:String},
@@ -100,6 +101,7 @@ var stu_examSchema = new Schema({
     randomStr : {type:String},
     kslianjie : {type:String},
     res_danxuan_arr : [{
+        choose:{type:String},//选择的答案
         id : {type:Number},
         catname : {type:String},//分类名:如党章、十九大         
         leixing : {type:String},//单选，多选，判断
@@ -114,6 +116,7 @@ var stu_examSchema = new Schema({
         createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
     }],
     res_duoxuan_arr : [{
+        choose:{type:String},//选择的答案
         id : {type:Number},
         catname : {type:String},//分类名:如党章、十九大         
         leixing : {type:String},//单选，多选，判断
@@ -128,6 +131,7 @@ var stu_examSchema = new Schema({
         createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
     }],
     res_panduan_arr : [{
+        choose:{type:String},//选择的答案
         id : {type:Number},
         catname : {type:String},//分类名:如党章、十九大         
         leixing : {type:String},//单选，多选，判断
@@ -143,7 +147,8 @@ var stu_examSchema = new Schema({
     }],
     peopleinfo : {type:String,default:null},//录入人员信息
     createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
-    createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+    createTimeStamp : {type:String,default:moment().format('X')},//创建时间戳
+    tijiaoTimeStamp:{type:String}
 })
 //module.exports = mongoose.model('catinfo',catSchema);
 exports.stu_exam = mongoose.model('stu_exam',stu_examSchema);

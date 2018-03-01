@@ -11,6 +11,7 @@
     <!-- Bootstrap -->
     <link rel='stylesheet' href='/stylesheets/bootstrap.css' />
     <link rel='stylesheet' href='/stylesheets/bootstrapValidator.css' />
+    <link rel="stylesheet" href="/stylesheets/layui.css" media="all">
     <link href="/flat/blue.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -26,6 +27,12 @@
       }
        .has-success{
         color: red!important;
+      }
+      .ksresult{
+        text-align: center;
+        display: block;
+        height: 50px;
+        line-height: 50px;
       }
     </style>
   </head>
@@ -58,7 +65,7 @@
                                     <%if(ind == 8){chooseitem = 'I. '}%>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="<%=item._id%>" value="<%=it._id%>" /> &nbsp;<%=chooseitem%><%=it.content%>
+                                            <input type="radio" name="<%=item._id%>" value="<%=it._id%>" daan="<%=chooseitem%>"/> &nbsp;<%=chooseitem%><%=it.content%>
                                         </label>
                                     </div>
                                   <%})%>
@@ -86,7 +93,7 @@
                                   <%if(ind == 8){chooseitemdx = 'I. '}%>
                                   <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" name="<%=item._id%>" value="<%=it._id%>" /> &nbsp;<%=chooseitemdx%><%=it.content%>
+                                        <input type="checkbox" name="<%=item._id%>" value="<%=it._id%>" daan="<%=chooseitemdx%>"/> &nbsp;<%=chooseitemdx%><%=it.content%>
                                     </label>
                                   </div>
                                   <%})%>
@@ -114,7 +121,7 @@
                                     <%if(ind == 8){chooseitempd = 'I. '}%>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="panduanti<%=item._id%>" value="<%=it._id%>" /> &nbsp;<%=chooseitempd%><%=it.content%>
+                                            <input type="radio" name="panduanti<%=item._id%>" value="<%=it._id%>" daan="<%=chooseitempd%>" /> &nbsp;<%=chooseitempd%><%=it.content%>
                                         </label>
                                     </div>
                                   <%})%>
@@ -124,8 +131,8 @@
 
                       <div class="form-group">
                             <div class="col-lg-9 col-lg-offset-3">
-                                <button type="submit" class="btn btn-primary" name="signup" value="Sign up">Sign up</button>
-                                <button type="button" class="btn btn-info" id="validateBtn">Manual validate</button>
+                                <button type="submit" class="btn btn-primary" name="signup" value="Sign up">提交</button>
+                                <!-- <button type="button" class="btn btn-info" id="validateBtn">Manual validate</button> -->
                                 <button type="button" class="btn btn-info" id="resetBtn">Reset form</button>
                             </div>
                       </div>
@@ -140,6 +147,7 @@
 <script src="/javascripts/bootstrap.min.js"></script>
 <script src='/javascripts/bootstrapValidator.min.js' ></script>
 <script src='/javascripts/icheck.js' ></script>
+<script src="/javascripts/layui.js"></script>
 <script>
 'use strict'
 $(document).ready(function() {
@@ -180,11 +188,11 @@ $(document).ready(function() {
           console.log($(this).attr('name').indexOf('panduanti'))
           if($(this).attr('name').indexOf('panduanti') > -1){
             console.log('---判断题---')
-            temp_panduan.push(($(this).attr('name').substring(9)) + ':' + $(this).val())
+            temp_panduan.push(($(this).attr('name').substring(9)) + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1) )
             console.log('temp_panduan--',temp_panduan)
           }else{
             console.log('---单选题---')
-            temp_danxuan.push($(this).attr('name') + ':' + $(this).val())
+            temp_danxuan.push($(this).attr('name') + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1))
             console.log('temp_danxuan---->',temp_danxuan)
           }
         });
@@ -194,18 +202,19 @@ $(document).ready(function() {
         for(let i=0;i<duoxuan_arr.length;i++){
             temp_name = duoxuan_arr[i]._id
             console.log('temp_name--->',temp_name)
-            let temp_arr = []
+            let temp_arr = [],
+                temp_choose = []
             console.log('看看是什么--->',$('input[name=' + temp_name + ']:checked').length)
-            let obj = document.getElementsByName(temp_name)
-            for(let k in obj){
-              if(obj[k].checked)
-                temp_arr.push(obj[k].value);
-            }
-            // for(let j=0;j<$('input[name=' + temp_name + ']:checked').length;j++){
-            //   temp_arr.push($('input[name=' + temp_name + ']:checked').val())
-            //   console.log('temp_arr--->',temp_arr)
-            // }
-            temp_duoxuan.push(temp_name + ':' + temp_arr)
+            let tempobj = $('input[name=' + temp_name + ']')
+            tempobj.each(function(){
+              if($(this).is(':checked')){
+                console.log('$(this)--->',$(this).attr('daan').substring(0,1))
+                console.log('该多选题选择的答案-->',$(this).val())
+                temp_arr.push($(this).val())
+                temp_choose.push($(this).attr('daan').substring(0,1))
+              }
+            })
+            temp_duoxuan.push(temp_name + ':' + temp_arr + ':' + temp_choose)
             console.log('check temp_duoxuan--->',temp_duoxuan)
             temp_arr = []
         }
@@ -224,22 +233,24 @@ $(document).ready(function() {
             },
             success:function(res){
               if(res.code === 0){
-                console.log(res.msg)
-                // layer.open({
-                //   title: '提示',
-                //   content: '试卷设置成功',
-                //   end:function(){
-                //     parent.parent.layer.closeAll()
-                //     //layer.closeAll('iframe')
-                //   }
-                // }); 
-
+                console.log(res.result)
+                layui.use(['layer'], function(){
+                  let temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
+                  let layer = layui.layer
+                      layer.open({
+                        title: '考试结果',
+                        content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>',
+                        end:function(){
+                          window.location.reload
+                        }
+                    }); 
+                });
               }else{
                 //console.log('试卷设置成功')
               }
             },
             error:function(err){
-              console.log('err',err)
+              console.log('ajax err',err)
             }
           }) 
         }else{
