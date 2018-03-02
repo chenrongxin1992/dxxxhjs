@@ -702,17 +702,48 @@ router.get('/new_firststep',function(req,res){
     	check_panduan += item.num_panduan
     	if(check_danxuan>danxuan_num){
     		console.log('danxuan超过咯')
-    		item.num_danxuan = item.num_danxuan - 1
+    		let chaoguo = check_danxuan - danxuan_num
+    		if(item.percent != 0){
+    			item.num_danxuan = item.num_danxuan - chaoguo
+    		}
+    		console.log('单选超过多少---->',chaoguo)
     	}
     	if(check_duoxuan>duoxuan_num){
     		console.log('duoxuan超过咯')
-    		item.num_duoxuan = item.num_duoxuan - 1
+    		let chaoguo = check_duoxuan - duoxuan_num
+    		if(item.percent != 0){
+    			item.num_duoxuan = item.num_duoxuan - chaoguo
+    		}
+    		console.log('多选超过多少---->',chaoguo)
     	}
     	if(check_panduan>panduan_num){
     		console.log('panduan超过咯')
-    		item.num_panduan = item.num_panduan - 1
+    		let chaoguo = check_panduan - panduan_num
+    		if(item.percent != 0){
+    			item.num_panduan = item.num_panduan - chaoguo
+    		}
+    		console.log('判断超过多少---->',chaoguo)
     	}
     })
+    if(check_panduan < panduan_num){
+    	console.log('判断题数不够')
+    	let queshao = panduan_num - check_panduan
+    		tem_arr[0].num_panduan = tem_arr[0].num_panduan + queshao
+    		console.log('判断缺少多少---->',queshao)
+    }
+    if(check_danxuan<danxuan_num){
+    	console.log('danxuan还缺少咯')
+    	let queshao = danxuan_num - check_danxuan
+    	tem_arr[0].num_danxuan = tem_arr[0].num_danxuan + queshao
+    	console.log('单选缺少多少---->',queshao)
+    }
+    if(check_duoxuan<duoxuan_num){
+    	console.log('duoxuan还缺少咯')
+    	let queshao = duoxuan_num - check_duoxuan
+    	tem_arr[0].num_duoxuan = tem_arr[0].num_duoxuan + queshao
+    	console.log('多选缺少多少---->',queshao)
+    }
+
     console.log('tem_arr-->',tem_arr)
 
     let sjsz_id = 1

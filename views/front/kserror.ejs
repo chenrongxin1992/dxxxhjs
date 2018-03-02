@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>提示</title>
+
+    <!-- Bootstrap -->
+    <link rel='stylesheet' href='/stylesheets/bootstrap.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+      body{
+        padding: 0;
+        font-family: '微软雅黑';;
+      }
+      p{
+        margin-top: 10px;
+        font-size: 20px;
+        color:red;
+      }
+      .head{
+        font-size:26px;
+        background-color: #F0F8FF;
+        /*border: 1px solid #ddd;*/
+        margin:5px 0;
+        height: 50px;
+        padding: 5px 0 0 0;
+
+      }
+      @media (min-width: 1170px) {
+        .user{
+          height: 70px;
+          line-height: 70px;
+          vertical-align: bottom;
+          padding-top: 13px;
+        }
+      }
+      .user{
+        vertical-align: bottom;
+      }
+      hr{
+        margin: 5px 5px;
+        color: #EECFA1;
+        border: 1px solid;
+      }
+      .footer{
+        text-align: center;
+      }
+      a{
+        font-size: 18px;
+      }
+      a:hover{
+        font-size: 20px;
+        text-decoration:none
+      }
+      .uniform{
+        padding: 15px 15px;
+      }
+      @media (max-width: 768px) {
+        .btn_ {
+          margin:5px 0;
+        }
+        .meeting_date{
+          text-align: left;
+          margin-left: -15px;
+          min-height: 26px;
+        }
+        .meeting_info{
+          min-height: 26px;
+        }
+        .dynamic_code{
+          margin-left: -15px;
+          line-height: 32px;
+        }
+        .uniform{
+          padding: 0 15px;
+        }
+      }
+      @media (min-width: 768px) {
+        .meeting_date{
+          text-align: right;
+        }
+        .dynamic_code{
+          text-align: right;
+          line-height: 32px;
+        }
+        .meeting_info{
+          line-height: 34px;
+        }
+      }
+      @media (max-width: 768px) {
+        .glyphicon ,.glyphicon-remove{
+          color:#7CCD7C;
+          font-size:210px;
+          display: block;
+          text-align: center;
+        }
+      }
+      @media (min-width: 768px) {
+        .glyphicon, .glyphicon-remove{
+          color:#7CCD7C;
+          font-size:325px;
+          display: block;
+          text-align: center;
+        }
+      }
+      .note_1{
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+          
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <p style="text-align: center;"><%=msg%></p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <span class="glyphicon glyphicon-remove" ></span>
+        </div>
+      </div>
+
+      <div class="row">
+        <hr>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 footer">
+          <span>2017 © 计算机与软件学院</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模态框 -->
+    <!-- Button trigger modal -->
+    <!-- Modal -->
+    <div class="modal fade modal-msg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="data-modal">
+    <div class="modal-dialog modal-md modal-xs" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="gridSystemModalLabel">报名结果</h4>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success sure" data-dismiss="modal" id="result-sure">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script type="text/javascript" src='/javascripts/jquery-1.10.2.min.js' ></script>
+    <script type="text/javascript" src='/javascripts/bootstrap.min.js' ></script>
+    
+  </body>
+</html>
