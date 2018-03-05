@@ -54,6 +54,7 @@
                         <div id="ctl00_ContentPlaceHolder1_JQ1_divHead" class="surveyhead" style="border: 0px;">
                             <div id="ctl00_ContentPlaceHolder1_JQ1_h1Name" style="position:relative;">
                                 <h1 id="ctl00_ContentPlaceHolder1_JQ1_lblQuestionnaireName"><%=ksinfo.ksname%></h1>
+                                <h4 id="">本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分</h4>
                             </div>
 
                             <div style="clear: both;">
@@ -84,7 +85,7 @@
                                       <div class='div_question' id='div<%=index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=index+1%>.</div>
-                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( )</div>
+                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=index+1%>'>
@@ -102,8 +103,15 @@
                                             <%if(ind == 7){chooseitem = 'H. '}%>
                                             <%if(ind == 8){chooseitem = 'I. '}%>
                                             <li style='width:99%;'>
-                                              <a href='javascript:' class='jqRadio' rel='q<%=index+1%>_<%=ind+1%>'></a>
-                                              <input style='display:none;' type='radio' name='q<%=index+1%>' id='q<%=index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitem%>" timuid="<%=item._id%>"/>
+                                            <%if(it.is_correct==true){%>
+                                              <a href='javascript:' class='jqRadio jqChecked' rel='q<%=index+1%>_<%=ind+1%>'></a>
+                                              <%}else{%>
+                                              <a href='javascript:' class='jqRadio ' rel='q<%=index+1%>_<%=ind+1%>'></a>
+                                              <%}%>
+                                              <input style='display:none;' type='radio' name='q<%=index+1%>' id='q<%=index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitem%>" timuid="<%=item._id%>" checked="checked"/>
+                                              
+                                              <input style='display:none;' type='radio' name='q<%=index+1%>' id='q<%=index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitem%>" timuid="<%=item._id%>" />
+                                              
                                               <label for='q<%=index+1%>_<%=ind+1%>'><%=chooseitem%><%=it.content%></label>
                                             </li>
                                           <%})%>
@@ -121,7 +129,7 @@
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+index+1%>'>
@@ -139,8 +147,13 @@
                                             <%if(ind == 7){chooseitemdx = 'H. '}%>
                                             <%if(ind == 8){chooseitemdx = 'I. '}%>
                                             <li style='width:99%;'>
+                                              <%if(it.is_correct==true){%>
+                                              <a href='javascript:' class='jqCheckbox jqChecked' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                              <%}else{%>
                                               <a href='javascript:' class='jqCheckbox' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                              <%}%>
                                               <input style='display:none;' type='checkbox' name='q<%=result.res_danxuan_arr.length+index+1%>' id='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitemdx%>" timuid="<%=item._id%>"/>
+                                              
                                               <label for='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'><%=chooseitemdx%><%=it.content%></label>
                                             </li>
                                           <%})%>
@@ -158,7 +171,7 @@
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
@@ -176,8 +189,14 @@
                                             <%if(ind == 7){chooseitempd = 'H. '}%>
                                             <%if(ind == 8){chooseitempd = 'I. '}%>
                                             <li style='width:99%;'>
-                                              <a href='javascript:' class='jqRadio' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
-                                              <input style='display:none;' type='radio' name='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' id='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitempd%>" timuid="panduanti<%=item._id%>" />
+                                              
+                                              <%if(it.is_correct==true){%>
+                                              <a href='javascript:' class='jqRadio jqChecked' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                              <%}else{%>
+                                              <a href='javascript:' class='jqRadio ' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                              <%}%>
+                                              <input style='display:none;' type='radio' name='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' id='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitempd%>" timuid="panduanti<%=item._id%>" checked=""/>
+                                              
                                               <label for='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'><%=chooseitempd%><%=it.content%></label>
                                             </li>
                                           <%})%>
@@ -204,7 +223,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input type="button" class="submitbutton" value='提交' onmouseout="this.className='submitbutton';" id="submit_button" style="padding: 0 24px; height: 32px;" />
+                                            <!-- <input type="button" class="submitbutton" value='提交' onmouseout="this.className='submitbutton';" id="submit_button" style="padding: 0 24px; height: 32px;" /> -->
                                         </td>
                                         <td></td>
                                         <td align="right" style="position: relative;">

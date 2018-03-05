@@ -1,10 +1,10 @@
 <div class="col-12">
   <div class="jumbotron">
       <h3>导入题库</h3>
-      <button type="button" class="layui-btn" id="uploadtk" lay-data="{url: '/manage/uploadtk', exts: 'xlsx|xls'}" name='uploadtk'>
+      <button type="button" class="layui-btn" id="uploadtk" lay-data="{url: '/dxxxhjs/manage/uploadtk', exts: 'xlsx|xls'}" name='uploadtk'>
   	  <i class="layui-icon">&#xe67c;</i>导入题库
   	  </button>
-      <a href="/manage/download_tkmb" download=''>题库模板下载</a>
+      <a href="/dxxxhjs/manage/download_tkmb" download=''>题库模板下载</a>
   </div>
 </div>
 
@@ -17,7 +17,7 @@ layui.use(['upload','layer'], function(){
   //执行实例
   var uploadInst = upload.render({
     elem: '#uploadtk' //绑定元素
-    //,url: '/manage/uploadtk' //上传接口
+    //,url: '/dxxxhjs/manage/uploadtk' //上传接口
     ,before: function(obj){ 
   	 	uploading = layer.load(); //上传loading
   	 	obj.preview(function(index, file, result){

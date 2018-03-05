@@ -500,7 +500,8 @@ function random_str() {
     return str
 }
 
-const baselink = 'localhost:3000/front/ks?code='
+//const baselink = 'localhost:3000/front/ks?code='
+const baselink = 'qiandao.szu.edu.cn:81/dxxxhjs/front/ks?code='
 router.get('/sjsz',function(req,res){
 	console.log('sjsz')
 	res.render('manage/sjsz')

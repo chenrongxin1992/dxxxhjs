@@ -29,7 +29,7 @@ $(function(){
       elem: '#sjlb_tb'
       ,height: 'full-200'//高度最大化
       ,cellMinWidth: 50//列宽自动分配
-      ,url: '/manage/sjlb_data' //数据接口
+      ,url: '/dxxxhjs/manage/sjlb_data' //数据接口
       ,page: true //开启分页
       ,id: 'reload_tb'
       ,cols:  [[ //标题栏
@@ -64,7 +64,7 @@ $(function(){
           maxmin: true, //开启最大化最小化按钮
           area: '850px',
           maxHeight:'900px',
-          content: '/manage/new_firststep',
+          content: '/dxxxhjs/manage/new_firststep',
           success: function(layero, index) {
             console.log('layero-->',layero)
             console.log('index-->',index)
@@ -95,7 +95,7 @@ $(function(){
             shade: false,
             maxmin: true, //开启最大化最小化按钮
             area: ['900px', '600px'],
-            content: '/manage/iframe_mb?_id=' + data._id
+            content: '/dxxxhjs/manage/iframe_mb?_id=' + data._id
           }); 
           layer.iframeAuto(if_index);
       } 
@@ -104,7 +104,7 @@ $(function(){
         layer.confirm('确定要删除该条数据吗?', function(index){
           console.log('删除index-->',index)
           $.ajax({
-            url:'/manage/delete_sjlbitem',
+            url:'/dxxxhjs/manage/delete_sjlbitem',
             method:'post',
             data:{
               _id:data._id
@@ -136,7 +136,7 @@ $(function(){
             scrollbar: false,
             maxmin: true, //开启最大化最小化按钮
             area: ['900px', '600px'],
-            content: '/manage/iframe_mbbj?_id=' + data._id//模板编辑
+            content: '/dxxxhjs/manage/iframe_mbbj?_id=' + data._id//模板编辑
           }); 
         layer.iframeAuto(if_index);
       }

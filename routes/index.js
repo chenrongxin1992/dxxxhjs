@@ -5,9 +5,11 @@ const fs = require('fs')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+	//logger.debug('here')
+	console.log('dddddddddddddddddd')
+	res.redirect('/dxxxhjs/manage')
+  	//res.render('index', { title: 'Express' });
 });
-
 
 
 router.get('/importnew_',function(req,res){

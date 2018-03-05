@@ -5,6 +5,14 @@ const cat = require('../../db/cat').catinfo
 const stu_exam = require('../../db/cat').stu_exam
 const moment = require('moment')
 const async = require('async')
+const request = require('request')
+
+let MyServer = "http://116.13.96.53:81",
+	//CASserver = "https://auth.szu.edu.cn/cas.aspx/",
+	CASserver = 'https://authserver.szu.edu.cn/authserver/',
+	ReturnURL = "http://116.13.96.53:81";
+
+
 /*
 //code:{-1:数据库出错或其它错误，-2：结果为空，-3：考试日期已过，-4：考试尚未开始，-5：url有误}
  */
@@ -14,109 +22,144 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/ks',function(req,res){
-	let randomStr = req.query.code
-	console.log('check randomStr-->',randomStr)
-	if(!randomStr){
-		return res.json({'code':-5,'msg':'url有误'})
+function ksfunction(){
+	
+}
+//正则匹配
+function pipei(str,arg){
+	let zhengze = '<cas:' + arg + '>(.*)<\/cas:' + arg + '>' 
+	let res = str.match(zhengze)
+	if(res){
+		return res[1]
+	}else{
+		return null
 	}
-	let search_data = [],//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
-		danxuan_arr = [],
-		duoxuan_arr = [],
-		panduan_arr = [],
-		ksinfo = {},
-		random = parseInt((Math.random()+0.01) * 50)
-		if(random > 35 || random < 15){
-			random = 25
-		}
-	//1.该考试是否存在，存在时是否已经过了日期
-	async.waterfall([
-		function(cb){
-			console.log('计时开始')
-			console.time('countdown')
-			let search = sjsz.findOne({})
-				search.where('randomStr').equals(randomStr)
-				search.exec(function(err,doc){
-					if(err){
-						console.log('search err',err)
-						return res.json({'code':-1,'msg':err.message})
-					}
-					if(doc){
-						console.log('check doc-->',doc)
-						console.log('check doc.ksriqi-->',doc.ksriqi)
-						console.log('check nowday-->',moment().format('YYYY-MM-DD'))
-						if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
-							console.log('考试日期已过')
-							return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
-						}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
-							console.log('考试日期有效')
-							//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
-							ksinfo = doc
-							//看是否已有试卷，有的话直接返回
-							let search_sj = stu_exam.findOne({})
-								search_sj.where('randomStr').equals(randomStr)
-								search_sj.where('gonghao').equals('2011150178')
-								//search_sj.where('is_end').equals(0)
-								search_sj.exec(function(errr,docc){
-									if(errr){
-										console.log('search_sj errr')
-										return resjson({'code':-1,'msg':err.message})
-									}
-									if(docc && docc.is_end == 0){
-										console.log('docc---->',docc)
-										console.log('试卷存在，尚未结束，直接返回试卷继续')
-										return res.render('front/ks',{'code':0,'result':docc,'ksinfo':ksinfo})
-									}
-									if(docc && docc.is_end == 1){
-										console.log('该试卷已经提交')
-										return res.render('front/ksdone',{'result':docc,'ksinfo':ksinfo})
-									}
-									if(!docc){
-										console.log('考试日期有效，还没生成试卷')
-										cb(null,doc)
-									}
-								})
-						}else{
-							console.log('考试尚未开始')
-							return res.json({'code':-4,'msg':'考试尚未开始'})
-						}
-					}
-					if(!doc){
-						console.log('不存在该randomStr')
-						return res.render('front/kserror',{'code':-2,'msg':'没有对应的考试'})
-					}
-				})
-		},
-		function(doc,cb){//第一次循环找单选题
-			doc.per_of_modal.forEach(function(item,index){
-				let why_num = parseInt(item.num_danxuan)
-				console.log('check why_num---->',why_num)
-				let search = cat.find({})
-					search.where('catname').equals(item.name)
-					search.where('leixing').equals('单选')
-					search.where('random').gte(random)
-					search.limit(why_num)
-					search.exec(function(e,d){
-						if(e){
-							console.log('第一次forEach err-->',e)
-							return res.json({'code':-1,'msg':err.message})
-						}
-						console.log('第一次forEach docs-->',d.length)
-						console.log('第一次 单选 num-->',item.num_danxuan)
-						if(d.length < item.num_danxuan){
-							console.log('-------单选题 随机抽取的结果少于题目数，重新抽取-------')
-							let search1 = cat.find({})
-								search1.where('catname').equals(item.name)
-								search1.where('leixing').equals('单选')
-								search1.where('random').gte(random)
-								search1.limit(why_num)
-								search1.exec(function(e,d){
-									if(e){
-										console.log('第一次forEach err-->',e)
-										return res.json({'code':-1,'msg':err.message})
-									}
-									console.log('第一次forEach docs-->',d.length)
-									console.log('第一次 单选 num-->',item.num_danxuan)
+}
+router.get('/ks',function(req,res){
+	if(!req.query.ticket){
+		let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
+		console.log('ReturnURL url-->',ReturnURL)
+		let url = CASserver + 'login?service=' + ReturnURL
+		console.log('check redirecturl -->',url)
+		console.log('跳转获取ticket')
+
+		if(req.session.student){
+			console.log('没有ticket,考生有session,直接返回试卷流程')
+			console.log('session-->',req.session.student)
+			let randomStr = req.query.code
+			console.log('check randomStr-->',randomStr)
+			if(!randomStr){
+				return res.json({'code':-5,'msg':'url有误'})
+			}
+			let search_data = [],//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
+				danxuan_arr = [],
+				duoxuan_arr = [],
+				panduan_arr = [],
+				ksinfo = {},
+				random = parseInt((Math.random()+0.01) * 50)
+				if(random > 35 || random < 15){
+					random = 25
+				}
+			//1.该考试是否存在，存在时是否已经过了日期
+			async.waterfall([
+				function(cb){
+					console.log('计时开始')
+					console.time('countdown')
+					let search = sjsz.findOne({})
+						search.where('randomStr').equals(randomStr)
+						search.exec(function(err,doc){
+							if(err){
+								console.log('search err',err)
+								return res.json({'code':-1,'msg':err.message})
+							}
+							if(doc){
+								console.log('check doc-->',doc)
+								console.log('check doc.ksriqi-->',doc.ksriqi)
+								console.log('check nowday-->',moment().format('YYYY-MM-DD'))
+								if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
+									console.log('考试日期已过')
+									return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
+								}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
+									console.log('考试日期有效')
+									//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
+									ksinfo = doc
+									//看是否已有试卷，有的话直接返回
+									let search_sj = stu_exam.findOne({})
+										search_sj.where('randomStr').equals(randomStr)
+										search_sj.where('gonghao').equals('2011150178')
+										//search_sj.where('is_end').equals(0)
+										search_sj.exec(function(errr,docc){
+											if(errr){
+												console.log('search_sj errr')
+												return resjson({'code':-1,'msg':err.message})
+											}
+											if(docc && docc.is_end == 0){
+												console.log('docc---->',docc)
+												console.log('试卷存在，尚未结束，直接返回试卷继续')
+												return res.render('front/ks',{'code':0,'result':docc,'ksinfo':ksinfo})
+											}
+											if(docc && docc.is_end == 1){
+												console.log('该试卷已经提交')
+												return res.render('front/ksdonenew',{'result':docc,'ksinfo':ksinfo})
+											}
+											if(!docc){
+												console.log('考试日期有效，还没生成试卷')
+												cb(null,doc)
+											}
+										})
+								}else{
+									console.log('考试尚未开始')
+									return res.json({'code':-4,'msg':'考试尚未开始'})
+								}
+							}
+							if(!doc){
+								console.log('不存在该randomStr')
+								return res.render('front/kserror',{'code':-2,'msg':'没有对应的考试'})
+							}
+						})
+				},
+				function(doc,cb){//第一次循环找单选题
+					doc.per_of_modal.forEach(function(item,index){
+						let why_num = parseInt(item.num_danxuan)
+						console.log('check why_num---->',why_num)
+						let search = cat.find({})
+							search.where('catname').equals(item.name)
+							search.where('leixing').equals('单选')
+							search.where('random').gte(random)
+							search.limit(why_num)
+							search.exec(function(e,d){
+								if(e){
+									console.log('第一次forEach err-->',e)
+									return res.json({'code':-1,'msg':err.message})
+								}
+								console.log('第一次forEach docs-->',d.length)
+								console.log('第一次 单选 num-->',item.num_danxuan)
+								if(d.length < item.num_danxuan){
+									console.log('-------单选题 随机抽取的结果少于题目数，重新抽取-------')
+									let search1 = cat.find({})
+										search1.where('catname').equals(item.name)
+										search1.where('leixing').equals('单选')
+										search1.where('random').gte(random)
+										search1.limit(why_num)
+										search1.exec(function(e,d){
+											if(e){
+												console.log('第一次forEach err-->',e)
+												return res.json({'code':-1,'msg':err.message})
+											}
+											console.log('第一次forEach docs-->',d.length)
+											console.log('第一次 单选 num-->',item.num_danxuan)
+											if(why_num){
+												danxuan_arr.push(d)
+											}else{
+												danxuan_arr.push([])
+											}
+
+											if(danxuan_arr.length == doc.per_of_modal.length){
+												console.log('danxuan_arr-->',danxuan_arr,danxuan_arr.length)
+												cb(null,doc)
+											}
+										})
+								}else{
 									if(why_num){
 										danxuan_arr.push(d)
 									}else{
@@ -127,60 +170,59 @@ router.get('/ks',function(req,res){
 										console.log('danxuan_arr-->',danxuan_arr,danxuan_arr.length)
 										cb(null,doc)
 									}
-								})
-						}else{
-							if(why_num){
-								danxuan_arr.push(d)
-							}else{
-								danxuan_arr.push([])
-							}
-
-							if(danxuan_arr.length == doc.per_of_modal.length){
-								console.log('danxuan_arr-->',danxuan_arr,danxuan_arr.length)
-								cb(null,doc)
-							}
-						}
-					})//search
-			})
-		},
-		function(doc,cb){
-			//第二次循环找多选题
-			console.log('第二次循环')
-			random = parseInt((Math.random()+0.01) * 50)
-			if(random > 35 || random < 15){
-				random = 25
-			}
-			console.log('random 2-->',random)
-			doc.per_of_modal.forEach(function(item,index){
-				let why_num = parseInt(item.num_duoxuan)
-				console.log('check why_num---->',why_num)
-				let search = cat.find({})
-					search.where('catname').equals(item.name)
-					search.where('leixing').equals('多选')
-					search.where('random').gte(random)
-					search.limit(why_num)
-					search.exec(function(e,d){
-						if(e){
-							console.log('第二次forEach err-->',e)
-							return res.json({'code':-1,'msg':e.message})
-						}
-						console.log('第二次forEach docs-->',d.length)
-						console.log('第二次 多选 num-->',item.num_duoxuan)
-						//
-						if(d.length < item.num_duoxuan){
-							console.log('-------多选题 随机抽取的结果少于题目数，重新抽取-------')
-							let search1 = cat.find({})
-								search1.where('catname').equals(item.name)
-								search1.where('leixing').equals('多选')
-								search1.where('random').lte(random)
-								search1.limit(why_num)
-								search1.exec(function(e,d){
-									if(e){
-										console.log('第二次forEach err-->',e)
-										return res.json({'code':-1,'msg':e.message})
-									}
-									console.log('第二次forEach docs-->',d.length)
-									console.log('第二次 多选 num-->',item.num_duoxuan)
+								}
+							})//search
+					})
+				},
+				function(doc,cb){
+					//第二次循环找多选题
+					console.log('第二次循环')
+					random = parseInt((Math.random()+0.01) * 50)
+					if(random > 35 || random < 15){
+						random = 25
+					}
+					console.log('random 2-->',random)
+					doc.per_of_modal.forEach(function(item,index){
+						let why_num = parseInt(item.num_duoxuan)
+						console.log('check why_num---->',why_num)
+						let search = cat.find({})
+							search.where('catname').equals(item.name)
+							search.where('leixing').equals('多选')
+							search.where('random').gte(random)
+							search.limit(why_num)
+							search.exec(function(e,d){
+								if(e){
+									console.log('第二次forEach err-->',e)
+									return res.json({'code':-1,'msg':e.message})
+								}
+								console.log('第二次forEach docs-->',d.length)
+								console.log('第二次 多选 num-->',item.num_duoxuan)
+								//
+								if(d.length < item.num_duoxuan){
+									console.log('-------多选题 随机抽取的结果少于题目数，重新抽取-------')
+									let search1 = cat.find({})
+										search1.where('catname').equals(item.name)
+										search1.where('leixing').equals('多选')
+										search1.where('random').lte(random)
+										search1.limit(why_num)
+										search1.exec(function(e,d){
+											if(e){
+												console.log('第二次forEach err-->',e)
+												return res.json({'code':-1,'msg':e.message})
+											}
+											console.log('第二次forEach docs-->',d.length)
+											console.log('第二次 多选 num-->',item.num_duoxuan)
+											if(why_num){
+												duoxuan_arr.push(d)
+											}else{
+												duoxuan_arr.push([])
+											}
+											if(duoxuan_arr.length == doc.per_of_modal.length){
+												console.log('duoxuan_arr-->',duoxuan_arr,duoxuan_arr.length)
+												cb(null,doc)
+											}
+										})
+								}else{
 									if(why_num){
 										duoxuan_arr.push(d)
 									}else{
@@ -190,61 +232,62 @@ router.get('/ks',function(req,res){
 										console.log('duoxuan_arr-->',duoxuan_arr,duoxuan_arr.length)
 										cb(null,doc)
 									}
-								})
-						}else{
-							if(why_num){
-								duoxuan_arr.push(d)
-							}else{
-								duoxuan_arr.push([])
-							}
-							if(duoxuan_arr.length == doc.per_of_modal.length){
-								console.log('duoxuan_arr-->',duoxuan_arr,duoxuan_arr.length)
-								cb(null,doc)
-							}
-						}
-					})//search
-			})
-		},
-		function(doc,cb){
-			//第三次循环找判断题
-			console.log('第三次循环找判断题')
-			random = parseInt((Math.random()+0.01) * 50)
-			if(random > 35 || random < 15){
-				random = 25
-			}
-			random = 20
-			console.log('random 3-->',random)
-			doc.per_of_modal.forEach(function(item,index){
-				let why_num = parseInt(item.num_panduan)
-				console.log('check why_num---->',why_num)
-				let search = cat.find({})
-					search.where('catname').equals(item.name)
-					search.where('leixing').equals('判断')
-					search.where('random').lte(random)
-					search.limit(why_num)
-					search.exec(function(e,d){
-						if(e){
-							console.log('第三次forEach err-->',e)
-							return res.json({'code':-1,'msg':err.message})
-						}
-						console.log('第三次forEach docs-->',d.length)
-						console.log('第三次 判断 num-->',item.num_panduan)
-						console.log('第三次 判断 catname-->',item.name)
-						if(d.length < item.num_panduan){
-							console.log('-------随机抽取的结果少于题目数，重新抽取-------')
-							let search1 = cat.find({})
-								search1.where('catname').equals(item.name)
-								search1.where('leixing').equals('判断')
-								search1.where('random').gte(random)
-								search1.limit(why_num)
-								search1.exec(function(e,d){
-									if(e){
-										console.log('第三次forEach err-->',e)
-										return res.json({'code':-1,'msg':err.message})
-									}
-									console.log('第三次forEach docs-->',d.length)
-									console.log('第三次 判断 num-->',item.num_panduan)
-									console.log('第三次 判断 catname-->',item.name)
+								}
+							})//search
+					})
+				},
+				function(doc,cb){
+					//第三次循环找判断题
+					console.log('第三次循环找判断题')
+					random = parseInt((Math.random()+0.01) * 50)
+					if(random > 35 || random < 15){
+						random = 25
+					}
+					random = 20
+					console.log('random 3-->',random)
+					doc.per_of_modal.forEach(function(item,index){
+						let why_num = parseInt(item.num_panduan)
+						console.log('check why_num---->',why_num)
+						let search = cat.find({})
+							search.where('catname').equals(item.name)
+							search.where('leixing').equals('判断')
+							search.where('random').lte(random)
+							search.limit(why_num)
+							search.exec(function(e,d){
+								if(e){
+									console.log('第三次forEach err-->',e)
+									return res.json({'code':-1,'msg':err.message})
+								}
+								console.log('第三次forEach docs-->',d.length)
+								console.log('第三次 判断 num-->',item.num_panduan)
+								console.log('第三次 判断 catname-->',item.name)
+								if(d.length < item.num_panduan){
+									console.log('-------随机抽取的结果少于题目数，重新抽取-------')
+									let search1 = cat.find({})
+										search1.where('catname').equals(item.name)
+										search1.where('leixing').equals('判断')
+										search1.where('random').gte(random)
+										search1.limit(why_num)
+										search1.exec(function(e,d){
+											if(e){
+												console.log('第三次forEach err-->',e)
+												return res.json({'code':-1,'msg':err.message})
+											}
+											console.log('第三次forEach docs-->',d.length)
+											console.log('第三次 判断 num-->',item.num_panduan)
+											console.log('第三次 判断 catname-->',item.name)
+											if(why_num){
+												panduan_arr.push(d)
+											}else{
+												panduan_arr.push([])
+											}
+											if(panduan_arr.length == doc.per_of_modal.length){
+												console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
+												console.log('找齐咯')
+												cb(null)
+											}
+										})//seach
+								}else{
 									if(why_num){
 										panduan_arr.push(d)
 									}else{
@@ -255,172 +298,821 @@ router.get('/ks',function(req,res){
 										console.log('找齐咯')
 										cb(null)
 									}
-								})//seach
-						}else{
-							if(why_num){
-								panduan_arr.push(d)
-							}else{
-								panduan_arr.push([])
+								}
+							})//seach
+					})//foreach
+				},
+				function(cb){
+					console.log('check---->',danxuan_arr[0].length,danxuan_arr[1].length,danxuan_arr[2].length)
+					console.log('check---->',duoxuan_arr[0].length,duoxuan_arr[1].length,duoxuan_arr[2].length)
+					console.log('check---->',panduan_arr[0].length,panduan_arr[1].length,panduan_arr[2].length)
+					//题目已经是乱序取出的了，剩下答案乱序
+					console.log('单选-->',danxuan_arr)
+					console.log('多选-->',duoxuan_arr)
+					console.log('判断-->',panduan_arr)
+					//保存到数据库
+					//返回前端乱序吧
+					let res_danxuan_arr = [],
+						res_duoxuan_arr = [],
+						res_panduan_arr = []
+					let num_of_danxuan = 0,//danxuan_arr中题目数量，用来跳出循环
+						num_of_duoxuan = 0,
+						num_of_panduan = 0
+					async.waterfall([
+						function(cbb){
+							danxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									num_of_danxuan += item.length
+								}
+								if((index+1) == danxuan_arr.length){
+									console.log('num_of_danxuan---->',num_of_danxuan)
+									cbb()
+								}
+							})
+						},
+						function(cbb){
+							duoxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									num_of_duoxuan += item.length
+								}
+								if((index+1) == duoxuan_arr.length){
+									console.log('num_of_duoxuan---->',num_of_duoxuan)
+									cbb()
+								}
+							})
+						},
+						function(cbb){
+							panduan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									num_of_panduan += item.length
+								}
+								if((index+1) == panduan_arr.length){
+									console.log('num_of_panduan---->',num_of_panduan)
+									cbb()
+								}
+							})
+						},
+						function(cbb){
+							danxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									item.forEach(function(it,ind){
+										console.log('it.xuanxiang---->单选',ind,it.xuanxiang)
+										it.xuanxiang = it.xuanxiang.sort(randomsort)
+										console.log('单选答案乱序it.xuanxiang---->',it.xuanxiang)
+										res_danxuan_arr.push(it)
+									})
+								}
+								if((res_danxuan_arr.length == num_of_danxuan) && ((index+1) == danxuan_arr.length)){
+									//console.log('res_danxuan_arr---->',res_danxuan_arr,res_danxuan_arr.length)
+									console.log('-------------单选乱序完成---------------')
+									cbb(null)
+								}
+							})
+						},
+						function(cbb){
+							duoxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									item.forEach(function(it,ind){
+										console.log('it.xuanxiang---->多选',ind,it.xuanxiang)
+										it.xuanxiang = it.xuanxiang.sort(randomsort)
+										console.log('多选答案乱序it.xuanxiang---->',it.xuanxiang)
+										res_duoxuan_arr.push(it)
+									})
+								}
+								if((res_duoxuan_arr.length == num_of_duoxuan) && ((index+1) == duoxuan_arr.length)){
+									//console.log('res_duoxuan_arr---->',res_duoxuan_arr,res_duoxuan_arr.length)
+									console.log('-------------多选乱序完成---------------')
+									cbb(null)
+								}
+							})
+						},
+						function(cbb){
+							panduan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									item.forEach(function(it,ind){
+										console.log('it.xuanxiang---->判断',ind,it.xuanxiang)
+										it.xuanxiang = it.xuanxiang.sort(randomsort)
+										console.log('判断答案乱序it.xuanxiang---->',it.xuanxiang)
+										res_panduan_arr.push(it)
+									})
+								}
+								if((res_panduan_arr.length == num_of_panduan) && ((index+1) == panduan_arr.length)){
+									//console.log('res_panduan_arr---->',res_panduan_arr,res_panduan_arr.length)
+									console.log('-------------判断乱序完成---------------')
+									cbb(null)
+								}
+							})
+						},
+						function(cbb){
+							console.log('++++++++++++++++进来了没有++++++++++++++++')
+							//增加一步，生成qstr
+							let temp_danxuan_str = '',
+			                    temp_duoxuan_str = '',
+			                    temp_panduan_str = '',
+			                    danxuan_num = parseInt(res_danxuan_arr.length),
+			                    duoxuan_num = parseInt(res_duoxuan_arr.length),
+			                    panduan_num = parseInt(res_panduan_arr.length)
+			                async.waterfall([
+			                	function(cbbb){
+			                		let count = 0
+			                		res_danxuan_arr.forEach(function(item,index){
+			                			temp_danxuan_str += '¤radio§' + (index+1) + '§1§false§false§§true§§§0§§'
+			                			for(let i=0;i<item.xuanxiang.length;i++){
+			                				temp_danxuan_str += '§false〒0〒0'
+			                				if((index + 1 == res_danxuan_arr.length) && (i+1 == item.xuanxiang.length) ){
+				                				console.log('单选循环结束')
+					                   			console.log('temp_danxuan_str-->',temp_danxuan_str)
+					                   			cbbb()
+				                			}
+			                			}
+			                		})
+			                	},
+			                	function(cbbb){
+			                		console.log('ddddddddddddddddddddddddddddddddddd')
+			                		res_duoxuan_arr.forEach(function(ite,inde){
+			                			temp_duoxuan_str += '¤check§' + parseInt((danxuan_num+inde+1)) + '§1§false§false§§true,,§§§0§§'
+			                			console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+			                			for(let i=0;i<ite.xuanxiang.length;i++){
+			                				console.log('ddddddddddddddddddddddddddddddddddd')
+			                				temp_duoxuan_str += '§false〒0〒0〒'
+			                				if((inde + 1 == res_duoxuan_arr.length) && (i+1 == ite.xuanxiang.length)){
+				                				console.log('多选循环结束')
+					                        	console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+					                        	cbbb()
+				                			}
+			                			}
+			                			
+			                		})
+			                	},
+			                	function(cbbb){
+			                		res_panduan_arr.forEach(function(it,ind){
+			                			temp_panduan_str += '¤radio§' + parseInt(danxuan_num+duoxuan_num+ind+(1)) + '§1§false§false§§true§§§0§§'
+			                			for(let i=0;i<it.xuanxiang.length;i++){
+			                				temp_panduan_str += '§false〒0〒0'
+			                				if((ind + 1 == res_panduan_arr.length) && (i+1 == it.xuanxiang.length)){
+				                				console.log('判断循环结束')
+								                console.log('temp_panduan_str-->',temp_panduan_str)
+								                cbbb()
+				                			}
+			                			}
+			                			
+			                		})
+			                	}
+			                ],function(error,result){
+			                	qstr = 'false§false¤page§1§§§' + temp_danxuan_str + temp_duoxuan_str + temp_panduan_str
+								console.log('check qstr--->',qstr)
+								cbb()
+			                })
+			             //    res_danxuan_arr.forEach(function(item,index){
+				            //     temp_danxuan_str += '¤radio§' + (index+1) + '§1§false§false§§true§§§0§§'
+				            //     console.log(index,'---->',temp_danxuan_str)
+				            //     if(index + 1 == res_danxuan_arr.length){
+				            //         console.log('单选循环结束')
+				            //        	console.log('temp_danxuan_str-->',temp_danxuan_str)
+				            //         res_duoxuan_arr.forEach(function(ite,inde){
+				            //         	console.log('ddddddddddddddd')
+				            //             temp_duoxuan_str += '¤check§' + parseInt((danxuan_num+inde+1)) + '§1§false§false§§true,,§§§0§§'
+				            //             console.log(inde,'---->',temp_duoxuan_str)
+				            //             if(inde + 1 == res_duoxuan_arr.length){
+				            //             	console.log('多选循环结束')
+				            //             	console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+				            //             	res_panduan_arr.forEach(function(it,ind){
+						          //               temp_panduan_str += '¤radio§' + parseInt(danxuan_num+duoxuan_num+ind+(1)) + '§1§false§false§§true§§§0§§'
+						          //          		console.log(ind,'---->',temp_panduan_str)
+						          //          		if(ind + 1 == res_panduan_arr.length){
+							         //                console.log('判断循环结束')
+							         //                console.log('temp_panduan_str-->',temp_panduan_str)
+							         //                qstr = 'false§false¤page§1§§§' + temp_danxuan_str + temp_duoxuan_str + temp_panduan_str
+									       //          console.log('check qstr--->',qstr)
+									       //          cbb()
+							         //            }
+						          //          	})
+				            //             }
+				            //         })    	
+				            //     }
+				            // })
+						}
+					],function(err,result){
+						if(err){
+							console.log('组成结果时async出错')
+							console.log(err)
+							cb(err)
+						}
+						//console.log('a最终返回结果-->',res_danxuan_arr,res_duoxuan_arr,res_panduan_arr)
+						let back = {}
+							back.res_danxuan_arr = res_danxuan_arr,
+							back.res_duoxuan_arr = res_duoxuan_arr,
+							back.res_panduan_arr = res_panduan_arr,
+							back.qstr = qstr
+						//console.log('check back-->',back)
+						//保存到数据库
+						let new_stu_exam = new stu_exam({
+							qstr : qstr,
+							gonghao : '2011150178',
+							xingming : 'test',
+							ksname : ksinfo.ksname,
+							ksshijian : ksinfo.ksshijian,
+							ksriqi : ksinfo.ksriqi,
+							danxuan_num : ksinfo.danxuan_num,
+							danxuan_fenzhi : ksinfo.danxuan_fenzhi,
+							duoxuan_num : ksinfo.duoxuan_num,
+							duoxuan_fenzhi : ksinfo.duoxuan_fenzhi,
+							panduan_num : ksinfo.panduan_num,
+							panduan_fenzhi : ksinfo.panduan_fenzhi,
+							randomStr : ksinfo.randomStr,
+							kslianjie : ksinfo.kslianjie,
+							res_danxuan_arr : res_danxuan_arr,
+							res_duoxuan_arr : res_duoxuan_arr,
+							res_panduan_arr : res_panduan_arr
+						})
+						new_stu_exam.save(function(err){
+							if(err){
+								console.log('new_stu_exam save err---->',err)
+								cb(err)
 							}
-							if(panduan_arr.length == doc.per_of_modal.length){
-								console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
-								console.log('找齐咯')
-								cb(null)
-							}
-						}
-					})//seach
-			})//foreach
-		},
-		function(cb){
-			console.log('check---->',danxuan_arr[0].length,danxuan_arr[1].length,danxuan_arr[2].length)
-			console.log('check---->',duoxuan_arr[0].length,duoxuan_arr[1].length,duoxuan_arr[2].length)
-			console.log('check---->',panduan_arr[0].length,panduan_arr[1].length,panduan_arr[2].length)
-			//题目已经是乱序取出的了，剩下答案乱序
-			console.log('单选-->',danxuan_arr)
-			console.log('多选-->',duoxuan_arr)
-			console.log('判断-->',panduan_arr)
-			//保存到数据库
-			//返回前端乱序吧
-			let res_danxuan_arr = [],
-				res_duoxuan_arr = [],
-				res_panduan_arr = []
-			let num_of_danxuan = 0,//danxuan_arr中题目数量，用来跳出循环
-				num_of_duoxuan = 0,
-				num_of_panduan = 0
-			async.waterfall([
-				function(cbb){
-					danxuan_arr.forEach(function(item,index){
-						if(item.length!=0){
-							num_of_danxuan += item.length
-						}
-						if((index+1) == danxuan_arr.length){
-							console.log('num_of_danxuan---->',num_of_danxuan)
-							cbb()
-						}
-					})
-				},
-				function(cbb){
-					duoxuan_arr.forEach(function(item,index){
-						if(item.length!=0){
-							num_of_duoxuan += item.length
-						}
-						if((index+1) == duoxuan_arr.length){
-							console.log('num_of_duoxuan---->',num_of_duoxuan)
-							cbb()
-						}
-					})
-				},
-				function(cbb){
-					panduan_arr.forEach(function(item,index){
-						if(item.length!=0){
-							num_of_panduan += item.length
-						}
-						if((index+1) == panduan_arr.length){
-							console.log('num_of_panduan---->',num_of_panduan)
-							cbb()
-						}
-					})
-				},
-				function(cbb){
-					danxuan_arr.forEach(function(item,index){
-						if(item.length!=0){
-							item.forEach(function(it,ind){
-								console.log('it.xuanxiang---->单选',ind,it.xuanxiang)
-								it.xuanxiang = it.xuanxiang.sort(randomsort)
-								console.log('单选答案乱序it.xuanxiang---->',it.xuanxiang)
-								res_danxuan_arr.push(it)
-							})
-						}
-						if((res_danxuan_arr.length == num_of_danxuan) && ((index+1) == danxuan_arr.length)){
-							//console.log('res_danxuan_arr---->',res_danxuan_arr,res_danxuan_arr.length)
-							console.log('-------------单选乱序完成---------------')
-							cbb(null)
-						}
-					})
-				},
-				function(cbb){
-					duoxuan_arr.forEach(function(item,index){
-						if(item.length!=0){
-							item.forEach(function(it,ind){
-								console.log('it.xuanxiang---->多选',ind,it.xuanxiang)
-								it.xuanxiang = it.xuanxiang.sort(randomsort)
-								console.log('多选答案乱序it.xuanxiang---->',it.xuanxiang)
-								res_duoxuan_arr.push(it)
-							})
-						}
-						if((res_duoxuan_arr.length == num_of_duoxuan) && ((index+1) == duoxuan_arr.length)){
-							//console.log('res_duoxuan_arr---->',res_duoxuan_arr,res_duoxuan_arr.length)
-							console.log('-------------多选乱序完成---------------')
-							cbb(null)
-						}
-					})
-				},
-				function(cbb){
-					panduan_arr.forEach(function(item,index){
-						if(item.length!=0){
-							item.forEach(function(it,ind){
-								console.log('it.xuanxiang---->判断',ind,it.xuanxiang)
-								it.xuanxiang = it.xuanxiang.sort(randomsort)
-								console.log('判断答案乱序it.xuanxiang---->',it.xuanxiang)
-								res_panduan_arr.push(it)
-							})
-						}
-						if((res_panduan_arr.length == num_of_panduan) && ((index+1) == panduan_arr.length)){
-							//console.log('res_panduan_arr---->',res_panduan_arr,res_panduan_arr.length)
-							console.log('-------------判断乱序完成---------------')
-							cbb(null)
-						}
+							cb(null,back)
+						})
 					})
 				}
 			],function(err,result){
 				if(err){
-					console.log('组成结果时async出错')
-					console.log(err)
-					cb(err)
+					console.log('async err-->',err)
+					return res.json({'code':-1,'msg':err.message})
 				}
-				console.log('a最终返回结果-->',res_danxuan_arr,res_duoxuan_arr,res_panduan_arr)
-				let back = {}
-					back.res_danxuan_arr = res_danxuan_arr,
-					back.res_duoxuan_arr = res_duoxuan_arr,
-					back.res_panduan_arr = res_panduan_arr
-				console.log('check back-->',back)
-				//保存到数据库
-				let new_stu_exam = new stu_exam({
-					gonghao : '2011150178',
-					xingming : 'test',
-					ksname : ksinfo.ksname,
-					ksshijian : ksinfo.ksshijian,
-					ksriqi : ksinfo.ksriqi,
-					danxuan_num : ksinfo.danxuan_num,
-					danxuan_fenzhi : ksinfo.danxuan_fenzhi,
-					duoxuan_num : ksinfo.duoxuan_num,
-					duoxuan_fenzhi : ksinfo.duoxuan_fenzhi,
-					panduan_num : ksinfo.panduan_num,
-					panduan_fenzhi : ksinfo.panduan_fenzhi,
-					randomStr : ksinfo.randomStr,
-					kslianjie : ksinfo.kslianjie,
-					res_danxuan_arr : res_danxuan_arr,
-					res_duoxuan_arr : res_duoxuan_arr,
-					res_panduan_arr : res_panduan_arr
-				})
-				new_stu_exam.save(function(err){
-					if(err){
-						console.log('new_stu_exam save err---->',err)
-						cb(err)
-					}
-					cb(null,back)
-				})
+				console.timeEnd('countdown')
+				
+				return res.render('front/ks',{'code':0,'result':result,'ksinfo':ksinfo})
+				//return res.json({'code':-0,'msg':result})
 			})
 		}
-	],function(err,result){
-		if(err){
-			console.log('async err-->',err)
-			return res.json({'code':-1,'msg':err.message})
+		else{
+			console.log('没有ticket，去获取ticket')
+			return res.redirect(url)
 		}
-		console.timeEnd('countdown')
-		return res.render('front/ks',{'code':0,'result':result,'ksinfo':ksinfo})
-		//return res.json({'code':-0,'msg':result})
-	})
+	}else{
+		if(req.session.student){
+			console.log('有ticket,也有session')
+			console.log('session-->',req.session.student)
+			let randomStr = req.query.code
+			console.log('check randomStr-->',randomStr)
+			if(!randomStr){
+				return res.json({'code':-5,'msg':'url有误'})
+			}
+			let search_data = [],//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
+				danxuan_arr = [],
+				duoxuan_arr = [],
+				panduan_arr = [],
+				ksinfo = {},
+				qstr = ''
+				random = parseInt((Math.random()+0.01) * 50)
+				if(random > 35 || random < 15){
+					random = 25
+				}
+			//1.该考试是否存在，存在时是否已经过了日期
+			async.waterfall([
+				function(cb){
+					console.log('计时开始')
+					console.time('countdown')
+					let search = sjsz.findOne({})
+						search.where('randomStr').equals(randomStr)
+						search.exec(function(err,doc){
+							if(err){
+								console.log('search err',err)
+								return res.json({'code':-1,'msg':err.message})
+							}
+							if(doc){
+								console.log('check doc-->',doc)
+								console.log('check doc.ksriqi-->',doc.ksriqi)
+								console.log('check nowday-->',moment().format('YYYY-MM-DD'))
+								if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
+									console.log('考试日期已过')
+									return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
+								}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
+									console.log('考试日期有效')
+									//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
+									ksinfo = doc
+									//看是否已有试卷，有的话直接返回
+									let search_sj = stu_exam.findOne({})
+										search_sj.where('randomStr').equals(randomStr)
+										search_sj.where('gonghao').equals('2011150178')
+										//search_sj.where('is_end').equals(0)
+										search_sj.exec(function(errr,docc){
+											if(errr){
+												console.log('search_sj errr')
+												return resjson({'code':-1,'msg':err.message})
+											}
+											if(docc && docc.is_end == 0){
+												console.log('docc---->',docc)
+												console.log('试卷存在，尚未结束，直接返回试卷继续')
+												return res.render('front/ks',{'code':0,'result':docc,'ksinfo':ksinfo})
+											}
+											if(docc && docc.is_end == 1){
+												console.log('该试卷已经提交')
+												return res.render('front/ksdonenew',{'result':docc,'ksinfo':ksinfo})
+											}
+											if(!docc){
+												console.log('考试日期有效，还没生成试卷')
+												cb(null,doc)
+											}
+										})
+								}else{
+									console.log('考试尚未开始')
+									return res.json({'code':-4,'msg':'考试尚未开始'})
+								}
+							}
+							if(!doc){
+								console.log('不存在该randomStr')
+								return res.render('front/kserror',{'code':-2,'msg':'没有对应的考试'})
+							}
+						})
+				},
+				function(doc,cb){//第一次循环找单选题
+					doc.per_of_modal.forEach(function(item,index){
+						let why_num = parseInt(item.num_danxuan)
+						console.log('check why_num---->',why_num)
+						let search = cat.find({})
+							search.where('catname').equals(item.name)
+							search.where('leixing').equals('单选')
+							search.where('random').gte(random)
+							search.limit(why_num)
+							search.exec(function(e,d){
+								if(e){
+									console.log('第一次forEach err-->',e)
+									return res.json({'code':-1,'msg':err.message})
+								}
+								console.log('第一次forEach docs-->',d.length)
+								console.log('第一次 单选 num-->',item.num_danxuan)
+								if(d.length < item.num_danxuan){
+									console.log('-------单选题 随机抽取的结果少于题目数，重新抽取-------')
+									let search1 = cat.find({})
+										search1.where('catname').equals(item.name)
+										search1.where('leixing').equals('单选')
+										search1.where('random').gte(random)
+										search1.limit(why_num)
+										search1.exec(function(e,d){
+											if(e){
+												console.log('第一次forEach err-->',e)
+												return res.json({'code':-1,'msg':err.message})
+											}
+											console.log('第一次forEach docs-->',d.length)
+											console.log('第一次 单选 num-->',item.num_danxuan)
+											if(why_num){
+												danxuan_arr.push(d)
+											}else{
+												danxuan_arr.push([])
+											}
+
+											if(danxuan_arr.length == doc.per_of_modal.length){
+												console.log('danxuan_arr-->',danxuan_arr,danxuan_arr.length)
+												cb(null,doc)
+											}
+										})
+								}else{
+									if(why_num){
+										danxuan_arr.push(d)
+									}else{
+										danxuan_arr.push([])
+									}
+
+									if(danxuan_arr.length == doc.per_of_modal.length){
+										console.log('danxuan_arr-->',danxuan_arr,danxuan_arr.length)
+										cb(null,doc)
+									}
+								}
+							})//search
+					})
+				},
+				function(doc,cb){
+					//第二次循环找多选题
+					console.log('第二次循环')
+					random = parseInt((Math.random()+0.01) * 50)
+					if(random > 35 || random < 15){
+						random = 25
+					}
+					console.log('random 2-->',random)
+					doc.per_of_modal.forEach(function(item,index){
+						let why_num = parseInt(item.num_duoxuan)
+						console.log('check why_num---->',why_num)
+						let search = cat.find({})
+							search.where('catname').equals(item.name)
+							search.where('leixing').equals('多选')
+							search.where('random').gte(random)
+							search.limit(why_num)
+							search.exec(function(e,d){
+								if(e){
+									console.log('第二次forEach err-->',e)
+									return res.json({'code':-1,'msg':e.message})
+								}
+								console.log('第二次forEach docs-->',d.length)
+								console.log('第二次 多选 num-->',item.num_duoxuan)
+								//
+								if(d.length < item.num_duoxuan){
+									console.log('-------多选题 随机抽取的结果少于题目数，重新抽取-------')
+									let search1 = cat.find({})
+										search1.where('catname').equals(item.name)
+										search1.where('leixing').equals('多选')
+										search1.where('random').lte(random)
+										search1.limit(why_num)
+										search1.exec(function(e,d){
+											if(e){
+												console.log('第二次forEach err-->',e)
+												return res.json({'code':-1,'msg':e.message})
+											}
+											console.log('第二次forEach docs-->',d.length)
+											console.log('第二次 多选 num-->',item.num_duoxuan)
+											if(why_num){
+												duoxuan_arr.push(d)
+											}else{
+												duoxuan_arr.push([])
+											}
+											if(duoxuan_arr.length == doc.per_of_modal.length){
+												console.log('duoxuan_arr-->',duoxuan_arr,duoxuan_arr.length)
+												cb(null,doc)
+											}
+										})
+								}else{
+									if(why_num){
+										duoxuan_arr.push(d)
+									}else{
+										duoxuan_arr.push([])
+									}
+									if(duoxuan_arr.length == doc.per_of_modal.length){
+										console.log('duoxuan_arr-->',duoxuan_arr,duoxuan_arr.length)
+										cb(null,doc)
+									}
+								}
+							})//search
+					})
+				},
+				function(doc,cb){
+					//第三次循环找判断题
+					console.log('第三次循环找判断题')
+					random = parseInt((Math.random()+0.01) * 50)
+					if(random > 35 || random < 15){
+						random = 25
+					}
+					random = 20
+					console.log('random 3-->',random)
+					doc.per_of_modal.forEach(function(item,index){
+						let why_num = parseInt(item.num_panduan)
+						console.log('check why_num---->',why_num)
+						let search = cat.find({})
+							search.where('catname').equals(item.name)
+							search.where('leixing').equals('判断')
+							search.where('random').lte(random)
+							search.limit(why_num)
+							search.exec(function(e,d){
+								if(e){
+									console.log('第三次forEach err-->',e)
+									return res.json({'code':-1,'msg':err.message})
+								}
+								console.log('第三次forEach docs-->',d.length)
+								console.log('第三次 判断 num-->',item.num_panduan)
+								console.log('第三次 判断 catname-->',item.name)
+								if(d.length < item.num_panduan){
+									console.log('-------随机抽取的结果少于题目数，重新抽取-------')
+									let search1 = cat.find({})
+										search1.where('catname').equals(item.name)
+										search1.where('leixing').equals('判断')
+										search1.where('random').gte(random)
+										search1.limit(why_num)
+										search1.exec(function(e,d){
+											if(e){
+												console.log('第三次forEach err-->',e)
+												return res.json({'code':-1,'msg':err.message})
+											}
+											console.log('第三次forEach docs-->',d.length)
+											console.log('第三次 判断 num-->',item.num_panduan)
+											console.log('第三次 判断 catname-->',item.name)
+											if(why_num){
+												panduan_arr.push(d)
+											}else{
+												panduan_arr.push([])
+											}
+											if(panduan_arr.length == doc.per_of_modal.length){
+												console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
+												console.log('找齐咯')
+												cb(null)
+											}
+										})//seach
+								}else{
+									if(why_num){
+										panduan_arr.push(d)
+									}else{
+										panduan_arr.push([])
+									}
+									if(panduan_arr.length == doc.per_of_modal.length){
+										console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
+										console.log('找齐咯')
+										cb(null)
+									}
+								}
+							})//seach
+					})//foreach
+				},
+				function(cb){
+					console.log('check---->',danxuan_arr[0].length,danxuan_arr[1].length,danxuan_arr[2].length)
+					console.log('check---->',duoxuan_arr[0].length,duoxuan_arr[1].length,duoxuan_arr[2].length)
+					console.log('check---->',panduan_arr[0].length,panduan_arr[1].length,panduan_arr[2].length)
+					//题目已经是乱序取出的了，剩下答案乱序
+					console.log('单选-->',danxuan_arr)
+					console.log('多选-->',duoxuan_arr)
+					console.log('判断-->',panduan_arr)
+					//保存到数据库
+					//返回前端乱序吧
+					let res_danxuan_arr = [],
+						res_duoxuan_arr = [],
+						res_panduan_arr = []
+					let num_of_danxuan = 0,//danxuan_arr中题目数量，用来跳出循环
+						num_of_duoxuan = 0,
+						num_of_panduan = 0
+					async.waterfall([
+						function(cbb){
+							danxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									num_of_danxuan += item.length
+								}
+								if((index+1) == danxuan_arr.length){
+									console.log('num_of_danxuan---->',num_of_danxuan)
+									cbb()
+								}
+							})
+						},
+						function(cbb){
+							duoxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									num_of_duoxuan += item.length
+								}
+								if((index+1) == duoxuan_arr.length){
+									console.log('num_of_duoxuan---->',num_of_duoxuan)
+									cbb()
+								}
+							})
+						},
+						function(cbb){
+							panduan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									num_of_panduan += item.length
+								}
+								if((index+1) == panduan_arr.length){
+									console.log('num_of_panduan---->',num_of_panduan)
+									cbb()
+								}
+							})
+						},
+						function(cbb){
+							danxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									item.forEach(function(it,ind){
+										console.log('it.xuanxiang---->单选',ind,it.xuanxiang)
+										it.xuanxiang = it.xuanxiang.sort(randomsort)
+										console.log('单选答案乱序it.xuanxiang---->',it.xuanxiang)
+										res_danxuan_arr.push(it)
+									})
+								}
+								if((res_danxuan_arr.length == num_of_danxuan) && ((index+1) == danxuan_arr.length)){
+									//console.log('res_danxuan_arr---->',res_danxuan_arr,res_danxuan_arr.length)
+									console.log('-------------单选乱序完成---------------')
+									cbb(null)
+								}
+							})
+						},
+						function(cbb){
+							duoxuan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									item.forEach(function(it,ind){
+										console.log('it.xuanxiang---->多选',ind,it.xuanxiang)
+										it.xuanxiang = it.xuanxiang.sort(randomsort)
+										console.log('多选答案乱序it.xuanxiang---->',it.xuanxiang)
+										res_duoxuan_arr.push(it)
+									})
+								}
+								if((res_duoxuan_arr.length == num_of_duoxuan) && ((index+1) == duoxuan_arr.length)){
+									//console.log('res_duoxuan_arr---->',res_duoxuan_arr,res_duoxuan_arr.length)
+									console.log('-------------多选乱序完成---------------')
+									cbb(null)
+								}
+							})
+						},
+						function(cbb){
+							panduan_arr.forEach(function(item,index){
+								if(item.length!=0){
+									item.forEach(function(it,ind){
+										console.log('it.xuanxiang---->判断',ind,it.xuanxiang)
+										it.xuanxiang = it.xuanxiang.sort(randomsort)
+										console.log('判断答案乱序it.xuanxiang---->',it.xuanxiang)
+										res_panduan_arr.push(it)
+									})
+								}
+								if((res_panduan_arr.length == num_of_panduan) && ((index+1) == panduan_arr.length)){
+									//console.log('res_panduan_arr---->',res_panduan_arr,res_panduan_arr.length)
+									console.log('-------------判断乱序完成---------------')
+									cbb(null)
+								}
+							})
+						},
+						function(cbb){
+							console.log('++++++++++++++++进来了没有++++++++++++++++')
+							//增加一步，生成qstr
+							let temp_danxuan_str = '',
+			                    temp_duoxuan_str = '',
+			                    temp_panduan_str = ''
+			                    danxuan_num = parseInt(res_danxuan_arr.length),
+			                    duoxuan_num = parseInt(res_duoxuan_arr.length),
+			                    panduan_num = parseInt(res_panduan_arr.length)
+			                async.waterfall([
+			                	function(cbbb){
+			                		let count = 0
+			                		res_danxuan_arr.forEach(function(item,index){
+			                			temp_danxuan_str += '¤radio§' + (index+1) + '§1§false§false§§true§§§0§§'
+			                			for(let i=0;i<item.xuanxiang.length;i++){
+			                				temp_danxuan_str += '§false〒0〒0'
+			                				if((index + 1 == res_danxuan_arr.length) && (i+1 == item.xuanxiang.length) ){
+				                				console.log('单选循环结束')
+					                   			console.log('temp_danxuan_str-->',temp_danxuan_str)
+					                   			cbbb()
+				                			}
+			                			}
+			                		})
+			                	},
+			                	function(cbbb){
+			                		console.log('ddddddddddddddddddddddddddddddddddd')
+			                		res_duoxuan_arr.forEach(function(ite,inde){
+			                			temp_duoxuan_str += '¤check§' + parseInt((danxuan_num+inde+1)) + '§1§false§false§§true,,§§§0§§'
+			                			console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+			                			for(let i=0;i<ite.xuanxiang.length;i++){
+			                				console.log('ddddddddddddddddddddddddddddddddddd')
+			                				temp_duoxuan_str += '§false〒0〒0〒'
+			                				if((inde + 1 == res_duoxuan_arr.length) && (i+1 == ite.xuanxiang.length)){
+				                				console.log('多选循环结束')
+					                        	console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+					                        	cbbb()
+				                			}
+			                			}
+			                			
+			                		})
+			                	},
+			                	function(cbbb){
+			                		res_panduan_arr.forEach(function(it,ind){
+			                			temp_panduan_str += '¤radio§' + parseInt(danxuan_num+duoxuan_num+ind+(1)) + '§1§false§false§§true§§§0§§'
+			                			for(let i=0;i<it.xuanxiang.length;i++){
+			                				temp_panduan_str += '§false〒0〒0'
+			                				if((ind + 1 == res_panduan_arr.length) && (i+1 == it.xuanxiang.length)){
+				                				console.log('判断循环结束')
+								                console.log('temp_panduan_str-->',temp_panduan_str)
+								                cbbb()
+				                			}
+			                			}
+			                			
+			                		})
+			                	}
+			                ],function(error,result){
+			                	qstr = 'false§false¤page§1§§§' + temp_danxuan_str + temp_duoxuan_str + temp_panduan_str
+								console.log('check qstr--->',qstr)
+								cbb()
+			                })
+			             //    res_danxuan_arr.forEach(function(item,index){
+				            //     temp_danxuan_str += '¤radio§' + (index+1) + '§1§false§false§§true§§§0§§'
+				            //     console.log(index,'---->',temp_danxuan_str)
+				            //     if(index + 1 == res_danxuan_arr.length){
+				            //         console.log('单选循环结束')
+				            //        	console.log('temp_danxuan_str-->',temp_danxuan_str)
+				            //         res_duoxuan_arr.forEach(function(ite,inde){
+				            //         	console.log('ddddddddddddddd')
+				            //             temp_duoxuan_str += '¤check§' + parseInt(danxuan_num+inde+1) + '§false§false§§true,,§§§0§§'
+				            //             console.log(inde,'---->',temp_duoxuan_str)
+				            //             if(inde + 1 == res_duoxuan_arr.length){
+				            //             	console.log('多选循环结束')
+				            //             	console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+				            //             	res_panduan_arr.forEach(function(it,ind){
+						          //               temp_panduan_str += '¤radio§' + parseInt(danxuan_num+duoxuan_num+ind+1) + '§1§false§false§§true§§§0§§'
+						          //          		console.log(ind,'---->',temp_panduan_str)
+						          //          		if(ind + 1 == res_panduan_arr.length){
+							         //                console.log('判断循环结束')
+							         //                console.log('temp_panduan_str-->',temp_panduan_str)
+							         //                qstr = 'false§false¤page§1§§§' + temp_danxuan_str + temp_duoxuan_str + temp_panduan_str
+									       //          console.log('check qstr--->',qstr)
+									       //          cbb()
+							         //            }
+						          //          	})
+				            //             }
+				            //         })    	
+				            //     }
+				            // })
+							
+						}
+					],function(err,result){
+						if(err){
+							console.log('组成结果时async出错')
+							console.log(err)
+							cb(err)
+						}
+						//console.log('a最终返回结果-->',res_danxuan_arr,res_duoxuan_arr,res_panduan_arr)
+						let back = {}
+							back.res_danxuan_arr = res_danxuan_arr,
+							back.res_duoxuan_arr = res_duoxuan_arr,
+							back.res_panduan_arr = res_panduan_arr,
+							back.qstr = qstr
+						//console.log('check back-->',back)
+						//保存到数据库
+						let new_stu_exam = new stu_exam({
+							qstr : qstr,
+							gonghao : '2011150178',
+							xingming : 'test',
+							ksname : ksinfo.ksname,
+							ksshijian : ksinfo.ksshijian,
+							ksriqi : ksinfo.ksriqi,
+							danxuan_num : ksinfo.danxuan_num,
+							danxuan_fenzhi : ksinfo.danxuan_fenzhi,
+							duoxuan_num : ksinfo.duoxuan_num,
+							duoxuan_fenzhi : ksinfo.duoxuan_fenzhi,
+							panduan_num : ksinfo.panduan_num,
+							panduan_fenzhi : ksinfo.panduan_fenzhi,
+							randomStr : ksinfo.randomStr,
+							kslianjie : ksinfo.kslianjie,
+							res_danxuan_arr : res_danxuan_arr,
+							res_duoxuan_arr : res_duoxuan_arr,
+							res_panduan_arr : res_panduan_arr
+						})
+						new_stu_exam.save(function(err){
+							if(err){
+								console.log('new_stu_exam save err---->',err)
+								cb(err)
+							}
+							cb(null,back)
+						})
+					})
+				}
+			],function(err,result){
+				if(err){
+					console.log('async err-->',err)
+					return res.json({'code':-1,'msg':err.message})
+				}
+				console.timeEnd('countdown')
+				
+				return res.render('front/ks',{'code':0,'result':result,'ksinfo':ksinfo})
+				//return res.json({'code':-0,'msg':result})
+			})
+		}
+		else{
+			let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
+			console.log('ReturnURL url-->',ReturnURL)
+			console.log('you ticket, meiyou session')
+			let ticket = req.query.ticket
+			console.log('check ticket-->',ticket)
+			let url = CASserver + 'serviceValidate?ticket=' + ticket + '&service=' + ReturnURL
+			console.log('check url -->',url)
+			request(url, function (error, response, body) {
+				    if (!error && response.statusCode == 200) {
+				    	console.log('body -- >',body)
+				       let user = pipei(body,'user'),//工号
+						   eduPersonOrgDN = pipei(body,'eduPersonOrgDN'),//学院
+						   alias = pipei(body,'alias'),//校园卡号
+						   cn = pipei(body,'cn'),//姓名
+						   gender = pipei(body,'gender'),//性别
+						   containerId = pipei(body,'containerId'),//个人信息（包括uid，）
+						   nianji = null
+						if(containerId){
+							RankName = containerId.substring(18,21)//卡类别 jzg-->教职工
+						}else{
+							RankName = null
+						}
+						if(user){
+						   	nianji = user.substring(0,4)
+						}else{
+						   	nianji = null
+						}
+						console.log('check final result -->',user,eduPersonOrgDN,alias,cn,gender,containerId,RankName)
+						let arg = {}
+							arg.nianji = nianji
+						   	arg.user = user
+						   	arg.eduPersonOrgDN = eduPersonOrgDN
+						   	arg.alias = alias
+						   	arg.cn = cn
+						   	arg.gender = gender
+						   	arg.containerId = containerId
+						   	arg.RankName = RankName
+						   	//arg.code = code
+						   	//arg.stuXueHao = stuXueHao
+						    console.log('check arg-->',arg)
+
+						   console.log('check arg-->',arg)
+						   if(arg.user == null){
+						   		console.log('ticket is unvalid,重新回去获取ticket，清空session')
+						   		delete req.session.student
+						   		console.log('check req.session.student-->',req.session.student)
+						   		return res.json({'errCode':-1,'errMsg':'ticket is unvalid！'})
+						   }else{
+						   		req.session.student = arg
+						   		return res.redirect(ReturnURL)
+						  }
+				     }else{
+				     	console.log(error)
+				     	return res.json({'errCode':-1,'errMsg':error})
+				     }
+			    })
+		}
+	}
 })
 function randomsort(a, b) {
    return Math.random()>.5 ? -1 : 1; //通过随机产生0到1的数，然后判断是否大于0.5从而影响排序，产生随机性的效果。

@@ -3,18 +3,18 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="/favicon.ico"/>
+  <link rel="shortcut icon" href="/dxxxhjs/favicon.ico"/>
 
     <title>后台管理</title>
 
 
     <!-- Bootstrap core CSS -->
-    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
-    <link rel="stylesheet" href="/stylesheets/layui.css" media="all">
+    <link rel='stylesheet' href='/dxxxhjs/stylesheets/bootstrap.min.css' />
+    <link rel="stylesheet" href="/dxxxhjs/stylesheets/layui.css" media="all">
 
     <!-- Custom styles for this template -->
-    <link href="/stylesheets/style.css" rel="stylesheet">
-    <link href="/stylesheets/offcanvas.css" rel="stylesheet">
+    <link href="/dxxxhjs/stylesheets/style.css" rel="stylesheet">
+    <link href="/dxxxhjs/stylesheets/offcanvas.css" rel="stylesheet">
   </head>
 
   <body>
@@ -60,16 +60,16 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/javascripts/jquery-3.1.1.js"></script>
-    <script>window.jQuery || document.write('<script src="/javascripts/jquery-3.1.1.js"><\/script>')</script>
-    <script src="/javascripts/tether.min.js"></script>
-    <script src="/javascripts/bootstrap.min.js"></script>
-    <script src="/javascripts/layui.js"></script>
+    <script src="/dxxxhjs/javascripts/jquery-3.1.1.js"></script>
+    <script>window.jQuery || document.write('<script src="/dxxxhjs/javascripts/jquery-3.1.1.js"><\/script>')</script>
+    <script src="/dxxxhjs/javascripts/tether.min.js"></script>
+    <script src="/dxxxhjs/javascripts/bootstrap.min.js"></script>
+    <script src="/dxxxhjs/javascripts/layui.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/javascripts/ie10-viewport-bug-workaround.js"></script>
+    <script src="/dxxxhjs/javascripts/ie10-viewport-bug-workaround.js"></script>
     <script type="text/javascript">
     $(function(){
-      $('#middle-container').load('/manage/drtk',function(result){
+      $('#middle-container').load('/dxxxhjs/manage/drtk',function(result){
         $result = $(result)
         $result.find("script").appendTo('#middle-container');
       })
@@ -78,7 +78,7 @@
         'use strict'
         let current_active_a_id = $('.list-group-item.active').attr('id'),
             current_id = $(this).attr('id') 
-        $('#middle-container').load('/manage/'+current_id+'',function(result){
+        $('#middle-container').load('/dxxxhjs/manage/'+current_id+'',function(result){
           $('#'+current_active_a_id).toggleClass('active')
           $('#'+current_id).toggleClass('active')
           $result = $(result)
