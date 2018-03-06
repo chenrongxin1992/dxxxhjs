@@ -149,7 +149,8 @@ var stu_examSchema = new Schema({
     peopleinfo : {type:String,default:null},//录入人员信息
     createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
     createTimeStamp : {type:String,default:moment().format('X')},//创建时间戳
-    tijiaoTimeStamp:{type:String}
+    tijiaoTimeStamp:{type:String},
+    cha:{type:String}//完成时间
 })
 //module.exports = mongoose.model('catinfo',catSchema);
 exports.stu_exam = mongoose.model('stu_exam',stu_examSchema);

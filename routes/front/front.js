@@ -22,9 +22,6 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-function ksfunction(){
-	
-}
 //正则匹配
 function pipei(str,arg){
 	let zhengze = '<cas:' + arg + '>(.*)<\/cas:' + arg + '>' 
@@ -77,8 +74,27 @@ router.get('/ks',function(req,res){
 								console.log('check doc.ksriqi-->',doc.ksriqi)
 								console.log('check nowday-->',moment().format('YYYY-MM-DD'))
 								if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
-									console.log('考试日期已过')
-									return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
+									let search_sj = stu_exam.findOne({})
+										search_sj.where('randomStr').equals(randomStr)
+										search_sj.where('gonghao').equals(req.session.student.alias)
+										search_sj.exec(function(errr,docc){
+											if(errr){
+												console.log('search_sj errr')
+												return resjson({'code':-1,'msg':err.message})
+											}
+											if(docc && docc.is_end == 0){
+												console.log('考试日期已过')
+												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
+											}
+											if(docc && docc.is_end == 1){
+												console.log('该试卷已经提交')
+												return res.render('front/ksdonenew',{'result':docc,'ksinfo':doc})
+											}
+											if(!docc){
+												console.log('考试日期已过,你没有参与该考试')
+												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过，你没有参与该考试'})
+											}
+										})
 								}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
 									console.log('考试日期有效')
 									//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
@@ -86,7 +102,7 @@ router.get('/ks',function(req,res){
 									//看是否已有试卷，有的话直接返回
 									let search_sj = stu_exam.findOne({})
 										search_sj.where('randomStr').equals(randomStr)
-										search_sj.where('gonghao').equals('2011150178')
+										search_sj.where('gonghao').equals(req.session.student.alias)//这里替换成session中的alias
 										//search_sj.where('is_end').equals(0)
 										search_sj.exec(function(errr,docc){
 											if(errr){
@@ -109,7 +125,7 @@ router.get('/ks',function(req,res){
 										})
 								}else{
 									console.log('考试尚未开始')
-									return res.json({'code':-4,'msg':'考试尚未开始'})
+									return res.render('front/kserror',{'code':-4,'msg':'考试尚未开始'})
 								}
 							}
 							if(!doc){
@@ -463,34 +479,6 @@ router.get('/ks',function(req,res){
 								console.log('check qstr--->',qstr)
 								cbb()
 			                })
-			             //    res_danxuan_arr.forEach(function(item,index){
-				            //     temp_danxuan_str += '¤radio§' + (index+1) + '§1§false§false§§true§§§0§§'
-				            //     console.log(index,'---->',temp_danxuan_str)
-				            //     if(index + 1 == res_danxuan_arr.length){
-				            //         console.log('单选循环结束')
-				            //        	console.log('temp_danxuan_str-->',temp_danxuan_str)
-				            //         res_duoxuan_arr.forEach(function(ite,inde){
-				            //         	console.log('ddddddddddddddd')
-				            //             temp_duoxuan_str += '¤check§' + parseInt((danxuan_num+inde+1)) + '§1§false§false§§true,,§§§0§§'
-				            //             console.log(inde,'---->',temp_duoxuan_str)
-				            //             if(inde + 1 == res_duoxuan_arr.length){
-				            //             	console.log('多选循环结束')
-				            //             	console.log('temp_duoxuan_str-->',temp_duoxuan_str)
-				            //             	res_panduan_arr.forEach(function(it,ind){
-						          //               temp_panduan_str += '¤radio§' + parseInt(danxuan_num+duoxuan_num+ind+(1)) + '§1§false§false§§true§§§0§§'
-						          //          		console.log(ind,'---->',temp_panduan_str)
-						          //          		if(ind + 1 == res_panduan_arr.length){
-							         //                console.log('判断循环结束')
-							         //                console.log('temp_panduan_str-->',temp_panduan_str)
-							         //                qstr = 'false§false¤page§1§§§' + temp_danxuan_str + temp_duoxuan_str + temp_panduan_str
-									       //          console.log('check qstr--->',qstr)
-									       //          cbb()
-							         //            }
-						          //          	})
-				            //             }
-				            //         })    	
-				            //     }
-				            // })
 						}
 					],function(err,result){
 						if(err){
@@ -508,8 +496,8 @@ router.get('/ks',function(req,res){
 						//保存到数据库
 						let new_stu_exam = new stu_exam({
 							qstr : qstr,
-							gonghao : '2011150178',
-							xingming : 'test',
+							gonghao : req.session.student.alias,//这里替换成session中的alias
+							xingming : req.session.student.cn,//这里替换成session中的cn
 							ksname : ksinfo.ksname,
 							ksshijian : ksinfo.ksshijian,
 							ksriqi : ksinfo.ksriqi,
@@ -523,7 +511,8 @@ router.get('/ks',function(req,res){
 							kslianjie : ksinfo.kslianjie,
 							res_danxuan_arr : res_danxuan_arr,
 							res_duoxuan_arr : res_duoxuan_arr,
-							res_panduan_arr : res_panduan_arr
+							res_panduan_arr : res_panduan_arr,
+							createTimeStamp : moment().format('X')
 						})
 						new_stu_exam.save(function(err){
 							if(err){
@@ -585,8 +574,26 @@ router.get('/ks',function(req,res){
 								console.log('check doc.ksriqi-->',doc.ksriqi)
 								console.log('check nowday-->',moment().format('YYYY-MM-DD'))
 								if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
-									console.log('考试日期已过')
-									return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
+									let search_sj = stu_exam.findOne({})
+										search_sj.where('randomStr').equals(randomStr)
+										search_sj.exec(function(errr,docc){
+											if(errr){
+												console.log('search_sj errr')
+												return resjson({'code':-1,'msg':err.message})
+											}
+											if(docc && docc.is_end == 0){
+												console.log('考试日期已过')
+												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
+											}
+											if(docc && docc.is_end == 1){
+												console.log('该试卷已经提交')
+												return res.render('front/ksdonenew',{'result':docc,'ksinfo':doc})
+											}
+											if(!docc){
+												console.log('考试日期已过,你没有参与该考试')
+												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过，你没有参与该考试'})
+											}
+										})
 								}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
 									console.log('考试日期有效')
 									//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
@@ -594,7 +601,7 @@ router.get('/ks',function(req,res){
 									//看是否已有试卷，有的话直接返回
 									let search_sj = stu_exam.findOne({})
 										search_sj.where('randomStr').equals(randomStr)
-										search_sj.where('gonghao').equals('2011150178')
+										search_sj.where('gonghao').equals(req.session.student.alias)//这里替换成session中的alias
 										//search_sj.where('is_end').equals(0)
 										search_sj.exec(function(errr,docc){
 											if(errr){
@@ -617,7 +624,7 @@ router.get('/ks',function(req,res){
 										})
 								}else{
 									console.log('考试尚未开始')
-									return res.json({'code':-4,'msg':'考试尚未开始'})
+									return res.render('front/kserror',{'code':-4,'msg':'考试尚未开始'})
 								}
 							}
 							if(!doc){
@@ -971,35 +978,6 @@ router.get('/ks',function(req,res){
 								console.log('check qstr--->',qstr)
 								cbb()
 			                })
-			             //    res_danxuan_arr.forEach(function(item,index){
-				            //     temp_danxuan_str += '¤radio§' + (index+1) + '§1§false§false§§true§§§0§§'
-				            //     console.log(index,'---->',temp_danxuan_str)
-				            //     if(index + 1 == res_danxuan_arr.length){
-				            //         console.log('单选循环结束')
-				            //        	console.log('temp_danxuan_str-->',temp_danxuan_str)
-				            //         res_duoxuan_arr.forEach(function(ite,inde){
-				            //         	console.log('ddddddddddddddd')
-				            //             temp_duoxuan_str += '¤check§' + parseInt(danxuan_num+inde+1) + '§false§false§§true,,§§§0§§'
-				            //             console.log(inde,'---->',temp_duoxuan_str)
-				            //             if(inde + 1 == res_duoxuan_arr.length){
-				            //             	console.log('多选循环结束')
-				            //             	console.log('temp_duoxuan_str-->',temp_duoxuan_str)
-				            //             	res_panduan_arr.forEach(function(it,ind){
-						          //               temp_panduan_str += '¤radio§' + parseInt(danxuan_num+duoxuan_num+ind+1) + '§1§false§false§§true§§§0§§'
-						          //          		console.log(ind,'---->',temp_panduan_str)
-						          //          		if(ind + 1 == res_panduan_arr.length){
-							         //                console.log('判断循环结束')
-							         //                console.log('temp_panduan_str-->',temp_panduan_str)
-							         //                qstr = 'false§false¤page§1§§§' + temp_danxuan_str + temp_duoxuan_str + temp_panduan_str
-									       //          console.log('check qstr--->',qstr)
-									       //          cbb()
-							         //            }
-						          //          	})
-				            //             }
-				            //         })    	
-				            //     }
-				            // })
-							
 						}
 					],function(err,result){
 						if(err){
@@ -1017,8 +995,8 @@ router.get('/ks',function(req,res){
 						//保存到数据库
 						let new_stu_exam = new stu_exam({
 							qstr : qstr,
-							gonghao : '2011150178',
-							xingming : 'test',
+							gonghao : req.session.student.alias,//这里替换成session中的alias
+							xingming : req.session.student.cn,//这里替换成session中的cn
 							ksname : ksinfo.ksname,
 							ksshijian : ksinfo.ksshijian,
 							ksriqi : ksinfo.ksriqi,
@@ -1032,7 +1010,8 @@ router.get('/ks',function(req,res){
 							kslianjie : ksinfo.kslianjie,
 							res_danxuan_arr : res_danxuan_arr,
 							res_duoxuan_arr : res_duoxuan_arr,
-							res_panduan_arr : res_panduan_arr
+							res_panduan_arr : res_panduan_arr,
+							createTimeStamp : moment().format('X')
 						})
 						new_stu_exam.save(function(err){
 							if(err){
@@ -1166,12 +1145,12 @@ router.post('/checkks',function(req,res){
 	console.log('check duoxuan_arr---->',duoxuan_arr)
 	console.log('check panduan_arr---->',panduan_arr)
 
-
+	console.log('check session-->',req.session)
 	async.waterfall([
 		function(cb){
 			let search = stu_exam.findOne({})
 				search.where('randomStr').equals(randomStr)
-				search.where('gonghao').equals('2011150178')
+				search.where('gonghao').equals(req.session.student.alias)//这里替换成session中的alias
 				search.exec(function(err,doc){
 					if(err){
 						console.log('查找试卷错误',err)
@@ -1421,23 +1400,59 @@ router.post('/checkks',function(req,res){
 				tempresult.duoxuan_defen = duoxuan_defen
 				tempresult.zongfen = danxuan_defen + panduan_defen + duoxuan_defen
 				console.log('该次考试总分-->',tempresult.zongfen)
-				stu_exam.update({'_id':shijuan._id},{'zongfen':tempresult.zongfen,'is_end':1},function(err){
-					if(err){
-						console.log('插入分数出错',err)
-						cb(err)
-					}
-					console.log('插入分数-->',tempresult.zongfen)
-					cb(null,tempresult)
-				})
+				let search = stu_exam.findOne({})
+					search.where('_id').equals(shijuan._id)
+					search.exec(function(err,doc){
+						if(err){
+							console.log('search stu_exam err')
+							console.log(err)
+							cb(err)
+						}
+						else{
+							let nowTimeStamp = moment().format('X'),
+							createTimeStamp = doc.createTimeStamp,
+							cha = Number(nowTimeStamp) - Number(createTimeStamp),
+							res_cha = MillisecondToDate(cha)
+							console.log('check res_cha---->',res_cha,cha)
+							stu_exam.update({'_id':shijuan._id},{'zongfen':tempresult.zongfen,'is_end':1,'cha':res_cha,'tijiaoTimeStamp':nowTimeStamp},function(err){
+								if(err){
+									console.log('插入分数和时间出错',err)
+									cb(err)
+								}
+								console.log('插入分数和时间----->',tempresult.zongfen,res_cha)
+								tempresult.res_cha = res_cha
+								cb(null,tempresult)
+							})
+						}
+					})
 		}
 	],function(error,result){
 		if(error){
 			console.log('waterfall error',error)
 			return res.json({'code':-1,'msg':error})
 		}
-		console.log('waterfall success',result)
+		//console.log('waterfall success',result)
 		return res.json({'code':0,'result':result})
 	})
 })
-
+function MillisecondToDate(msd) {  
+    var time = parseFloat(msd);  
+    if (null!= time &&""!= time) {  
+        if (time >60&& time <60*60) {  
+            time = parseInt(time /60.0) +"分钟"+ parseInt((parseFloat(time /60.0) -  
+            parseInt(time /60.0)) *60) +"秒";  
+        }else if (time >=60*60&& time <60*60*24) {  
+            time = parseInt(time /3600.0) +"小时"+ parseInt((parseFloat(time /3600.0) -  
+            parseInt(time /3600.0)) *60) +"分钟"+  
+            parseInt((parseFloat((parseFloat(time /3600.0) - parseInt(time /3600.0)) *60) -  
+            parseInt((parseFloat(time /3600.0) - parseInt(time /3600.0)) *60)) *60) +"秒";  
+        }else {  
+            time = parseInt(time) +"秒";  
+        }  
+    }else{  
+        time = "0 时 0 分0 秒";  
+    }  
+    return time;  
+  
+}  
 module.exports = router;

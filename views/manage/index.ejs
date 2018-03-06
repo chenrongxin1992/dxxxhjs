@@ -20,7 +20,9 @@
   <body>
     <div class="container-fluid">
       <div class="row" style="padding: 0 15px;">
-        <div class="col-12" style="min-height: 100px;background-color: #F08080;"></div>
+        <div class="col-12" style="min-height: 100px;background-color: #C91B1C;padding: 0 0;">
+          <img class="img-responsive" src="/dxxxhjs/stylesheets/head_top.jpg">
+        </div>
       </div>
 
       <div class="row row-offcanvas row-offcanvas-left">
@@ -43,7 +45,7 @@
           </div>
         </div>
         <div class="col-12 col-md-11">
-          <div id="middle-container" class="row"></div>
+          <div id="middle-container" class="row-fluid"></div>
         </div><!--middle-container-->
 
         
@@ -52,7 +54,7 @@
       <hr style="height:1px;border:none;border-top:1px dashed #F08080;">
 
       <footer>
-        <p class="text-center">2018 &copy; 深圳大学</p>
+        <p class="text-center">2018 &copy; 深圳大学党委组织部</p>
       </footer>
 
     </div><!--/.container-->
@@ -65,6 +67,7 @@
     <script src="/dxxxhjs/javascripts/tether.min.js"></script>
     <script src="/dxxxhjs/javascripts/bootstrap.min.js"></script>
     <script src="/dxxxhjs/javascripts/layui.js"></script>
+    <script type="text/javascript" src='/dxxxhjs/javascripts/echarts.min.js' ></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/dxxxhjs/javascripts/ie10-viewport-bug-workaround.js"></script>
     <script type="text/javascript">
@@ -73,17 +76,24 @@
         $result = $(result)
         $result.find("script").appendTo('#middle-container');
       })
-      
-      $('.list-group-item').on('click',function(e){
-        'use strict'
-        let current_active_a_id = $('.list-group-item.active').attr('id'),
-            current_id = $(this).attr('id') 
-        $('#middle-container').load('/dxxxhjs/manage/'+current_id+'',function(result){
-          $('#'+current_active_a_id).toggleClass('active')
-          $('#'+current_id).toggleClass('active')
-          $result = $(result)
-          $result.find("script").appendTo('#middle-container')
-          $('.row-offcanvas').toggleClass('active')
+      layui.use(['table','layer','form'], function(){
+          $('.list-group-item').on('click',function(e){
+          'use strict'
+          let mask = layer.load(1, {shade: [0.8, '#393D49']});
+          // layer.msg('加载中', {
+          //   icon: 16
+          //   ,shade: 0.01
+          // });
+          let current_active_a_id = $('.list-group-item.active').attr('id'),
+              current_id = $(this).attr('id') 
+          $('#middle-container').load('/dxxxhjs/manage/'+current_id+'',function(result){
+            layer.close(mask);
+            $('#'+current_active_a_id).toggleClass('active')
+            $('#'+current_id).toggleClass('active')
+            $result = $(result)
+            $result.find("script").appendTo('#middle-container')
+            $('.row-offcanvas').toggleClass('active')
+          })
         })
       })
       $('[data-toggle="offcanvas"]').click(function () {

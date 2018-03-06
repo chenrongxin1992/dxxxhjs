@@ -1,0 +1,148 @@
+<div class="row" style="text-align:center;">
+    <div class="col-12">
+     	<h3>概况</h3>
+     	<p>目前题库共有：<span style="color:red;" id="num_of_cat"></span>个模块，总共有<span style="color:red;" id="num_of_timu"></span>道题目</p>
+    </div>
+</div>
+  	<div class="row">
+      <div class="col-6">
+        <div id="mokuai_chart" class="chart" style="width: 600px;height:400px;"></div>
+      </div>
+      <div style="clear: both;"></div>
+      <div class="col-6">
+        <div id="type_of_tixing" class="chart" style="width: 600px;height:400px;"></div>
+      </div>
+     </div>
+
+
+<script>
+'use strict'
+	$(function(){
+		// 基于准备好的dom，初始化echarts实例
+    let mokuai_chart = echarts.init(document.getElementById('mokuai_chart')),
+    	type_of_tixing_chart = echarts.init(document.getElementById('type_of_tixing'))
+    let res_cat = '<%-JSON.stringify(result.res_cat)%>',
+    	mokuai_data = '<%-JSON.stringify(result.mokuai)%>',
+    	timu_type = '<%-JSON.stringify(result.timu_type)%>',
+    	res_timu = '<%-JSON.stringify(result.res_timu)%>',
+    	num_of_cat = JSON.parse(res_cat).length,
+    	num_of_timu = 0,
+    	temp_res_timu = JSON.parse(res_timu)
+
+    temp_res_timu.forEach(function(item,index){
+    	num_of_timu += item.value
+    })
+    console.log('check num_of_cat && num_of_timu-->',num_of_cat,num_of_timu)
+    $('#num_of_cat').text(num_of_cat)
+    $('#num_of_timu').text(num_of_timu)
+    console.log('check res_cat-->',res_cat,JSON.parse(res_cat).length)
+    console.log('check timu-->',timu_type,JSON.parse(timu_type))
+        // 指定图表的配置项和数据
+        let mokuai_chart_option = {
+		    title: {
+		        text: '模块占比',
+		        left: 'center',
+		        top: 20,
+		        textStyle: {
+		            color: '#DC143C'
+		        }
+		    },
+            tooltip: {
+            	top:20,
+		        trigger: 'item',
+		        formatter: "{a} <br/>{b}: {c} ({d}%)"
+		    },
+		    legend: {
+		        orient: 'vertical',
+		        x: 'left',
+		        data:JSON.parse(res_cat)
+		    },
+		    series: [
+		        {
+		            name:'题库模块占比',
+		            type:'pie',
+		            radius: ['50%', '70%'],
+		            avoidLabelOverlap: false,
+		            label: {
+		                normal: {
+		                    show: false,
+		                    position: 'center'
+		                },
+		                emphasis: {
+		                    show: true,
+		                    textStyle: {
+		                        fontSize: '30',
+		                        fontWeight: 'bold'
+		                    }
+		                }
+		            },
+		            labelLine: {
+		                normal: {
+		                    show: false
+		                }
+		            },
+		            data:JSON.parse(mokuai_data)
+		        }
+		    ]
+        };
+        // 指定图表的配置项和数据
+        let timu_chart_option = {
+		    title: {
+		        text: '题型占比',
+		        left: 'center',
+		        top: 20,
+		        textStyle: {
+		            color: '#DC143C'
+		        }
+		    },
+            tooltip: {
+            	top:20,
+		        trigger: 'item',
+		        formatter: "{a} <br/>{b}: {c} ({d}%)"
+		    },
+		    legend: {
+		        orient: 'vertical',
+		        x: 'left',
+		        data:JSON.parse(timu_type)
+		    },
+		    series: [
+		        {
+		            name:'题型占比',
+		            type:'pie',
+		            radius: ['50%', '70%'],
+		            avoidLabelOverlap: false,
+		            label: {
+		                normal: {
+		                    show: false,
+		                    position: 'center'
+		                },
+		                emphasis: {
+		                    show: true,
+		                    textStyle: {
+		                        fontSize: '30',
+		                        fontWeight: 'bold'
+		                    }
+		                }
+		            },
+		            labelLine: {
+		                normal: {
+		                    show: false
+		                }
+		            },
+		            data:JSON.parse(res_timu)
+		        }
+		    ],
+		    itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        };
+        // 使用刚指定的配置项和数据显示图表。
+        mokuai_chart.setOption(mokuai_chart_option);
+        type_of_tixing_chart.setOption(timu_chart_option)
+	})
+	
+</script>

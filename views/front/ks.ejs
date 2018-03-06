@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
 
-    <title></title>
+    <title><%=ksinfo.ksname%></title>
 
     <!-- Bootstrap -->
     <link rel='stylesheet' href='/dxxxhjs/stylesheets/bootstrap.css' />
@@ -53,7 +53,8 @@
                     <div class="survey" style="margin:0px auto;">
                         <div id="ctl00_ContentPlaceHolder1_JQ1_divHead" class="surveyhead" style="border: 0px;">
                             <div id="ctl00_ContentPlaceHolder1_JQ1_h1Name" style="position:relative;">
-                                <h1 id="ctl00_ContentPlaceHolder1_JQ1_lblQuestionnaireName"><%=ksinfo.ksname%></h1>
+                                <h1 id=""><%=ksinfo.ksname%></h1>
+                                <h4 id="">姓名：<%=student.cn%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=student.alias%>&nbsp;&nbsp;&nbsp;&nbsp;考试时间：<span style="color: red;"><%=ksinfo.ksshijian%></span>分钟</h4>
                             </div>
 
                             <div style="clear: both;">
@@ -84,7 +85,7 @@
                                       <div class='div_question' id='div<%=index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=index+1%>.</div>
-                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( )</div>
+                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>&nbsp;&nbsp;(&nbsp;&nbsp;)</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=index+1%>'>
@@ -121,7 +122,7 @@
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>&nbsp;&nbsp;(&nbsp;&nbsp;)</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+index+1%>'>
@@ -158,7 +159,7 @@
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>&nbsp;&nbsp;(&nbsp;&nbsp;)</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
@@ -356,10 +357,10 @@
                         </script>
                         <script src="/dxxxhjs/javascripts/jquery-1.10.2.min.js"></script>
                         <script type="text/javascript">
-                          var qstr = ''
+                          var qstr = '';
                           
-                          qstr = '<%- JSON.stringify(result.qstr) %>'
-                          console.log('qstr-->',qstr)
+                          qstr = '<%- JSON.stringify(result.qstr) %>';
+                          console.log('qstr-->',qstr);
                             //总页数，问卷相关
                             var totalPage = 1;
                             var totalCut = 0;
@@ -545,6 +546,7 @@
                         </script>
                         <script src="/dxxxhjs/javascripts/layui.js"></script>
                         <script type="text/javascript">
+                        'use strict';
                         function GetQueryString(name)
                         {
                             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
@@ -618,11 +620,14 @@
                                       layui.use(['layer'], function(){
                                         let temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
                                         let layer = layui.layer
-                                            layer.open({
+                                            layer.alert({
+                                              skin: 'layui-layer-molv', //样式类名
                                               title: '考试结果',
-                                              content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>',
+                                              content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span>分</div><div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
                                               end:function(){
-                                                window.location.reload
+                                                //跳转
+                                                location.href = '/dxxxhjs/front/ks?code=' + randomStr
+                                                //location.reload()
                                               }
                                           }); 
                                       });

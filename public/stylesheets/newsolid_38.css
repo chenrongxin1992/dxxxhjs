@@ -1,10 +1,10 @@
 ﻿body {
-background: #ddf4ff url("oldbg2-bg.jpg") repeat-x;
+background: #ff7371 url("oldbg2-bg.jpg") repeat-x;
 }
 #jqContent {
 width:920px;
 background:url("oldbg2.jpg") no-repeat top center;
-padding-top:105px;
+padding-top:144px;
 margin:0 auto;
 }
 #headerCss {

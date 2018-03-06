@@ -786,4 +786,108 @@ router.get('/new_firststep',function(req,res){
 		})
 })
 
+router.get('/tktj',function(req,res){
+	//题库提醒所属模块比例及数量
+	//返回题库模块，题目类型
+	let mokuai = [],
+		res_cat = [],
+		timu_type = [],
+		res_timu = []
+	async.waterfall([
+		function(cb){
+			let search = cat.distinct('catname',function(err,docs){
+				if(err){
+					console.log('search err-->',err)
+					return res.json({'code':-1,'msg':err.stack})
+				}
+				else{
+					res_cat = docs
+					let temp_obj = {},
+						temp_arr = []
+					async.eachLimit(docs,3,function(item,callback){
+						let search1 = cat.count({'catname':item},function(er,count){
+							if(er){
+								console.log('eachLimit er -->',er)
+								callback(er)
+							}
+							else{
+								console.log('check item && count --->',item,count)
+								temp_obj.name = item
+								temp_obj.value = count
+								mokuai.push(temp_obj)
+								temp_obj = {}
+								callback()
+							}
+						})
+					},function(err){
+						console.log('eachLimit catname done && check mokuai--->',mokuai,docs)
+						cb()
+					})
+				}
+			})
+		},
+		//题目类型
+		
+		function(cb){
+			let search = cat.distinct('leixing',function(err,docs){
+				if(err){
+					console.log('search leixing err-->',err)
+					cb(err)
+				}
+				else{
+					timu_type = docs
+					let temp_obj = {}
+					async.eachLimit(docs,3,function(item,callback){
+						let search1 = cat.count({'leixing':item},function(er,count){
+							if(er){
+								console.log('eachLimit er-->',er)
+								callback(er)
+							}else{
+								console.log('check item && count -->',item,count)
+								temp_obj.value = count
+								temp_obj.name = item
+								res_timu.push(temp_obj)
+								temp_obj = {}
+								callback()
+							}
+						})
+					},function(er){
+						if(er){
+							console.log('eachLimit er-->',er)
+							cb(er)
+						}
+						else{
+							console.log('eachLimit timu_type done && check timu_type--->',timu_type,res_timu)
+							cb()
+						}
+					})
+				}
+			})
+		}
+	],function(error,result){
+		if(error){
+			console.log('async waterfall err-->',error)
+			return res.json({'code':-1,'msg':error})
+		}else{
+			console.log('dddd')
+			let temp_result = {}
+				temp_result.mokuai = mokuai
+				temp_result.res_cat = res_cat
+				temp_result.timu_type = timu_type
+				temp_result.res_timu = res_timu
+			console.log(temp_result)
+			return res.render('manage/tktj',{'result':temp_result})
+		}
+	})
+})
+
+router.get('/kscj',function(req,res){
+	console.log('tktj')
+	res.render('manage/tktj')
+})
+
+router.get('/cjtj',function(req,res){
+	console.log('cjtj')
+	res.render('manage/cjtj')
+})
 module.exports = router;
