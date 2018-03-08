@@ -7,7 +7,7 @@ const fs = require('fs')
 router.get('/', function(req, res, next) {
 	//logger.debug('here')
 	console.log('dddddddddddddddddd')
-	res.redirect('/dxxxhjs/manage')
+	res.redirect('/dxxxhjs/manage?w=w')
   	//res.render('index', { title: 'Express' });
 });
 

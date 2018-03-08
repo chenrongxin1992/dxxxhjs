@@ -10,7 +10,7 @@
     const DB_URL = 'mongodb://dxxxhjs:youtrytry@localhost:27017/dxxxhjs'
     //本地
     //const DB_URL = 'mongodb://localhost:27017/dxxxhjs'
-    mongoose.connect(DB_URL)
+    mongoose.connect(DB_URL,{ keepAlive: 1, connectTimeoutMS: 30000, reconnectTries: 30, reconnectInterval: 2000 } )
 
     /**
       * 连接成功
