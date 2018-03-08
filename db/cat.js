@@ -57,6 +57,7 @@ var catSchema = new Schema({
 
 //试卷设置
 var sjszSchema = new Schema({ 
+    ckcs : {type:Number,default:3},//可重考次数
     id : {type:Number},//试卷设置记录
     ksname : {type:String},//该次考试主题(比如第一单元，第二单元) 
     ksshijian : {type:Number},//考试时间
@@ -83,6 +84,8 @@ var sjszSchema = new Schema({
 })
 
 var stu_examSchema = new Schema({
+    kscs : {type:Number,default:0},//已考次数
+    ckcs : {type:Number,default:3},//可重考次数
     qstr : {type:String},
     kaoshiyongshi:{type:Number},
     is_end : {type:Number,default:0},

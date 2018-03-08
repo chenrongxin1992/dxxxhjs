@@ -55,6 +55,7 @@
                             <div id="ctl00_ContentPlaceHolder1_JQ1_h1Name" style="position:relative;">
                                 <h1 id=""><%=ksinfo.ksname%></h1>
                                 <h4 id="">姓名：<%=student.cn%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=student.alias%>&nbsp;&nbsp;&nbsp;&nbsp;考试时间：<span style="color: red;"><%=ksinfo.ksshijian%></span>分钟</h4>
+
                             </div>
 
                             <div style="clear: both;">
@@ -73,7 +74,7 @@
                         </div>
 
                         <!--页面内容开始-->
-
+                        <h4 id=""><span style="font-weight: bold;">*考前须知：</span>您共有&nbsp;&nbsp;<span style="color: red;"><%=ksinfo.ckcs%></span>&nbsp;&nbsp;次考试机会&nbsp;&nbsp;&nbsp;&nbsp; 目前是您第&nbsp;&nbsp;<span style="color: red;"><%=result.kscs%></span>&nbsp;&nbsp;次答题</h4>
                         <div id="ctl00_ContentPlaceHolder1_JQ1_question" class="surveycontent">
                             <div id="ctl00_ContentPlaceHolder1_JQ1_surveyContent">
                                 <fieldset class='fieldset' id='fieldset1'>
@@ -616,18 +617,18 @@
                                   },
                                   success:function(res){
                                     if(res.code === 0){
-                                      console.log(res.result)
+                                      console.log('res.result-->',res.result)
                                       layui.use(['layer'], function(){
                                         let temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
                                         let layer = layui.layer
-                                            layer.alert({
+                                            layer.open({
                                               skin: 'layui-layer-molv', //样式类名
                                               title: '考试结果',
                                               content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span>分</div><div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
                                               end:function(){
                                                 //跳转
-                                                location.href = '/dxxxhjs/front/ks?code=' + randomStr
-                                                //location.reload()
+                                                //location.href = '/dxxxhjs/front/ks?code=' + randomStr
+                                                location.reload()
                                               }
                                           }); 
                                       });

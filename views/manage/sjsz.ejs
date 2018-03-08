@@ -31,6 +31,7 @@ $(function(){
     //执行实例
     table.render({
       elem: '#sjlb_tb'
+      ,style: 'background-color: #5FB878; color: #fff;'//高度最大化
       ,height: 'full-200'//高度最大化
       ,cellMinWidth: 50//列宽自动分配
       ,url: '/dxxxhjs/manage/sjlb_data' //数据接口
@@ -45,6 +46,7 @@ $(function(){
         ,{field: 'duoxuan_num', title: '多选题', align: 'center',rowspan: 2}
         ,{field: 'panduan_num', title: '判断题', align: 'center',rowspan: 2}
         ,{field: 'kslianjie', title: '考试链接', align: 'center',rowspan: 2}
+        ,{field: 'ckcs', title: '可重考次数', align: 'center',rowspan: 2}
         ,{align: 'center', title: '模块比例', colspan: 9}
         ,{align: 'center',field:'caozuo', title: '操作', width:180,toolbar:"#toolbar" ,rowspan: 2}
       ],

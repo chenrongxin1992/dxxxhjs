@@ -77,6 +77,12 @@
                 <input type="text" name="sjfz" id="sjfz" class="layui-input" lay-verify="sjfz" value='0' style="color: red;" disabled="">
               </div>
             </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">可重考次数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="ckcs" id="ckcs" class="layui-input" lay-verify="required|number" style="color: red;" >
+              </div>
+            </div>
           </div>
           
           <div class="layui-form-item">
@@ -131,7 +137,8 @@ $(function(){
               duoxuan_num = getCookie('duoxuan_num'),
               panduan_fenzhi = getCookie('panduan_fenzhi'),
               panduan_num = getCookie('panduan_num'),
-              sjfz = getCookie('sjfz')
+              sjfz = getCookie('sjfz'),
+              ckcs = getCookie('ckcs')
           console.log('有没有值-->',ksname)
           console.log('有没有值-->',ksriqi)
           console.log('有没有值-->',ksshijian)
@@ -142,6 +149,7 @@ $(function(){
           console.log('有没有值-->',panduan_fenzhi)
           console.log('有没有值-->',panduan_num)
           console.log('有没有值-->',sjfz)
+          console.log('有没有值-->',ckcs)
           $('#ksname').val(ksname)
           $('#ksriqi').val(ksriqi)
           $('#ksshijian').val(ksshijian)
@@ -151,7 +159,7 @@ $(function(){
           $('#duoxuan_num').val(duoxuan_num)
           $('#panduan_fenzhi').val(panduan_fenzhi)
           $('#panduan_num').val(panduan_num)
-          //$('#sjfz').val(sjfz)
+          $('#ckcs').val(ckcs)
 
   function setCookie (name, value)
   { 
@@ -298,6 +306,7 @@ $(function(){
               duoxuan_num = $('#duoxuan_num').val(),
               panduan_fenzhi = $('#panduan_fenzhi').val(),
               panduan_num = $('#panduan_num').val(),
+              ckcs = $('#ckcs').val(),
               obj = {},
               tem_arr = [],
               tem_choose = ''
@@ -344,7 +353,8 @@ $(function(){
               duoxuan_num : duoxuan_num,
               panduan_fenzhi : panduan_fenzhi,
               panduan_num : panduan_num,
-              modal_arr : JSON.stringify(tem_arr)
+              modal_arr : JSON.stringify(tem_arr),
+              ckcs : ckcs
             },
             success:function(res){
               if(res.code === 0){
@@ -390,6 +400,7 @@ $(function(){
           setCookie('panduan_fenzhi',$('#panduan_fenzhi').val())
           setCookie('panduan_num',$('#panduan_num').val())
           setCookie('sjfz',$('#sjfz').val())
+          setCookie('ckcs',$('#ckcs').val())
 
           console.log(document.cookie)
 

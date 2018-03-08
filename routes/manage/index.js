@@ -713,6 +713,7 @@ router.get('/sjlb_data',function(req,res){
 					tempdata.panduan_fenzhi = item.panduan_fenzhi
 					tempdata.panduan_num = item.panduan_num
 					tempdata.kslianjie = item.kslianjie
+					tempdata.ckcs = item.ckcs
 					item.per_of_modal.forEach(function(it,ind){
 						console.log(it)
 						tempdata['mokuai' + ind] = it.name +' (' + it.percent + '%)'
@@ -768,7 +769,9 @@ router.get('/new_firststep',function(req,res){
         duoxuan_num = req.body.duoxuan_num,
         panduan_fenzhi = req.body.panduan_fenzhi,
         panduan_num = req.body.panduan_num,
-        per_of_modal = req.body.modal_arr
+        per_of_modal = req.body.modal_arr,
+        ckcs = req.body.ckcs ? req.body.ckcs : 3
+    console.log('ckcs-->',ckcs)
     console.log('per_of_modal-->',JSON.parse(per_of_modal))
     //console.log('req.body-->',req.body)
     //console.log('req.body-->',JSON.parse(req.body))
@@ -874,7 +877,8 @@ router.get('/new_firststep',function(req,res){
 		        panduan_num : req.body.panduan_num,
 		        per_of_modal : tem_arr,
 		        kslianjie:baselink+randomStr,
-		        randomStr:randomStr
+		        randomStr:randomStr,
+		        ckcs : ckcs
 		    })
 		    console.log('new_sjsz-->',new_sjsz)
 			new_sjsz.save(function(err){
