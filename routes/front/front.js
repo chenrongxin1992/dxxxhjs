@@ -91,7 +91,7 @@ router.get('/ks',function(req,res){
 											if(docc && docc.is_end == 1 && (docc.kscs==doc.ckcs)){//考试次数等于重考次数
 												console.log('考试次数等于重考次数')
 												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.user.alias)
+													search.where('gonghao').equals(req.session.student.alias)
 													search.where('is_end').equals(1)
 													search.exec(function(err,doc){
 														if(err){
@@ -135,7 +135,7 @@ router.get('/ks',function(req,res){
 										search_sj.exec(function(errr,docc){
 											if(errr){
 												console.log('search_sj errr')
-												return resjson({'code':-1,'msg':err.message})
+												return res.json({'code':-1,'msg':err.message})
 											}
 											if(docc && docc.is_end == 0 && (docc.kscs<=ksinfo.ckcs)){
 												//console.log('docc---->',docc)
@@ -147,7 +147,7 @@ router.get('/ks',function(req,res){
 												console.log('该试卷已经提交')
 												console.log('重考次数已用完')
 												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.user.alias)
+													search.where('gonghao').equals(req.session.student.alias)
 													search.where('is_end').equals(1)
 													search.exec(function(err,doc){
 														if(err){
@@ -679,6 +679,7 @@ router.get('/ks',function(req,res){
 								if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
 									let search_sj = stu_exam.findOne({})
 										search_sj.where('randomStr').equals(randomStr)
+										search_sj.where('gonghao').equals(req.session.student.alias)
 										search_sj.sort({'kscs':-1})//找最后一条考试记录
 										search_sj.limit(1)
 										search_sj.exec(function(errr,docc){
@@ -693,7 +694,7 @@ router.get('/ks',function(req,res){
 											if(docc && docc.is_end == 1 && (docc.kscs==doc.ckcs)){//考试次数等于重考次数
 												console.log('考试次数等于重考次数')
 												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.user.alias)
+													search.where('gonghao').equals(req.session.student.alias)
 													search.where('is_end').equals(1)
 													search.exec(function(err,doc){
 														if(err){
@@ -737,7 +738,7 @@ router.get('/ks',function(req,res){
 										//search_sj.where('is_end').equals(0)
 										search_sj.exec(function(errr,docc){
 											if(errr){
-												console.log('search_sj errr')
+												console.log('search_sj errr',errr)
 												return res.json({'code':-1,'msg':errr})
 											}
 											if(docc && docc.is_end == 0 && (docc.kscs<=ksinfo.ckcs)){
@@ -750,7 +751,7 @@ router.get('/ks',function(req,res){
 												console.log('该试卷已经提交')
 												console.log('重考次数已用完')
 												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.user.alias)
+													search.where('gonghao').equals(req.session.student.alias)
 													search.where('is_end').equals(1)
 													search.exec(function(err,doc){
 														if(err){
@@ -1422,6 +1423,19 @@ router.get('/myexamlist',function(req,res){
 			    })
 		}
 	}
+})
+router.get('/ksdonenew',function(req,res){
+	let _id = req.query._id
+	console.log('check _id-->',_id)
+	let search = stu_exam.findOne({'_id':_id})
+		search.exec(function(err,doc){
+			if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err})
+			}
+			console.log('check doc-->',doc)
+			return res.render('front/ksdonenew',{'result':doc})
+		})
 })
 function randomsort(a, b) {
    return Math.random()>.5 ? -1 : 1; //通过随机产生0到1的数，然后判断是否大于0.5从而影响排序，产生随机性的效果。

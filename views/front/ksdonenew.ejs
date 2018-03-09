@@ -53,7 +53,7 @@
                     <div class="survey" style="margin:0px auto;">
                         <div id="ctl00_ContentPlaceHolder1_JQ1_divHead" class="surveyhead" style="border: 0px;">
                             <div id="ctl00_ContentPlaceHolder1_JQ1_h1Name" style="position:relative;">
-                                <h1 id=""><%=ksinfo.ksname%></h1>
+                                <h1 id=""><%=result.ksname%>(第<%=result.kscs%>次成绩)</h1>
                                 <h4 id="">姓名：<%=result.xingming%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=result.gonghao%>&nbsp;&nbsp;&nbsp;&nbsp;本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分&nbsp;&nbsp;&nbsp;&nbsp;用时：<%=result.cha%></h4>
                             </div>
 
@@ -79,7 +79,7 @@
                                 <fieldset class='fieldset' id='fieldset1'>
                                     <!-- 一个DIV一个题目 -->
                                     <div class="page-header">
-                                      <h4>一、单选题(该部分共有<%=result.res_danxuan_arr.length%>小题,每小题<%=ksinfo.danxuan_fenzhi%>分)</h4>
+                                      <h4>一、单选题(该部分共有<%=result.res_danxuan_arr.length%>小题,每小题<%=result.danxuan_fenzhi%>分)</h4>
                                     </div>
                                     <%result.res_danxuan_arr.forEach(function(item,index){%>
                                       <div class='div_question' id='div<%=index+1%>'>
@@ -123,7 +123,7 @@
                                       </div>
                                     <%})%>
                                     <div class="page-header">
-                                      <h4>二、多选题(该部分共有<%=result.res_duoxuan_arr.length%>小题,每小题<%=ksinfo.duoxuan_fenzhi%>分)</h4>
+                                      <h4>二、多选题(该部分共有<%=result.res_duoxuan_arr.length%>小题,每小题<%=result.duoxuan_fenzhi%>分)</h4>
                                     </div>
                                     <%result.res_duoxuan_arr.forEach(function(item,index){%>
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+index+1%>'>
@@ -165,7 +165,7 @@
                                       </div>
                                     <%})%>
                                     <div class="page-header">
-                                      <h4>三、判断题(该部分共有<%=result.res_panduan_arr.length%>小题,每小题<%=ksinfo.panduan_fenzhi%>分)</h4>
+                                      <h4>三、判断题(该部分共有<%=result.res_panduan_arr.length%>小题,每小题<%=result.panduan_fenzhi%>分)</h4>
                                     </div>
                                     <%result.res_panduan_arr.forEach(function(item,index){%>
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
