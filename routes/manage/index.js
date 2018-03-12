@@ -57,8 +57,10 @@ router.get('/', function(req, res, next) {
 			res.render('manage/index',{'user': req.session.user });
 		}
 		else{
-			let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
+			let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl,
+				finalReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs'
 			console.log('ReturnURL url-->',ReturnURL)
+			console.log('req-->',req.baseUrl)//finalReturnURL
 			console.log('you ticket, meiyou session')
 			let ticket = req.query.ticket
 			console.log('check ticket-->',ticket)
@@ -106,7 +108,8 @@ router.get('/', function(req, res, next) {
 						   		return res.json({'errCode':-1,'errMsg':'ticket is unvalid,请重新扫码！'})
 						   }else{
 						   		req.session.user = arg
-						   		return res.redirect(ReturnURL)
+						   		return res.redirect(finalReturnURL)
+						   		//return res.redirect(ReturnURL)
 						  }
 				     }else{
 				     	console.log(error)

@@ -75,4 +75,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+front.scheduleJob()
+
 module.exports = app;
