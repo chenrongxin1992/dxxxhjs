@@ -37,10 +37,30 @@
         height: 50px;
         line-height: 50px;
       }
+      .time-item{
+          position:fixed;
+          margin-top:150px;
+          left: 1412px;
+          max-width: 250px;
+          background:#C71C60;
+          color:#fff;
+          line-height:49px;
+          font-size:36px;
+          font-family:Arial;
+          padding:0 10px;
+          margin-right:10px;
+          border-radius:5px;
+          box-shadow:1px 1px 3px rgba(0,0,0,0.2);
+      }
+
     </style>
   </head>
 
   <body>
+    <div class="time-item">
+      <strong id="minute_show">0分</strong>
+      <strong id="second_show">0秒</strong>
+    </div>
     <div id="jqContent" class="" style="text-align: left; ">
         <div id="headerCss" style="overflow-x: hidden; overflow-y: hidden; ">
             <div id="ctl00_header">
@@ -546,6 +566,38 @@
                             var cpid = "";
                         </script>
                         <script src="/dxxxhjs/javascripts/layui.js"></script>
+                        <script src="/dxxxhjs/javascripts/jquery.min.js"></script>
+
+                        <script type="text/javascript">
+                        let min_ = '<%=ksinfo.ksshijian%>'
+                        var intDiff = parseInt(min_*60);//倒计时总秒数量
+                        function timer(intDiff){
+                            window.setInterval(function(){
+                            var day=0,
+                                hour=0,
+                                minute=0,
+                                second=0;//时间默认值        
+                            if(intDiff > 0){
+                                //day = Math.floor(intDiff / (60 * 60 * 24));
+                                //hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+                                //minute = min_
+                                minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+                                second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+                            }
+                            if (minute <= 9) minute = '0' + minute;
+                            if (second <= 9) second = '0' + second;
+                           // $('#day_show').html(day+"天");
+                           // $('#hour_show').html('<s id="h"></s>'+hour+'时');
+                            $('#minute_show').html('<s></s>'+minute+'分');
+                            $('#second_show').html('<s></s>'+second+'秒');
+                            intDiff--;
+                            }, 1000);
+                        } 
+                        $(function(){
+                          console.log('ddddd')
+                            timer(intDiff);
+                        }); 
+                        </script>
                         <script type="text/javascript">
                         'use strict';
                         function GetQueryString(name)
