@@ -105,7 +105,9 @@ router.get('/', function(req, res, next) {
 						   		console.log('ticket is unvalid,重新回去获取ticket，清空session')
 						   		delete req.session.user
 						   		console.log('check req.session.user-->',req.session.user)
-						   		return res.json({'errCode':-1,'errMsg':'ticket is unvalid,请重新扫码！'})
+						   		console.log('ticket is unvalid')
+						   		return res.redirect(finalReturnURL)
+						   		//return res.json({'errCode':-1,'errMsg':'ticket is unvalid,请重新扫码！'})
 						   }else{
 						   		req.session.user = arg
 						   		return res.redirect(finalReturnURL)
@@ -990,8 +992,8 @@ router.get('/tktj',function(req,res){
 })
 
 router.get('/kscj',function(req,res){
-	console.log('tktj')
-	res.render('manage/tktj')
+	console.log('kscj')
+	res.render('manage/kscj')
 })
 
 router.get('/cjtj',function(req,res){

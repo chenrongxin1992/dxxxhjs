@@ -1970,7 +1970,9 @@ router.get('/ks',function(req,res){
 						   		console.log('ticket is unvalid,重新回去获取ticket，清空session')
 						   		delete req.session.student
 						   		console.log('check req.session.student-->',req.session.student)
-						   		return res.json({'errCode':-1,'errMsg':'ticket is unvalid！'})
+						   		console.log('ticket is unvalid')
+						   		return res.redirect(finalReturnURL)
+						   		//return res.json({'errCode':-1,'errMsg':'ticket is unvalid！'})
 						   }else{
 						   		req.session.student = arg
 						   		return res.redirect(finalReturnURL)
@@ -2048,6 +2050,10 @@ router.get('/myexamlist',function(req,res){
 		}
 		else{
 			let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
+			let temparr = req.originalUrl.split('&')
+			console.log('temparr-->',temparr)
+			let finalReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + temparr[0]
+			console.log('finalReturnURL-->',finalReturnURL)
 			console.log('ReturnURL url-->',ReturnURL)
 			console.log('you ticket, meiyou session')
 			let ticket = req.query.ticket
@@ -2093,10 +2099,13 @@ router.get('/myexamlist',function(req,res){
 						   		console.log('ticket is unvalid,重新回去获取ticket，清空session')
 						   		delete req.session.user
 						   		console.log('check req.session.user-->',req.session.user)
-						   		return res.json({'errCode':-1,'errMsg':'ticket is unvalid,请重新扫码！'})
+						   		console.log('ticket is unvalid')
+						   		return res.redirect(finalReturnURL)
+						   		//return res.json({'errCode':-1,'errMsg':'ticket is unvalid,请重新扫码！'})
 						   }else{
 						   		req.session.user = arg
-						   		return res.redirect(ReturnURL)
+						   		return res.redirect(finalReturnURL)
+						   		//return res.redirect(ReturnURL)
 						  }
 				     }else{
 				     	console.log(error)
