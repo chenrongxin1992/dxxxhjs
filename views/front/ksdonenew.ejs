@@ -44,6 +44,9 @@
       h3{
         font-size: 14px;
       }
+      .rightorfalse{
+        border: 2px solid red;
+      }
     </style>
   </head>
 
@@ -92,7 +95,8 @@
                                       <h4>一、单选题(该部分共有<%=result.res_danxuan_arr.length%>小题,每小题<%=result.danxuan_fenzhi%>分)</h4>
                                     </div>
                                     <%result.res_danxuan_arr.forEach(function(item,index){%>
-                                      <div class='div_question' id='div<%=index+1%>'>
+                                      <%if(item.correct==1){%>
+                                        <div class='div_question' id='div<%=index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=index+1%>.</div>
                                           <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
@@ -131,11 +135,53 @@
                                         </div>
                                         <div class='errorMessage'></div>
                                       </div>
+                                      <%}else{%>
+                                      <div class='div_question rightorfalse' id='div<%=index+1%>'>
+                                        <div class='div_title_question_all'>
+                                          <div class='div_topic_question'><%=index+1%>.</div>
+                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;"><%=item.choose%></span> )</div>
+                                          <div style='clear:both;'></div>
+                                        </div>
+                                        <div class='div_table_radio_question' id='divquestion<%=index+1%>'>
+                                          <div class='div_table_clear_top'></div>
+                                          <ul class='ulradiocheck'>
+                                          <%item.xuanxiang.forEach(function(it,ind){%>
+                                            <%var chooseitem = ''%>
+                                            <%if(ind == 0){chooseitem = 'A. '}%>
+                                            <%if(ind == 1){chooseitem = 'B. '}%>
+                                            <%if(ind == 2){chooseitem = 'C. '}%>
+                                            <%if(ind == 3){chooseitem = 'D. '}%>
+                                            <%if(ind == 4){chooseitem = 'E. '}%>
+                                            <%if(ind == 5){chooseitem = 'F. '}%>
+                                            <%if(ind == 6){chooseitem = 'G. '}%>
+                                            <%if(ind == 7){chooseitem = 'H. '}%>
+                                            <%if(ind == 8){chooseitem = 'I. '}%>
+                                            <li style='width:99%;'>
+                                            <%if(it.is_correct==true){%>
+                                              <a href='javascript:' class='jqRadio jqChecked' rel='q<%=index+1%>_<%=ind+1%>'></a>
+                                              <%}else{%>
+                                              <a href='javascript:' class='jqRadio ' rel='q<%=index+1%>_<%=ind+1%>'></a>
+                                              <%}%>
+                                              <input style='display:none;' type='radio' name='q<%=index+1%>' id='q<%=index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitem%>" timuid="<%=item._id%>" checked="checked"/>
+                                              
+                                              <input style='display:none;' type='radio' name='q<%=index+1%>' id='q<%=index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitem%>" timuid="<%=item._id%>" />
+                                              
+                                              <label for='q<%=index+1%>_<%=ind+1%>'><%=chooseitem%><%=it.content%></label>
+                                            </li>
+                                          <%})%>
+                                          </ul>
+                                          <div style='clear:both;'></div>
+                                          <div class='div_table_clear_bottom'></div>
+                                        </div>
+                                        <div class='errorMessage'></div>
+                                      </div>
+                                      <%}%>
                                     <%})%>
                                     <div class="page-header">
                                       <h4>二、多选题(该部分共有<%=result.res_duoxuan_arr.length%>小题,每小题<%=result.duoxuan_fenzhi%>分)</h4>
                                     </div>
                                     <%result.res_duoxuan_arr.forEach(function(item,index){%>
+                                      <%if(item.correct==1){%>
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+index+1%>.</div>
@@ -173,15 +219,94 @@
                                         </div>
                                         <div class='errorMessage'></div>
                                       </div>
+                                      <%}else{%>
+                                        <div class='div_question rightorfalse' id='div<%=result.res_danxuan_arr.length+index+1%>'>
+                                        <div class='div_title_question_all'>
+                                          <div class='div_topic_question'><%=result.res_danxuan_arr.length+index+1%>.</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;"><%=item.choose%></span> )</div>
+                                          <div style='clear:both;'></div>
+                                        </div>
+                                        <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+index+1%>'>
+                                          <div class='div_table_clear_top'></div>
+                                          <ul class='ulradiocheck'>
+                                          <%item.xuanxiang.forEach(function(it,ind){%>
+                                            <%var chooseitemdx = ''%>
+                                            <%if(ind == 0){chooseitemdx = 'A. '}%>
+                                            <%if(ind == 1){chooseitemdx = 'B. '}%>
+                                            <%if(ind == 2){chooseitemdx = 'C. '}%>
+                                            <%if(ind == 3){chooseitemdx = 'D. '}%>
+                                            <%if(ind == 4){chooseitemdx = 'E. '}%>
+                                            <%if(ind == 5){chooseitemdx = 'F. '}%>
+                                            <%if(ind == 6){chooseitemdx = 'G. '}%>
+                                            <%if(ind == 7){chooseitemdx = 'H. '}%>
+                                            <%if(ind == 8){chooseitemdx = 'I. '}%>
+                                            <li style='width:99%;'>
+                                              <%if(it.is_correct==true){%>
+                                              <a href='javascript:' class='jqCheckbox jqChecked' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                              <%}else{%>
+                                              <a href='javascript:' class='jqCheckbox' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                              <%}%>
+                                              <input style='display:none;' type='checkbox' name='q<%=result.res_danxuan_arr.length+index+1%>' id='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitemdx%>" timuid="<%=item._id%>"/>
+                                              
+                                              <label for='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'><%=chooseitemdx%><%=it.content%></label>
+                                            </li>
+                                          <%})%>
+                                          </ul>
+                                          <div style='clear:both;'></div>
+                                          <div class='div_table_clear_bottom'></div>
+                                        </div>
+                                        <div class='errorMessage'></div>
+                                      </div>
+                                      <%}%>
                                     <%})%>
                                     <div class="page-header">
                                       <h4>三、判断题(该部分共有<%=result.res_panduan_arr.length%>小题,每小题<%=result.panduan_fenzhi%>分)</h4>
                                     </div>
                                     <%result.res_panduan_arr.forEach(function(item,index){%>
-                                      <div class='div_question' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
+                                      <%if(item.correct==1){%>
+                                        <div class='div_question' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
+                                          <div class='div_title_question_all'>
+                                            <div class='div_topic_question'><%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>.</div>
+                                            <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
+                                            <div style='clear:both;'></div>
+                                          </div>
+                                          <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
+                                            <div class='div_table_clear_top'></div>
+                                            <ul class='ulradiocheck'>
+                                            <%item.xuanxiang.forEach(function(it,ind){%>
+                                              <%var chooseitempd = ''%>
+                                              <%if(ind == 0){chooseitempd = 'A. '}%>
+                                              <%if(ind == 1){chooseitempd = 'B. '}%>
+                                              <%if(ind == 2){chooseitempd = 'C. '}%>
+                                              <%if(ind == 3){chooseitempd = 'D. '}%>
+                                              <%if(ind == 4){chooseitempd = 'E. '}%>
+                                              <%if(ind == 5){chooseitempd = 'F. '}%>
+                                              <%if(ind == 6){chooseitempd = 'G. '}%>
+                                              <%if(ind == 7){chooseitempd = 'H. '}%>
+                                              <%if(ind == 8){chooseitempd = 'I. '}%>
+                                              <li style='width:99%;'>
+                                                
+                                                <%if(it.is_correct==true){%>
+                                                <a href='javascript:' class='jqRadio jqChecked' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                                <%}else{%>
+                                                <a href='javascript:' class='jqRadio ' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
+                                                <%}%>
+                                                <input style='display:none;' type='radio' name='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' id='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitempd%>" timuid="panduanti<%=item._id%>" checked=""/>
+                                                
+                                                <label for='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'><%=chooseitempd%><%=it.content%></label>
+                                              </li>
+                                            <%})%>
+                                            </ul>
+                                            <div style='clear:both;'></div>
+                                            <div class='div_table_clear_bottom'></div>
+                                          </div>
+                                          <div class='errorMessage'></div>
+                                        </div>
+                                        <%}else{%>
+                                          <div class='div_question rightorfalse' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;"><%=item.choose%></span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
@@ -216,6 +341,7 @@
                                         </div>
                                         <div class='errorMessage'></div>
                                       </div>
+                                      <%}%>
                                     <%})%>
                                 </fieldset>
                                 <br><h4 id = "retry2" style="display:none;text-align: center;font-size: 14px;"><a href="/dxxxhjs/front/ks?code=<%=ksinfo.randomStr%>">&nbsp;&nbsp;&nbsp;&nbsp;点击此处再次考试</a></h4>

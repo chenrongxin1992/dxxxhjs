@@ -279,13 +279,13 @@ router.post('/uploadtk',function(req,res){
 						    			if(inarr(daid_arr,i)){
 							    			obj_xuanxiang.is_correct = true
 							    			obj_xuanxiang.id = 4+i
-										    obj_xuanxiang.content = item[4+i].trim()
+										    obj_xuanxiang.content = trim_str(item[4+i])
 										    arr_xuanxiang.push(obj_xuanxiang)
 										    delete obj_xuanxiang
 							    		}else{
 							    			obj_xuanxiang.is_correct = false
 							    			obj_xuanxiang.id = 4+i
-										    obj_xuanxiang.content = item[4+i].trim()
+										    obj_xuanxiang.content = trim_str(item[4+i])
 										    arr_xuanxiang.push(obj_xuanxiang)
 										    delete obj_xuanxiang
 							    		}
@@ -295,7 +295,7 @@ router.post('/uploadtk',function(req,res){
 						    			id : catid,
 						    			catname : item[0].trim(),
 						    			leixing : item[1].trim(),
-						    			timu : item[2].trim(),
+						    			timu : trim_str(item[2]),
 						    			zqda : item[3].trim(),
 						    			xuanxiang : arr_xuanxiang,
 						    			random : parseInt((Math.random()+0.01)*50)
@@ -320,13 +320,13 @@ router.post('/uploadtk',function(req,res){
 							    			if(daid == i){
 							    				obj_xuanxiang.is_correct = true
 							    				obj_xuanxiang.id = 4+i
-										    	obj_xuanxiang.content = item[4+i].trim()
+										    	obj_xuanxiang.content = trim_str(item[4+i])
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}else{
 							    				obj_xuanxiang.is_correct = false
 							    				obj_xuanxiang.id = 4+i
-										    	obj_xuanxiang.content = item[4+i].trim()
+										    	obj_xuanxiang.content = trim_str(item[4+i])
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}
@@ -337,7 +337,7 @@ router.post('/uploadtk',function(req,res){
 							    			id : catid,
 							    			catname : item[0].trim(),
 							    			leixing : item[1].trim(),
-							    			timu : item[2].trim(),
+							    			timu : trim_str(item[2]),
 							    			zqda : item[3].trim(),
 							    			xuanxiang : arr_xuanxiang,
 							    			random : parseInt((Math.random()+0.01)*50)
@@ -359,13 +359,13 @@ router.post('/uploadtk',function(req,res){
 						    				if(daid == i){
 							    				obj_xuanxiang.is_correct = true
 							    				obj_xuanxiang.id = 4+i
-										    	obj_xuanxiang.content = item[4+i].trim()
+										    	obj_xuanxiang.content = trim_str(item[4+i])
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}else{
 							    				obj_xuanxiang.is_correct = false
 							    				obj_xuanxiang.id = 4+i
-										    	obj_xuanxiang.content = item[4+i].trim()
+										    	obj_xuanxiang.content = trim_str(item[4+i])
 										    	arr_xuanxiang.push(obj_xuanxiang)
 										    	delete obj_xuanxiang
 							    			}
@@ -376,7 +376,7 @@ router.post('/uploadtk',function(req,res){
 							    			id : catid,
 							    			catname : item[0].trim(),
 							    			leixing : item[1].trim(),
-							    			timu : item[2].trim(),
+							    			timu : trim_str(item[2]),
 							    			zqda : item[3].trim(),
 							    			xuanxiang : arr_xuanxiang,
 							    			random : parseInt((Math.random()+0.01)*50)
@@ -926,7 +926,10 @@ router.get('/new_firststep',function(req,res){
 			})
 		})
 })
-
+//去掉空格
+function trim_str(str){
+    return str.replace(/\s|\xA0/g,"");    
+}
 router.get('/tktj',function(req,res){
 	//题库提醒所属模块比例及数量
 	//返回题库模块，题目类型

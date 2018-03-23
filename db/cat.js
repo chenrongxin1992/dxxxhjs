@@ -110,6 +110,7 @@ var stu_examSchema = new Schema({
     randomStr : {type:String},
     kslianjie : {type:String},
     res_danxuan_arr : [{
+        correct : {type:Number,default:0},
         choose:{type:String},//选择的答案
         id : {type:Number},
         catname : {type:String},//分类名:如党章、十九大         
@@ -125,6 +126,7 @@ var stu_examSchema = new Schema({
         createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
     }],
     res_duoxuan_arr : [{
+        correct : {type:Number,default:0},
         choose:{type:String},//选择的答案
         id : {type:Number},
         catname : {type:String},//分类名:如党章、十九大         
@@ -140,6 +142,7 @@ var stu_examSchema = new Schema({
         createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
     }],
     res_panduan_arr : [{
+        correct : {type:Number,default:0},
         choose:{type:String},//选择的答案
         id : {type:Number},
         catname : {type:String},//分类名:如党章、十九大         

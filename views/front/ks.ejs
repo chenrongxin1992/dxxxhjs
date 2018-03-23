@@ -569,6 +569,11 @@
                         <!-- <script src="/dxxxhjs/javascripts/jquery.min.js"></script> -->
 
                         <script type="text/javascript">
+                        function br2nl(txt){
+                            var re=/(<br\s\/>|<br>|<BR>|<BR\/>)/g;
+                            var s=txt.replace(re,"\n");
+                            return s;                                  
+                        }
                         let min_ = '<%=ksinfo.ksshijian%>'
                         var intDiff = parseInt(min_*60);//倒计时总秒数量
                         function timer(intDiff){
@@ -616,9 +621,13 @@
                                   console.log('temp_danxuan---->',temp_danxuan)
                                 }
                               });
-                              let temp_duoxuan_arr =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
-                                  duoxuan_arr = JSON.parse(temp_duoxuan_arr),
+                              let temp_duoxuan_arr_1 =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
+                                  //temp_duoxuan_arr = temp_duoxuan_arr_1.replace(/\n/g,'<br />'),
+                                  duoxuan_arr = JSON.parse(temp_duoxuan_arr_1),
+                                  //duoxuan_arr = eval('(' + temp_duoxuan_arr_1 + ')'),
                                   temp_name = ''
+                              console.log('11111',temp_duoxuan_arr_1)
+                              console.log('type of duoxuan_arr',typeof(duoxuan_arr))
                               for(let i=0;i<duoxuan_arr.length;i++){
                                   temp_name = duoxuan_arr[i]._id
                                   console.log('temp_name--->',temp_name)
@@ -758,9 +767,13 @@
                                   console.log('temp_danxuan---->',temp_danxuan)
                                 }
                               });
-                              let temp_duoxuan_arr =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
-                                  duoxuan_arr = JSON.parse(temp_duoxuan_arr),
+                              let temp_duoxuan_arr_1 =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
+                                  //temp_duoxuan_arr = temp_duoxuan_arr_1.replace(/\n/g,'<br />'),
+                                  duoxuan_arr = JSON.parse(temp_duoxuan_arr_1),
+                                  //duoxuan_arr = eval('(' + temp_duoxuan_arr_1 + ')'),
                                   temp_name = ''
+                                  console.log('22222',temp_duoxuan_arr_1)
+                                  console.log('type of duoxuan_arr',typeof(duoxuan_arr))
                               for(let i=0;i<duoxuan_arr.length;i++){
                                   temp_name = duoxuan_arr[i]._id
                                   console.log('temp_name--->',temp_name)
