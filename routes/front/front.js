@@ -372,7 +372,7 @@ router.get('/ks_bk',function(req,res){//测试使用
 					if(random > 35 || random < 15){
 						random = 25
 					}
-					random = 20
+					//random = 20
 					console.log('random 3-->',random)
 					doc.per_of_modal.forEach(function(item,index){
 						let why_num = parseInt(item.num_panduan)
@@ -856,6 +856,7 @@ router.get('/ks',function(req,res){
 						})
 				},
 				function(doc,cb){//第一次循环找单选题
+					console.log('doc-->',doc)
 					doc.per_of_modal.forEach(function(item,index){
 						let why_num = parseInt(item.num_danxuan)
 						console.log('check why_num---->',why_num)
@@ -872,7 +873,7 @@ router.get('/ks',function(req,res){
 								console.log('第一次forEach docs-->',d.length)
 								console.log('第一次 单选 num-->',item.num_danxuan)
 								if(d.length < item.num_danxuan){
-									console.log('-------单选题 随机抽取的结果少于题目数，重新抽取-------')
+									console.log('-------单选题 随机抽取的结果少于题目数，重新抽取-------',d.length,item.num_danxuan)
 									let search1 = cat.find({})
 										search1.where('catname').equals(item.name)
 										search1.where('leixing').equals('单选')
@@ -936,7 +937,7 @@ router.get('/ks',function(req,res){
 								console.log('第二次 多选 num-->',item.num_duoxuan)
 								//
 								if(d.length < item.num_duoxuan){
-									console.log('-------多选题 随机抽取的结果少于题目数，重新抽取-------')
+									console.log('-------多选题 随机抽取的结果少于题目数，重新抽取-------',d.length,item.num_duoxuan)
 									let search1 = cat.find({})
 										search1.where('catname').equals(item.name)
 										search1.where('leixing').equals('多选')
@@ -980,7 +981,7 @@ router.get('/ks',function(req,res){
 					if(random > 35 || random < 15){
 						random = 25
 					}
-					random = 20
+					//random = 20
 					console.log('random 3-->',random)
 					doc.per_of_modal.forEach(function(item,index){
 						let why_num = parseInt(item.num_panduan)
@@ -999,7 +1000,7 @@ router.get('/ks',function(req,res){
 								console.log('第三次 判断 num-->',item.num_panduan)
 								console.log('第三次 判断 catname-->',item.name)
 								if(d.length < item.num_panduan){
-									console.log('-------随机抽取的结果少于题目数，重新抽取-------')
+									console.log('-------随机抽取的结果少于题目数，重新抽取-------',d.length,item.num_panduan)
 									let search1 = cat.find({})
 										search1.where('catname').equals(item.name)
 										search1.where('leixing').equals('判断')
@@ -1584,7 +1585,7 @@ router.get('/ks',function(req,res){
 					if(random > 35 || random < 15){
 						random = 25
 					}
-					random = 20
+					//random = 20
 					console.log('random 3-->',random)
 					doc.per_of_modal.forEach(function(item,index){
 						let why_num = parseInt(item.num_panduan)

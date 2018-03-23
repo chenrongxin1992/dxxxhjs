@@ -566,7 +566,7 @@
                             var cpid = "";
                         </script>
                         <script src="/dxxxhjs/javascripts/layui.js"></script>
-                        <script src="/dxxxhjs/javascripts/jquery.min.js"></script>
+                        <!-- <script src="/dxxxhjs/javascripts/jquery.min.js"></script> -->
 
                         <script type="text/javascript">
                         let min_ = '<%=ksinfo.ksshijian%>'
@@ -591,6 +591,132 @@
                             $('#minute_show').html('<s></s>'+minute+'分');
                             $('#second_show').html('<s></s>'+second+'秒');
                             intDiff--;
+                            //时间到，自动提交
+                            if(intDiff == 0){
+                              console.log('处理提交')
+                              let temp_danxuan = [],
+                                  temp_duoxuan = [],
+                                  temp_panduan = [],
+                                  danxuan_num = '<%=result.res_danxuan_arr.length%>',
+                                  duoxuan_num = '<%=result.res_duoxuan_arr.length%>',
+                                  panduan_num = '<%=result.res_panduan_arr.length%>'
+                              console.log('danxuan_num-->',danxuan_num)
+                              console.log('duoxuan_num-->',duoxuan_num)
+                              console.log('panduan_num-->',panduan_num)
+                              $('input:radio:checked').each(function(){
+                                //提交答案格式 timu_id:daan_id  d.xuanxiang2.indexOf('true')) > 0
+                                console.log($(this).attr('timuid').indexOf('panduanti'))
+                                if($(this).attr('timuid').indexOf('panduanti') > -1){
+                                  console.log('---判断题---')
+                                  temp_panduan.push(($(this).attr('timuid').substring(9)) + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1) )
+                                  console.log('temp_panduan--',temp_panduan)
+                                }else{
+                                  console.log('---单选题---')
+                                  temp_danxuan.push($(this).attr('timuid') + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1))
+                                  console.log('temp_danxuan---->',temp_danxuan)
+                                }
+                              });
+                              let temp_duoxuan_arr =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
+                                  duoxuan_arr = JSON.parse(temp_duoxuan_arr),
+                                  temp_name = ''
+                              for(let i=0;i<duoxuan_arr.length;i++){
+                                  temp_name = duoxuan_arr[i]._id
+                                  console.log('temp_name--->',temp_name)
+                                  let temp_arr = [],
+                                      temp_choose = []
+                                  console.log('看看是什么--->',$('input[timuid=' + temp_name + ']:checked').length)
+                                  let tempobj = $('input[timuid=' + temp_name + ']')
+                                  tempobj.each(function(){
+                                    if($(this).is(':checked')){
+                                      console.log('$(this)--->',$(this).attr('daan').substring(0,1))
+                                      console.log('该多选题选择的答案-->',$(this).val())
+                                      temp_arr.push($(this).val())
+                                      temp_choose.push($(this).attr('daan').substring(0,1))
+                                    }
+                                  })
+                                  temp_duoxuan.push(temp_name + ':' + temp_arr + ':' + temp_choose)
+                                  console.log('check temp_duoxuan--->',temp_duoxuan)
+                                  temp_arr = []
+                              }
+                              if((danxuan_num==temp_danxuan.length) && (duoxuan_num==temp_duoxuan.length) && (panduan_num==temp_panduan.length)){
+                                console.log('ajax 了')
+                                let randomStr = GetQueryString('code')
+                                console.log('check randomStr-->',randomStr)
+                                $.ajax({
+                                  url:'/dxxxhjs/front/checkks',
+                                  method: 'POST',
+                                  data:{
+                                    randomStr : randomStr,
+                                    danxuan_arr : JSON.stringify(temp_danxuan),
+                                    duoxuan_arr : JSON.stringify(temp_duoxuan),
+                                    panduan_arr : JSON.stringify(temp_panduan)
+                                  },
+                                  success:function(res){
+                                    if(res.code === 0){
+                                      console.log('res.result-->',res.result)
+                                      layui.use(['layer'], function(){
+                                        let temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
+                                        let layer = layui.layer
+                                            layer.open({
+                                              skin: 'layui-layer-molv', //样式类名
+                                              title: '时间截止，本次考试结果',
+                                              content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span>分</div><div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
+                                              end:function(){
+                                                //跳转
+                                                location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                                //location.reload()
+                                              }
+                                          }); 
+                                      });
+                                    }else{
+                                      //console.log('试卷设置成功')
+                                    }
+                                  },
+                                  error:function(err){
+                                    console.log('ajax err',err)
+                                  }
+                                }) 
+                              }else{
+                                console.log('题目没有选齐')
+                                console.log('题目没有选齐,强制ajax 了')
+                                let randomStr = GetQueryString('code')
+                                console.log('check randomStr-->',randomStr)
+                                $.ajax({
+                                  url:'/dxxxhjs/front/checkks',
+                                  method: 'POST',
+                                  data:{
+                                    randomStr : randomStr,
+                                    danxuan_arr : JSON.stringify(temp_danxuan),
+                                    duoxuan_arr : JSON.stringify(temp_duoxuan),
+                                    panduan_arr : JSON.stringify(temp_panduan)
+                                  },
+                                  success:function(res){
+                                    if(res.code === 0){
+                                      console.log('res.result-->',res.result)
+                                      layui.use(['layer'], function(){
+                                        let temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
+                                        let layer = layui.layer
+                                            layer.open({
+                                              skin: 'layui-layer-molv', //样式类名
+                                              title: '时间截止，本次考试结果',
+                                              content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span>分</div><div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
+                                              end:function(){
+                                                //跳转
+                                                location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                                //location.reload()
+                                              }
+                                          }); 
+                                      });
+                                    }else{
+                                      //console.log('试卷设置成功')
+                                    }
+                                  },
+                                  error:function(err){
+                                    console.log('ajax err',err)
+                                  }
+                                }) 
+                              }
+                            }
                             }, 1000);
                         } 
                         $(function(){
@@ -660,7 +786,7 @@
                                 console.log('check randomStr-->',randomStr)
                                 $.ajax({
                                   url:'/dxxxhjs/front/checkks',
-                                  method:'post',
+                                  method: 'POST',
                                   data:{
                                     randomStr : randomStr,
                                     danxuan_arr : JSON.stringify(temp_danxuan),

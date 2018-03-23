@@ -240,18 +240,21 @@ router.post('/uploadtk',function(req,res){
 		    console.log('读取文件路径-->',files.file[0].path)
 
 		    let exBuf=fs.readFileSync(files.file[0].path)
+		    console.log('exBuf-->',exBuf)
 		    //使用ejsExcel的getExcelArr将buffer读取为数组
 		    ejsExcel.getExcelArr(exBuf).then(exlJson=>{
 		    	console.log("---------------- read success:getExcelArr ----------------");
 			    let workBook=exlJson;
 			    let workSheets=workBook[0];//第一个工作表
-
+			    console.log('workBook-->',workBook)
+			    console.log('workSheets-->',workSheets)
 			    let count = 0,//计数，排除第一行
 			    	catid = 0;//cat id
 			    let search = cat.find({},{'id':1})
 			    	search.sort({'id':-1})
 			    	search.limit(1)
 			    	search.exec(function(err,docs){
+			    		console.log('workSheets-->',workSheets)
 			    		if(err){
 			    			console.log('search err',err.stack)
 			    			return res.json({'code':-1,'msg':err.stack})

@@ -1,36 +1,36 @@
 <div class="row" style="text-align:right;">
     <div class="col-12">
-      <p class="pull-right" style="font-size:14px;">å½“å‰ç”¨æˆ·ï¼š<span style="color:red;" id="user"><%=user.cn%></span> &nbsp;&nbsp;&nbsp;æ ¡å›­å¡å·ï¼š<span style="color:red;" id="xiaoyuankahao"><%=user.alias%></span> &nbsp;&nbsp;&nbsp;å•ä½ï¼š<span style="color:red;" id="danwei"><%=user.eduPersonOrgDN%></span></p>
+      <p class="pull-right" style="font-size:14px;">µ±Ç°ÓÃ»§£º<span style="color:red;" id="user"><%=user.cn%></span> &nbsp;&nbsp;&nbsp;Ğ£Ô°¿¨ºÅ£º<span style="color:red;" id="xiaoyuankahao"><%=user.alias%></span> &nbsp;&nbsp;&nbsp;µ¥Î»£º<span style="color:red;" id="danwei"><%=user.eduPersonOrgDN%></span></p>
     </div>
 </div>
 <div class="col-12">
   <form class="layui-form" action="">
     <div class="layui-form-item">
       <div class="layui-inline">
-        <label class="layui-form-label" style="width:98px;">æ¨¡å—</label>
+        <label class="layui-form-label" style="width:98px;">Ä£¿é</label>
         <div class="layui-input-inline">
           <select name="catname" id="catname" lay-filter="catname">
-            <option value="">è¯·é€‰æ‹©é¢˜ç›®æ¨¡å—</option>
+            <option value="">ÇëÑ¡ÔñÌâÄ¿Ä£¿é</option>
             <% for(let i=0;i<catname.length;i++) { %>
                 <option value='<%=catname[i]%>'><%=catname[i]%></option>
             <% } %>
           </select>
         </div>
-        <label class="layui-form-label" style="width:98px;">ç±»å‹</label>
+        <label class="layui-form-label" style="width:98px;">ÀàĞÍ</label>
         <div class="layui-input-inline">
           <select name="leixing" id="leixing" lay-filter="leixing">
-            <option value="">è¯·é€‰æ‹©é¢˜ç›®ç±»å‹</option>
-              <option value="å•é€‰">å•é€‰</option>
-              <option value="åˆ¤æ–­">åˆ¤æ–­</option>
-              <option value="å¤šé€‰">å¤šé€‰</option>
+            <option value="">ÇëÑ¡ÔñÌâÄ¿ÀàĞÍ</option>
+              <option value="µ¥Ñ¡">µ¥Ñ¡</option>
+              <option value="ÅĞ¶Ï">ÅĞ¶Ï</option>
+              <option value="¶àÑ¡">¶àÑ¡</option>
           </select>
         </div>
-        <label class="layui-form-label" style="width:98px;">é¢˜ç›®</label>
+        <label class="layui-form-label" style="width:98px;">ÌâÄ¿</label>
         <div class="layui-input-inline">
-          <input class="layui-input" name="timu" id="timu" autocomplete="off" placeholder="è¯·è¾“å…¥å…³é”®å­—">
+          <input class="layui-input" name="timu" id="timu" autocomplete="off" placeholder="ÇëÊäÈë¹Ø¼ü×Ö">
         </div>
-        <button class="layui-btn" lay-submit="" lay-filter="search">æœç´¢</button>
-        <button type="reset" class="layui-btn layui-btn-primary">é‡ç½®</button>
+        <button class="layui-btn" lay-submit="" lay-filter="search">ËÑË÷</button>
+        <button type="reset" class="layui-btn layui-btn-primary">ÖØÖÃ</button>
       </div>
     </div>  
   </form>
@@ -39,9 +39,9 @@
 </div>
 
 <script type="text/html" id="toolbar">
-  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" >æŸ¥çœ‹</a>
-  <a class="layui-btn layui-btn-xs" lay-event="edit" style="color:#fff;">ç¼–è¾‘</a>
-  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" style="color:#fff;">åˆ é™¤</a>
+  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" >²é¿´</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit" style="color:#fff;">±à¼­</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" style="color:#fff;">É¾³ı</a>
 </script>
 
 <script>
@@ -54,34 +54,38 @@ $(function(){
 
     form.render('select')
 
-    //æ‰§è¡Œå®ä¾‹
+    //Ö´ĞĞÊµÀı
     table.render({
       elem: '#cxtk_tb'
-      ,height: 'full-200'//é«˜åº¦æœ€å¤§åŒ–
-      ,cellMinWidth: 50//åˆ—å®½è‡ªåŠ¨åˆ†é…
-      ,url: '/dxxxhjs/manage/cxtk_data' //æ•°æ®æ¥å£
-      ,page: true //å¼€å¯åˆ†é¡µ
+      ,height: 'full-200'//¸ß¶È×î´ó»¯
+      ,cellMinWidth: 50//ÁĞ¿í×Ô¶¯·ÖÅä
+      ,url: '/dxxxhjs/manage/cxtk_data' //Êı¾İ½Ó¿Ú
+      ,page: true //¿ªÆô·ÖÒ³
       ,id: 'reload_tb'
-      ,cols:  [[ //æ ‡é¢˜æ 
-        {field: 'catid', title: 'id', align: 'center', rowspan: 2} //rowspanå³çºµå‘è·¨è¶Šçš„å•å…ƒæ ¼æ•°
-        ,{field: 'catname', title: 'é¢˜ç›®åˆ†ç±»', align: 'center', rowspan:2} //rowspanå³çºµå‘è·¨è¶Šçš„å•å…ƒæ ¼æ•°
-        ,{field: 'inused', title: 'æ˜¯å¦å¯ç”¨', align: 'center', rowspan: 2}
-        ,{field: 'leixing', title: 'é¢˜ç›®ç±»å‹', align: 'center', rowspan: 2}
-        ,{field: 'timu', title: 'é¢˜ç›®', align: 'center', rowspan: 2}
-        ,{field: 'zqda', title: 'ç­”æ¡ˆ', align: 'center', rowspan: 2}
-        ,{align: 'center', title: 'é€‰é¡¹', colspan: 5} //colspanå³æ¨ªè·¨çš„å•å…ƒæ ¼æ•°ï¼Œè¿™ç§æƒ…å†µä¸‹ä¸ç”¨è®¾ç½®fieldå’Œwidth
-        ,{align: 'center',field:'caozuo', title: 'æ“ä½œ', width:180,toolbar:"#toolbar" ,rowspan: 2}
+      ,cols:  [[ //±êÌâÀ¸
+        {field: 'catid', title: 'id', align: 'center', rowspan: 2} //rowspan¼´×İÏò¿çÔ½µÄµ¥Ôª¸ñÊı
+        ,{field: 'catname', title: 'ÌâÄ¿·ÖÀà', align: 'center', rowspan:2} //rowspan¼´×İÏò¿çÔ½µÄµ¥Ôª¸ñÊı
+        ,{field: 'inused', title: 'ÊÇ·ñÆôÓÃ', align: 'center', rowspan: 2}
+        ,{field: 'leixing', title: 'ÌâÄ¿ÀàĞÍ', align: 'center', rowspan: 2}
+        ,{field: 'timu', title: 'ÌâÄ¿', align: 'center', rowspan: 2}
+        ,{field: 'zqda', title: '´ğ°¸', align: 'center', rowspan: 2}
+        ,{align: 'center', title: 'Ñ¡Ïî', colspan: 9} //colspan¼´ºá¿çµÄµ¥Ôª¸ñÊı£¬ÕâÖÖÇé¿öÏÂ²»ÓÃÉèÖÃfieldºÍwidth
+        ,{align: 'center',field:'caozuo', title: '²Ù×÷', width:180,toolbar:"#toolbar" ,rowspan: 2}
       ], [
-        {field: 'xuanxiang0', align: 'center', title: 'é€‰é¡¹A',templet: '#xuanxiang0Tpl'}
-        ,{field: 'xuanxiang1', align: 'center', title: 'é€‰é¡¹B',templet: '#xuanxiang1Tpl'}
-        ,{field: 'xuanxiang2', align: 'center', title: 'é€‰é¡¹C',templet: '#xuanxiang2Tpl'}
-        ,{field: 'xuanxiang3', align: 'center', title: 'é€‰é¡¹D',templet: '#xuanxiang3Tpl'}
-        ,{field: 'xuanxiang4', align: 'center', title: 'é€‰é¡¹E',templet: '#xuanxiang4Tpl'}
+        {field: 'xuanxiang0', align: 'center', title: 'Ñ¡ÏîA',templet: '#xuanxiang0Tpl'}
+        ,{field: 'xuanxiang1', align: 'center', title: 'Ñ¡ÏîB',templet: '#xuanxiang1Tpl'}
+        ,{field: 'xuanxiang2', align: 'center', title: 'Ñ¡ÏîC',templet: '#xuanxiang2Tpl'}
+        ,{field: 'xuanxiang3', align: 'center', title: 'Ñ¡ÏîD',templet: '#xuanxiang3Tpl'}
+        ,{field: 'xuanxiang4', align: 'center', title: 'Ñ¡ÏîE',templet: '#xuanxiang4Tpl'}
+        ,{field: 'xuanxiang5', align: 'center', title: 'Ñ¡ÏîF',templet: '#xuanxiang5Tpl'}
+        ,{field: 'xuanxiang6', align: 'center', title: 'Ñ¡ÏîG',templet: '#xuanxiang6Tpl'}
+        ,{field: 'xuanxiang7', align: 'center', title: 'Ñ¡ÏîH',templet: '#xuanxiang7Tpl'}
+        ,{field: 'xuanxiang8', align: 'center', title: 'Ñ¡ÏîI',templet: '#xuanxiang8Tpl'}
       ]]
     })
-    //ç›‘å¬ä¸‹æ‹‰æ¡†
+    //¼àÌıÏÂÀ­¿ò
     form.on('select(catname)', function(data){
-      console.log('ç›‘å¬ä¸‹æ‹‰æ¡†-->catname',data)
+      console.log('¼àÌıÏÂÀ­¿ò-->catname',data)
       table.reload('reload_tb', {
         where: {
             timu: $('#timu').val(),
@@ -93,7 +97,7 @@ $(function(){
       return false;
     })
     form.on('select(leixing)', function(data){
-      console.log('ç›‘å¬ä¸‹æ‹‰æ¡†-->leixing',data)
+      console.log('¼àÌıÏÂÀ­¿ò-->leixing',data)
       table.reload('reload_tb', {
         where: {
             timu: $('#timu').val(),
@@ -104,7 +108,7 @@ $(function(){
       //form.render('select')
       return false;
     })
-    //æœç´¢
+    //ËÑË÷
     form.on('submit(search)', function(data){
       console.log('data-->',data)
       table.reload('reload_tb', {
@@ -117,29 +121,29 @@ $(function(){
       });
       return false;
     });
-    //ç›‘å¬å¤é€‰æ¡†æ“ä½œ
+    //¼àÌı¸´Ñ¡¿ò²Ù×÷
     table.on('checkbox(cxtk_table)', function(obj){
-      console.log('é€‰æ‹©å¤é€‰æ¡†')
+      console.log('Ñ¡Ôñ¸´Ñ¡¿ò')
       console.log('obj-->',obj)
       console.log('obj data-->',obj.data)
     });
-    //ç›‘å¬å·¥å…·æ¡
+    //¼àÌı¹¤¾ßÌõ
     table.on('tool(cxtk_table)', function(obj){
       console.log('obj-->',obj)
       let data = obj.data;
-      console.log('å·¥å…·æ¡ç›‘å¬-->',data)
+      console.log('¹¤¾ßÌõ¼àÌı-->',data)
       if(obj.event === 'detail'){
-        console.log('ç›‘å¬è¯¦æƒ…-->',data.catid)
-        console.log('èƒ½å–åˆ°_idå—-->',data._id)
-        //layer.msg('IDï¼š'+ data.catid + ' çš„æŸ¥çœ‹æ“ä½œ');
+        console.log('¼àÌıÏêÇé-->',data.catid)
+        console.log('ÄÜÈ¡µ½_idÂğ-->',data._id)
+        //layer.msg('ID£º'+ data.catid + ' µÄ²é¿´²Ù×÷');
        let if_index = layer.open({
           skin: 'layui-layer-molv',
           type: 2,
-          title: 'æŸ¥çœ‹',
+          title: '²é¿´',
           shadeClose: false,
           shade: [0.8, '#393D49'],
           offset: '10px',
-          maxmin: true, //å¼€å¯æœ€å¤§åŒ–æœ€å°åŒ–æŒ‰é’®
+          maxmin: true, //¿ªÆô×î´ó»¯×îĞ¡»¯°´Å¥
           area: '850px',
           maxHeight:'900px',
           content: '/dxxxhjs/manage/iframe_mb?_id=' + data._id,
@@ -151,9 +155,9 @@ $(function(){
         }); 
       } 
       else if(obj.event === 'del'){
-        console.log('ç›‘å¬åˆ é™¤-->',data.catid)
-        layer.confirm('ç¡®å®šè¦åˆ é™¤è¯¥æ¡æ•°æ®å—?', function(index){
-          console.log('åˆ é™¤index-->',index)
+        console.log('¼àÌıÉ¾³ı-->',data.catid)
+        layer.confirm('È·¶¨ÒªÉ¾³ı¸ÃÌõÊı¾İÂğ?', function(index){
+          console.log('É¾³ıindex-->',index)
           //obj.del();
           $.ajax({
             url:'/dxxxhjs/manage/delete_item',
@@ -167,7 +171,7 @@ $(function(){
                 obj.del()
                 layer.close(index);
               }else{
-                console.log('åˆ é™¤å¤±è´¥')
+                console.log('É¾³ıÊ§°Ü')
               }
             },
             error:function(err){
@@ -177,9 +181,9 @@ $(function(){
         });
       } 
       else if(obj.event === 'edit'){
-        console.log('ç¼–è¾‘-->',JSON.stringify(data))
-        layer.alert('è¯¥åŠŸèƒ½å°šåœ¨å®Œå–„')
-        //layer.alert('ç¼–è¾‘è¡Œï¼š<br>'+ JSON.stringify(data))
+        console.log('±à¼­-->',JSON.stringify(data))
+        layer.alert('¸Ã¹¦ÄÜÉĞÔÚÍêÉÆ')
+        //layer.alert('±à¼­ĞĞ£º<br>'+ JSON.stringify(data))
       }
     });
   });
