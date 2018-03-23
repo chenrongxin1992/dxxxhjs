@@ -37,6 +37,13 @@
         height: 50px;
         line-height: 50px;
       }
+      .headertop{
+        position:fixed;
+        margin-top:150px;
+      }
+      h3{
+        font-size: 14px;
+      }
     </style>
   </head>
 
@@ -53,8 +60,11 @@
                     <div class="survey" style="margin:0px auto;">
                         <div id="ctl00_ContentPlaceHolder1_JQ1_divHead" class="surveyhead" style="border: 0px;">
                             <div id="ctl00_ContentPlaceHolder1_JQ1_h1Name" style="position:relative;">
-                                <h1 id=""><%=result.ksname%>(第<%=result.kscs%>次成绩)</h1>
-                                <h4 id="">姓名：<%=result.xingming%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=result.gonghao%>&nbsp;&nbsp;&nbsp;&nbsp;本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分&nbsp;&nbsp;&nbsp;&nbsp;用时：<%=result.cha%></h4>
+                                <h1 id=""><%=result.ksname%>(第<%=result.kscs%>次考试成绩)</h1>
+                                <h3 id="">姓名：<%=result.xingming%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=result.gonghao%>&nbsp;&nbsp;&nbsp;&nbsp;本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分&nbsp;&nbsp;&nbsp;&nbsp;用时：<%=result.cha%></h3><br>
+
+                                  <br><h4 id = "retry1" style="display:none;font-size: 14px;"><a href="/dxxxhjs/front/ks?code=<%=ksinfo.randomStr%>">&nbsp;&nbsp;&nbsp;&nbsp;点击此处再次考试</a></h4>
+                                
                             </div>
 
                             <div style="clear: both;">
@@ -208,7 +218,9 @@
                                       </div>
                                     <%})%>
                                 </fieldset>
+                                <br><h4 id = "retry2" style="display:none;text-align: center;font-size: 14px;"><a href="/dxxxhjs/front/ks?code=<%=ksinfo.randomStr%>">&nbsp;&nbsp;&nbsp;&nbsp;点击此处再次考试</a></h4>
                             </div>
+                            
                             <div class="shopcart" id="shopcart" style="display:none;"></div>
                             <div style="padding-top: 6px;clear:both; padding-bottom:10px;" id="submit_div">
                                 <table id="submit_table" style="display: none; margin: 20px auto;">
@@ -571,6 +583,18 @@
                             if(r!=null)return  unescape(r[2]); return null;
                         }
                           $(function(){
+                            //是否显示重考链接
+
+                                  var kscs = '<%=result.kscs%>',
+                                      ckcs = '<%=ksinfo.ckcs%>'
+
+                                  console.log('kscs,ckcs',kscs,ckcs)
+                                  if(kscs < ckcs){
+                                    console.log('ddd')
+                                    $('#retry1').css('display','block')
+                                    $('#retry2').css('display','block')
+                                  }
+
                             //处理提交
                             $('#submit_button').on('click',function(){
                               console.log('处理提交')

@@ -460,9 +460,11 @@ router.get('/cxtk_data',function(req,res){
 		leixing = req.query.leixing
 	page ? page : 1;//当前页
 	limit ? limit : 15;//每页数据
-	timu ? timu : null
+	timu ? timu : ''
 	catname ? catname : null
 	leixing ? leixing : null
+	const reg = new RegExp(timu, 'i') 
+	console.log('check-->reg',reg)
 	async.waterfall([
 		function(cb){
 			let search = cat.find({}).count()
@@ -501,8 +503,22 @@ router.get('/cxtk_data',function(req,res){
 							cb(err)
 						}
 						console.log('check docs-->',docs.length)
+						//增加一步获取数量
+						let search1 = cat.find({})
+							search1.where('timu',qs_timu)
+							search1.where('catname',qs_catname)
+							search1.where('leixing',qs_leixing)
+							search1.count()
+							search1.exec(function(e,d){
+								if(e){
+									console.log('获取数量出错-->',e)
+									cb(e)
+								}
+								console.log('有参数查询，数量-->',d)
+								cb(null,docs,d)
+							})
 						//total = docs.length
-						cb(null,docs,docs.length)
+						//cb(null,docs,docs.length)
 					})
 				}else{
 					console.log('无搜索参数')
@@ -515,7 +531,7 @@ router.get('/cxtk_data',function(req,res){
 								console.log('search err-->',err.stack)
 								cb(err)
 							}
-							console.log('check docs-->',docs)
+							//console.log('check docs-->',docs)
 							cb(null,docs,total)
 					})
 				}
@@ -525,7 +541,7 @@ router.get('/cxtk_data',function(req,res){
 			let data = []//最终数据
 			docs.forEach(function(item,index){
 				let tempdata = {}
-				console.log('item-->',item)
+				//console.log('item-->',item)
 				tempdata._id = item._id
 				tempdata.catid = item.id
 				tempdata.inused = item.inused
@@ -534,16 +550,16 @@ router.get('/cxtk_data',function(req,res){
 				tempdata.timu = item.timu
 				tempdata.zqda = item.zqda
 				item.xuanxiang.forEach(function(it,ind){
-					console.log(it)
+					//console.log(it)
 					tempdata['xuanxiang' + ind] = it.content +'(' + it.is_correct + ')'
 					//tempdata['is_correct' + ind] = it.is_correct
-					console.log(tempdata)
+					//console.log(tempdata)
 				})
 				data.push(tempdata)
 				delete tempdata
 			})
 			data.count = total
-			console.log('返回数据-->',data)
+			//console.log('返回数据-->',data)
 			cb(null,data)
 		}
 	],function(error,result){
@@ -809,6 +825,9 @@ router.get('/new_firststep',function(req,res){
     let check_danxuan = 0,
     	check_duoxuan = 0,
     	check_panduan = 0
+    console.log('tem_arr',tem_arr)
+    console.log()
+    console.log()
     tem_arr.forEach(function(item,index){
     	check_danxuan += item.num_danxuan
     	check_duoxuan += item.num_duoxuan
@@ -818,6 +837,9 @@ router.get('/new_firststep',function(req,res){
     		let chaoguo = check_danxuan - danxuan_num
     		if(item.percent != 0){
     			item.num_danxuan = item.num_danxuan - chaoguo
+    			if(item.num_danxuan < 0){
+    				item.num_danxuan = 0
+    			}
     		}
     		console.log('单选超过多少---->',chaoguo)
     	}
@@ -826,6 +848,9 @@ router.get('/new_firststep',function(req,res){
     		let chaoguo = check_duoxuan - duoxuan_num
     		if(item.percent != 0){
     			item.num_duoxuan = item.num_duoxuan - chaoguo
+    			if(item.num_duoxuan < 0){
+    				item.num_duoxuan = 0
+    			}
     		}
     		console.log('多选超过多少---->',chaoguo)
     	}
@@ -834,6 +859,9 @@ router.get('/new_firststep',function(req,res){
     		let chaoguo = check_panduan - panduan_num
     		if(item.percent != 0){
     			item.num_panduan = item.num_panduan - chaoguo
+    			if(item.num_panduan < 0){
+    				item.num_panduan = 0
+    			}
     		}
     		console.log('判断超过多少---->',chaoguo)
     	}

@@ -2124,8 +2124,16 @@ router.get('/ksdonenew',function(req,res){
 				console.log('search err-->',err)
 				return res.json({'code':-1,'msg':err})
 			}
-			console.log('check doc-->',doc)
-			return res.render('front/ksdonenew',{'result':doc})
+			let search1 = sjsz.findOne({'randomStr':doc.randomStr})
+				search1.exec(function(error,docs){
+					if(error){
+						console.log('error-->',error)
+						return res.json({'code':-1,'msg':error})
+					}
+					console.log('check doc-->',doc.randomStr)
+					console.log('docs',docs)
+					return res.render('front/ksdonenew',{'result':doc,'ksinfo':docs})
+				})
 		})
 })
 function randomsort(a, b) {
