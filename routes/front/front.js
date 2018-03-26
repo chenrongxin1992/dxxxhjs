@@ -16,7 +16,8 @@ let MyServer = "http://116.13.96.53:81",
 //定时任务，每天乱序一次题库
 //数据量小应该还可以，大的时候应该就不行了
 router.scheduleJob = function(){
-	schedule.scheduleJob('0 0 18 * * ?',function(){//每天18点执行一次
+	schedule.scheduleJob('01 18 * * *',function(){//每天18点执行一次
+	//schedule.scheduleJob('0 0 18 * * ?',function(){//每天18点执行一次
 		let search = cat.find({})
 			search.exec(function(err,docs){
 				if(err){
@@ -57,7 +58,8 @@ router.scheduleJob = function(){
 									timu : item.timu,
 									zqda : item.zqda,
 									xuanxiang : item.xuanxiang,
-									random : item.random,
+									//random : item.random,
+									random : parseInt((Math.random()+0.01)*50),
 									inused : item.inused
 								})
 								newcat.save(function(error){
@@ -442,7 +444,7 @@ router.get('/ks',function(req,res){
 														if(panduan_arr.length == doc.per_of_modal.length){
 															//console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
 															console.log('找齐咯')
-															callback(null)
+															//callback(null)
 														}
 													})
 											}else{
@@ -457,7 +459,7 @@ router.get('/ks',function(req,res){
 												if(panduan_arr.length == doc.per_of_modal.length){
 													//console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
 													console.log('找齐咯')
-													callback(null)
+													//callback(null)
 												}
 											}
 										})
@@ -473,7 +475,7 @@ router.get('/ks',function(req,res){
 									if(panduan_arr.length == doc.per_of_modal.length){
 										//console.log('panduan_arr-->',panduan_arr,panduan_arr.length)
 										console.log('找齐咯')
-										callback(null)
+										//callback(null)
 									}
 								}
 							})
@@ -666,6 +668,7 @@ router.get('/ks',function(req,res){
 						//保存到数据库
 						let search = stu_exam.findOne({'randomStr':ksinfo.randomStr})
 							//search.where('_id').equals(ksinfo._id)
+							search.where('gonghao').equals(req.session.student.alias)
 							search.sort({'kscs':-1})
 							search.limit(1)
 							search.exec(function(er,doc){
@@ -1313,6 +1316,7 @@ router.get('/ks',function(req,res){
 						//保存到数据库
 						//console.log()
 						let search = stu_exam.findOne({'randomStr':ksinfo.randomStr})
+							search.where('gonghao').equals(req.session.student.alias)
 							//search.where('_id').equals()
 							search.sort({'kscs':-1})
 							search.limit(1)
@@ -1725,7 +1729,7 @@ router.post('/checkks',function(req,res){
 								callback2()
 							}
 							else{
-								ite.correct = 0
+								//ite.correct = 0
 								console.log('该题答错了')
 								callback2()
 							}
@@ -1798,7 +1802,7 @@ router.post('/checkks',function(req,res){
 								callback2()
 							}
 							else{
-								ite.correct = 0
+								//ite.correct = 0
 								console.log('该题答错了')
 								console.log('ite.correct--->',ite.correct)
 								callback2()
@@ -1891,7 +1895,7 @@ router.post('/checkks',function(req,res){
 								callback1()
 							}
 							else{
-								ite.correct = 0
+								//ite.correct = 0
 								console.log('该题错了')
 								ite.choose = timuda_choose
 								console.log('检查选择的答案-->',timuda_choose)

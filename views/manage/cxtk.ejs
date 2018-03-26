@@ -10,7 +10,7 @@
         <label class="layui-form-label" style="width:98px;">模块</label>
         <div class="layui-input-inline">
           <select name="catname" id="catname" lay-filter="catname">
-            <option value="">请选择题目模块</option>
+            <option value="">全部模块</option>
             <% for(let i=0;i<catname.length;i++) { %>
                 <option value='<%=catname[i]%>'><%=catname[i]%></option>
             <% } %>
@@ -19,7 +19,7 @@
         <label class="layui-form-label" style="width:98px;">类型</label>
         <div class="layui-input-inline">
           <select name="leixing" id="leixing" lay-filter="leixing">
-            <option value="">请选择题目类型</option>
+            <option value="">所有题型</option>
               <option value="单选">单选</option>
               <option value="判断">判断</option>
               <option value="多选">多选</option>

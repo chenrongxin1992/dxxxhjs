@@ -78,9 +78,9 @@
               </div>
             </div>
             <div class="layui-inline">
-              <label class="layui-form-label label_big">可重考次数</label>
+              <label class="layui-form-label label_big">可考次数</label>
               <div class="layui-input-inline">
-                <input type="text" name="ckcs" id="ckcs" class="layui-input" lay-verify="required|number" style="color: red;" >
+                <input type="text" name="ckcs" id="ckcs" class="layui-input" lay-verify="ckcs" style="color: red;" >
               </div>
             </div>
           </div>
@@ -251,6 +251,11 @@ $(function(){
               panduan_fenzhi: function(value){
                 if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
                   return '分值必须是大于0的整数';  
+                } 
+              },
+              ckcs: function(value){
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '可考次数必须是大于0的整数';  
                 } 
               }
         });  

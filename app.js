@@ -33,24 +33,37 @@ app.use(session({
   	saveUninitialized: true, //添加 saveUninitialized 选项 
     secret: 'dangxiaoxinxihuajianshe',
     cookie:{ 
-        maxAge: 1000*60*60*24
+        maxAge: Date.now() + 60 * 60 * 1000//60分钟有效期
     }
 }));
 app.use(function(req,res,next){ 
     res.locals.user = req.session.user;   // 从session 获取 user对象
     res.locals.student = req.session.student
     
-    let ip = req.headers['x-forwarded-for'] ||
-              req.ip ||
-              req.connection.remoteAddress ||
-              req.socket.remoteAddress ||
-              req.connection.socket.remoteAddress || '';
+    var ip;
+    if (req.headers['x-forwarded-for']) {
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    } else if (req.connection && req.connection.remoteAddress) {
+        ip = req.connection.remoteAddress;
+    } else {
+        ip = req.ip;
+    }
     if(ip.split(',').length>0){
       console.log('ip --- >',ip)
         ip = ip.split(',')[0]
     }
-    console.log('check client ip ---> ',ip)
-    next();  //中间件传递
+    console.log('check client ip ---> ',req.connection.remoteAddress)
+    console.log('cookie.originalMaxAge----------------->',req.session.cookie.originalMaxAge)
+    // if(Date.now() < req.session.cookie.originalMaxAge){
+    //   console.log('会话还没过期,重新设置过期时间')
+    //   req.session.cookie.originalMaxAge = Date.now() + 1 * 60 * 1000
+    //   next(); 
+    // }else{
+    //   console.log('会话过期')
+    //   return res.redirect('http://qiandao.szu.edu.cn:81/dxxxhjs')
+    //   //next(); 
+    // }
+    next() //中间件传递
 });
 
 app.use('/',redirect)
