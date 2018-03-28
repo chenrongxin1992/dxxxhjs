@@ -16,19 +16,38 @@
     <link href="/dxxxhjs/stylesheets/style.css" rel="stylesheet">
     <link href="/dxxxhjs/stylesheets/offcanvas.css" rel="stylesheet">
     <style type="text/css">
+      body{
+        width: 100%;
+        height:auto;
+        background:url("/dxxxhjs/stylesheets/guanli_bg.jpg") no-repeat;
+        background-size: 100%;
+      }
+      #middle-container{
+        background-color: white;
+        min-height: 650px;
+      }
       .list-group a{cursor: pointer;}
       .list-group a:hover{
-        background-color: #0275d8;
+        background-color: #94003F;
         color:red;
       }
       .list-group-item.active{
         color:white !important;
+        background-color: #94003F;
+        border-color: #94003F;
       }
       .list-group a:not([href]):not([tabindex]):focus, a:not([href]):not([tabindex]):hover {
         color:white;
       }
-      #layui-layer2{
+      #layui-layer2,#layui-layer5{
         min-height: 600px;
+      }
+      .special-btn:hover{
+        color:#555!important;
+      }
+      .footer-logo{
+        height: 50px;
+        margin-right: 15px;
       }
       /*.list-group a:not([href]):not([tabindex]){
         color:white;
@@ -36,11 +55,11 @@
     </style>
   </head>
 
-  <body>
+  <body background="">
     <div class="container-fluid">
       <div class="row" style="padding: 0 15px;">
-        <div class="col-12" style="min-height: 100px;background-color: #C91B1C;padding: 0 0;">
-          <img class="img-responsive" src="/dxxxhjs/stylesheets/head_top.jpg">
+        <div class="col-12" style="min-height: 100px;background-color: #94003F;padding: 0 0;">
+          <img class="img-responsive" src="/dxxxhjs/stylesheets/yetou.jpg">
         </div>
       </div>
 
@@ -73,7 +92,7 @@
       <hr style="height:1px;border:none;border-top:1px dashed #F08080;">
 
       <footer>
-        <p class="text-center">2018 &copy; 深圳大学党委组织部</p>
+        <p class="text-center"><img class="img-responsive footer-logo" src="/dxxxhjs/stylesheets/logo.jpg">2018 &copy; 深圳大学党委组织部</p>
       </footer>
 
     </div><!--/.container-->
