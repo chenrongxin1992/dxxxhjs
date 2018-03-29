@@ -15,7 +15,7 @@
   </div>
 
   <script type="text/html" id="toolbar">
-    <a class="layui-btn layui-btn-xs" lay-event="edit" style="color:#fff;">查看</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit" style="color:#fff;">编辑</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" style="color:#fff;">删除</a>
   </script>
 
@@ -40,7 +40,7 @@ $(function(){
       ,cols:  [[ //标题栏
          {field: 'id', title: '序号', align: 'center',rowspan: 2} //rowspan即纵向跨越的单元格数
         ,{field: 'ksname', title: '试卷主题', align: 'center',rowspan: 2} 
-        ,{field: 'ksriqi', title: '考试日期', align: 'center',rowspan: 2}
+        //,{field: 'ksriqi', title: '考试日期', align: 'center',rowspan: 2}
         ,{field: 'ksshijian', title: '考试时间(分钟)', align: 'center',rowspan: 2}
         ,{field: 'danxuan_num', title: '单选题', align: 'center',rowspan: 2}
         ,{field: 'duoxuan_num', title: '多选题', align: 'center',rowspan: 2}
@@ -160,6 +160,8 @@ $(function(){
             content: '/dxxxhjs/manage/iframe_mbbj?_id=' + data._id//模板编辑
           }); 
         layer.iframeAuto(if_index);
+      }else if(obj.event == 'dangqian'){
+        console.log('dangqian-->',JSON.stringify(data))
       }
     });//工具条
   });

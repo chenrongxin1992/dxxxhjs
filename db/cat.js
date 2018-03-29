@@ -57,11 +57,13 @@ var catSchema = new Schema({
 
 //试卷设置
 var sjszSchema = new Schema({ 
+    youxiao : {type:Number,default:1},//是否有效
+    dangqian : {type:Number,default:0},//当前考试
     ckcs : {type:Number,default:3},//可重考次数
     id : {type:Number},//试卷设置记录
     ksname : {type:String},//该次考试主题(比如第一单元，第二单元) 
     ksshijian : {type:Number},//考试时间
-    ksriqi : {type:String},//考试日期
+    // ksriqi : {type:String},//考试日期
     danxuan_num : {type:Number},
     danxuan_fenzhi : {type:Number},//每道单选题分值
     panduan_num : {type:Number},

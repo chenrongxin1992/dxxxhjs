@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>考试登录</title>
+
+    <!-- Bootstrap -->
+    <link rel='stylesheet' href='/dxxxhjs/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='/dxxxhjs/stylesheets/style.css' />
+    <link rel="stylesheet" href="/dxxxhjs/stylesheets/layui.css" media="all">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+      body{
+        padding: 0;
+        font-family: '微软雅黑';;
+        width: 100%;
+        height:auto;
+        background:url("/dxxxhjs/stylesheets/login_bg.jpg") no-repeat;
+        background-size: 100%;
+        /*position: relative;    */
+      }
+      .footer{
+        position: fixed;
+        top: 90%;
+        left: 0px;
+        right: 0px;
+        width: 350px;
+        height: 200px;
+        margin-left:auto;
+        margin-right:auto;
+      }
+      .footer-logo{
+        height: 50px;
+        margin-right: 15px;
+        display: inline-block;
+      }
+      .loginbtn{ 
+        position: fixed;
+        top: 50%;
+        left: 0px;
+        right: 0px;
+        width: 350px;
+        height: 50px;
+        margin-left:auto;
+        margin-right:auto; 
+      }
+
+    </style>
+  </head>
+  <body>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer">
+              <span><img class="img-responsive footer-logo" src="/dxxxhjs/stylesheets/ks--logo.png">2018 © 深圳大学党委组织部</span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <button class="layui-btn layui-btn-radius layui-btn-normal loginbtn" id="login">开始考试</button>
+          </div>
+        </div>
+      </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script type="text/javascript" src='/dxxxhjs/javascripts/jquery-1.10.2.min.js' ></script>
+    <script type="text/javascript" src='/dxxxhjs/javascripts/bootstrap.min.js' ></script>
+    <script src="/dxxxhjs/javascripts/layui.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        layui.use(['table','layer','form'], function(){
+          $('#login').on('click',function(){
+          
+            let kslianjie = '<%=kslianjie%>'
+            if(!kslianjie){
+              console.log('kslianjie---->',kslianjie)
+              layer.open({
+                  title: '提示',
+                  content: '当前暂无考试',
+                  end:function(){
+                  }
+              }); 
+            }else{
+              console.log('kslianjie---->',kslianjie)
+              window.location.href = 'http://' + kslianjie
+            }
+          })
+        })
+      })
+    </script>
+  </body>
+</html>

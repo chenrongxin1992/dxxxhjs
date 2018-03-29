@@ -13,6 +13,23 @@ let MyServer = "http://116.13.96.53:81",
 	CASserver = 'https://authserver.szu.edu.cn/authserver/',
 	ReturnURL = "http://116.13.96.53:81";
 
+router.get('/kslogin',function(req,res){
+	let search = sjsz.findOne({})
+		search.where('dangqian').equals(1)
+		search.exec(function(err,doc){
+			if(err){
+				console.log('kslogin err---->',err)
+				return res.json('front/kserror',{'code':-7,'msg':err})
+			}
+			if(!doc || doc.length == 0){
+				return res.render('front/kslogin', {'kslianjie':null});
+			}
+			if(doc){
+				return res.render('front/kslogin', {'kslianjie':doc.kslianjie});
+			}
+		})
+})
+
 //定时任务，每天乱序一次题库
 //数据量小应该还可以，大的时候应该就不行了
 router.scheduleJob = function(){
@@ -149,111 +166,64 @@ router.get('/ks',function(req,res){
 								console.log('search err',err)
 								return res.json({'code':-1,'msg':err.message})
 							}
-							if(doc){
+							if(doc && doc.youxiao == 1 && doc.dangqian == 1){//youxiao==1则该考试启用并且为当前考试
 								//console.log('check doc-->',doc)
-								console.log('check doc.ksriqi-->',doc.ksriqi)
-								console.log('check nowday-->',moment().format('YYYY-MM-DD'))
-								if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
-									let search_sj = stu_exam.findOne({})
-										search_sj.where('randomStr').equals(randomStr)
-										search_sj.where('gonghao').equals(req.session.student.alias)
-										search_sj.sort({'kscs':-1})//找最后一条考试记录
-			    						search_sj.limit(1)
-										search_sj.exec(function(errr,docc){
-											if(errr){
-												console.log('search_sj errr')
-												return resjson({'code':-1,'msg':err.message})
-											}
-											if(docc && docc.is_end == 0){
-												console.log('考试日期已过')
-												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
-											}
-											if(docc && docc.is_end == 1 && (docc.kscs==doc.ckcs)){//考试次数等于重考次数
-												console.log('考试次数等于重考次数')
-												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.student.alias)
-													search.where('is_end').equals(1)
-													search.exec(function(err,doc){
-														if(err){
-															console.log('err-->',err)
-															return res.json({'code':-1,'msg':err})
-														}
-														if(doc){
-															console.log('check doc-->',doc)
-															return res.render('front/myexamlist', { 'user': req.session.student,'examinfo':doc });
-														}
-														if(!doc){
-															return res.json({'code':-1,'msg':'暂无记录'})
-														}
-													})
-												//return res.render('front/myexamlist',{'user':req.session.student})
-												//return res.render('front/ksdonenew',{'result':docc,'ksinfo':doc})
-											}
-											if(docc && docc.is_end == 1 && (docc.kscs<doc.ckcs)){//考试次数等于重考次数
-												console.log('考试次数小于重考次数')
-												console.log('考试次数 && 重考次数--》',docc.kscs,doc.ckcs)
-												//return res.render('front/finish')
-												return res.render('front/ksdonenew',{'result':docc,'ksinfo':doc})
-											}
-											if(!docc){
-												console.log('考试日期已过,你没有参与该考试')
-												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过，你没有参与该考试'})
-											}
-										})
-								}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
-									console.log('考试日期有效')
-									//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
-									ksinfo = doc
-									//看是否已有试卷，有的话直接返回
-									console.log('4546465465464')
-									let search_sj = stu_exam.findOne({})
-										search_sj.where('randomStr').equals(randomStr)
-										search_sj.where('gonghao').equals(req.session.student.alias)//这里替换成session中的alias
-										//search_sj.where('is_end').equals(0)
-										search_sj.sort({'kscs':-1})//找最后一条考试记录
-			    						search_sj.limit(1)
-										search_sj.exec(function(errr,docc){
-											if(errr){
-												console.log('search_sj errr')
-												return res.json({'code':-1,'msg':err.message})
-											}
-											if(docc && docc.is_end == 0 && (docc.kscs<=ksinfo.ckcs)){
-												//console.log('docc---->',docc)
-												console.log('试卷存在，尚未结束，直接返回试卷继续')
-												console.log('考试次数 && 重考次数--》',docc.kscs,doc.ckcs)
-												return res.render('front/ks',{'code':0,'result':docc,'ksinfo':ksinfo})
-											}
-											if(docc && docc.is_end == 1 && (docc.kscs==ksinfo.ckcs)){
-												console.log('该试卷已经提交')
-												console.log('重考次数已用完')
-												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.student.alias)
-													search.where('is_end').equals(1)
-													search.exec(function(err,doc){
-														if(err){
-															console.log('err-->',err)
-															return res.json({'code':-1,'msg':err})
-														}
-														if(doc){
-															console.log('check doc-->',doc)
-															return res.render('front/myexamlist', { 'user': req.session.student,'examinfo':doc });
-														}
-														if(!doc){
-															return res.json({'code':-1,'msg':'暂无记录'})
-														}
-													})
+								//console.log('check doc.ksriqi-->',doc.ksriqi)
+								//console.log('check nowday-->',moment().format('YYYY-MM-DD'))
+
+								//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
+								ksinfo = doc
+								//看是否已有试卷，有的话直接返回
+								console.log('4546465465464')
+								let search_sj = stu_exam.findOne({})
+									search_sj.where('randomStr').equals(randomStr)
+									search_sj.where('gonghao').equals(req.session.student.alias)//这里替换成session中的alias
+									//search_sj.where('is_end').equals(0)
+									search_sj.sort({'kscs':-1})//找最后一条考试记录
+			    					search_sj.limit(1)
+									search_sj.exec(function(errr,docc){
+										if(errr){
+											console.log('search_sj errr')
+											return res.json({'code':-1,'msg':err.message})
+										}
+										if(docc && docc.is_end == 0 && (docc.kscs<=ksinfo.ckcs)){
+											//console.log('docc---->',docc)
+											console.log('试卷存在，尚未结束，直接返回试卷继续')
+											console.log('考试次数 && 重考次数--》',docc.kscs,doc.ckcs)
+											return res.render('front/ks',{'code':0,'result':docc,'ksinfo':ksinfo})
+										}
+										if(docc && docc.is_end == 1 && (docc.kscs==ksinfo.ckcs)){
+											console.log('该试卷已经提交')
+											console.log('重考次数已用完')
+											let search = stu_exam.find({})
+												search.where('gonghao').equals(req.session.student.alias)
+												search.where('is_end').equals(1)
+												search.exec(function(err,doc){
+													if(err){
+														console.log('err-->',err)
+														return res.json({'code':-1,'msg':err})
+													}
+													if(doc){
+														console.log('check doc-->',doc)
+														return res.render('front/myexamlist', { 'user': req.session.student,'examinfo':doc });
+													}
+													if(!doc){
+														return res.json({'code':-1,'msg':'暂无记录'})
+													}
+												})
 												//return res.render('front/myexamlist',{'user':req.session.student})
 												//return res.render('front/ksdonenew',{'result':docc,'ksinfo':ksinfo})
 											}
 											if(!docc || (docc.kscs<ksinfo.ckcs)){
-												console.log('考试日期有效，还没生成试卷')
+												console.log('还没生成试卷,往下走吧')
 												cb(null,doc)
 											}
 										})
-								}else{
-									console.log('考试尚未开始')
-									return res.render('front/kserror',{'code':-4,'msg':'考试尚未开始'})
-								}
+								
+							}
+							if(doc && doc.youxiao ==0){
+								console.log('该考试还没启用')
+								return res.render('front/kserror',{'code':-6,'msg':'该考试还没启用'})
 							}
 							if(!doc){
 								console.log('不存在该randomStr')
@@ -798,112 +768,64 @@ router.get('/ks',function(req,res){
 								console.log('search err',err)
 								return res.json({'code':-1,'msg':err.message})
 							}
-							if(doc){
+							if(doc && doc.youxiao == 1 && doc.dangqian == 1){//youxiao==1则该考试启用并且为当前考试
 								//console.log('check doc-->',doc)
-								console.log('check doc.ksriqi-->',doc.ksriqi)
-								console.log('check nowday-->',moment().format('YYYY-MM-DD'))
-								if(moment(doc.ksriqi).isBefore(moment().format('YYYY-MM-DD'))){
-									let search_sj = stu_exam.findOne({})
-										search_sj.where('randomStr').equals(randomStr)
-										search_sj.where('gonghao').equals(req.session.student.alias)
-										search_sj.sort({'kscs':-1})//找最后一条考试记录
-										search_sj.limit(1)
-										search_sj.exec(function(errr,docc){
-											if(errr){
-												console.log('search_sj errr')
-												return resjson({'code':-1,'msg':err.message})
-											}
-											if(docc && docc.is_end == 0){
-												console.log('考试日期已过')
-												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过'})
-											}
-											if(docc && docc.is_end == 1 && (docc.kscs==doc.ckcs)){//考试次数等于重考次数
-												console.log('考试次数等于重考次数')
-												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.student.alias)
-													search.where('is_end').equals(1)
-													search.exec(function(err,doc){
-														if(err){
-															console.log('err-->',err)
-															return res.json({'code':-1,'msg':err})
-														}
-														if(doc){
-															console.log('check doc-->',doc)
-															return res.render('front/myexamlist', { 'user': req.session.student,'examinfo':doc });
-														}
-														if(!doc){
-															return res.json({'code':-1,'msg':'暂无记录'})
-														}
-													})
-												//return res.render('front/myexamlist',{'user':req.session.student})
-												//return res.render('front/ksdonenew',{'result':docc,'ksinfo':doc})
-											}
-											if(docc && docc.is_end == 1 && (docc.kscs<doc.ckcs)){//考试次数等于重考次数
-												console.log('考试次数小于重考次数')
-												console.log('考试次数 && 重考次数--》',docc.kscs,doc.ckcs)
-												//return res.render('front/finish')
-												return res.render('front/ksdonenew',{'result':docc,'ksinfo':doc})
-											}
-											if(!docc){
-												console.log('考试日期已过,你没有参与该考试')
-												return res.render('front/kserror',{'code':-3,'msg':'考试日期已过，你没有参与该考试'})
-											}
-										})
-								}else if(moment(doc.ksriqi).isSame(moment().format('YYYY-MM-DD'))){
-									console.log('考试日期有效')
-									//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
-									ksinfo = doc
-									//看是否已有试卷，有的话直接返回
-									console.log('99999999999999')
-									let search_sj = stu_exam.findOne({})
-										search_sj.where('randomStr').equals(randomStr)
-										search_sj.where('gonghao').equals(req.session.student.alias)//这里替换成session中的alias
-										search_sj.sort({'kscs':-1})//找最后一条考试记录
-										search_sj.limit(1)
-										//console.log('search_sj-->',search_sj)
-										//search_sj.where('is_end').equals(0)
-										search_sj.exec(function(errr,docc){
-											if(errr){
-												console.log('search_sj errr',errr)
-												return res.json({'code':-1,'msg':errr})
-											}
-											if(docc && docc.is_end == 0 && (docc.kscs<=ksinfo.ckcs)){
-												//console.log('docc---->',docc)
-												console.log('试卷存在，尚未结束，直接返回试卷继续')
-												console.log('考试次数 && 重考次数--》',docc.kscs,doc.ckcs)
-												return res.render('front/ks',{'code':0,'result':docc,'ksinfo':ksinfo})
-											}
-											if(docc && docc.is_end == 1 && (docc.kscs==ksinfo.ckcs)){
-												console.log('该试卷已经提交')
-												console.log('重考次数已用完')
-												let search = stu_exam.find({})
-													search.where('gonghao').equals(req.session.student.alias)
-													search.where('is_end').equals(1)
-													search.exec(function(err,doc){
-														if(err){
-															console.log('err-->',err)
-															return res.json({'code':-1,'msg':err})
-														}
-														if(doc){
-															console.log('check doc-->',doc)
-															return res.render('front/myexamlist', { 'user': req.session.student,'examinfo':doc });
-														}
-														if(!doc){
-															return res.json({'code':-1,'msg':'暂无记录'})
-														}
-													})
+								//console.log('check doc.ksriqi-->',doc.ksriqi)
+								//console.log('check nowday-->',moment().format('YYYY-MM-DD'))
+
+								//这里要查是否已经开考，如果已经开考，则返回试卷，否则先找出该人最新的试卷id+1，并往下走
+								ksinfo = doc
+								//看是否已有试卷，有的话直接返回
+								console.log('4546465465464')
+								let search_sj = stu_exam.findOne({})
+									search_sj.where('randomStr').equals(randomStr)
+									search_sj.where('gonghao').equals(req.session.student.alias)//这里替换成session中的alias
+									//search_sj.where('is_end').equals(0)
+									search_sj.sort({'kscs':-1})//找最后一条考试记录
+			    					search_sj.limit(1)
+									search_sj.exec(function(errr,docc){
+										if(errr){
+											console.log('search_sj errr')
+											return res.json({'code':-1,'msg':err.message})
+										}
+										if(docc && docc.is_end == 0 && (docc.kscs<=ksinfo.ckcs)){
+											//console.log('docc---->',docc)
+											console.log('试卷存在，尚未结束，直接返回试卷继续')
+											console.log('考试次数 && 重考次数--》',docc.kscs,doc.ckcs)
+											return res.render('front/ks',{'code':0,'result':docc,'ksinfo':ksinfo})
+										}
+										if(docc && docc.is_end == 1 && (docc.kscs==ksinfo.ckcs)){
+											console.log('该试卷已经提交')
+											console.log('重考次数已用完')
+											let search = stu_exam.find({})
+												search.where('gonghao').equals(req.session.student.alias)
+												search.where('is_end').equals(1)
+												search.exec(function(err,doc){
+													if(err){
+														console.log('err-->',err)
+														return res.json({'code':-1,'msg':err})
+													}
+													if(doc){
+														console.log('check doc-->',doc)
+														return res.render('front/myexamlist', { 'user': req.session.student,'examinfo':doc });
+													}
+													if(!doc){
+														return res.json({'code':-1,'msg':'暂无记录'})
+													}
+												})
 												//return res.render('front/myexamlist',{'user':req.session.student})
 												//return res.render('front/ksdonenew',{'result':docc,'ksinfo':ksinfo})
 											}
 											if(!docc || (docc.kscs<ksinfo.ckcs)){
-												console.log('考试日期有效，还没生成试卷')
+												console.log('还没生成试卷,往下走吧')
 												cb(null,doc)
 											}
 										})
-								}else{
-									console.log('考试尚未开始')
-									return res.render('front/kserror',{'code':-4,'msg':'考试尚未开始'})
-								}
+								
+							}
+							if(doc && doc.youxiao ==0){
+								console.log('该考试还没启用')
+								return res.render('front/kserror',{'code':-6,'msg':'该考试还没启用'})
 							}
 							if(!doc){
 								console.log('不存在该randomStr')

@@ -20,12 +20,12 @@
           </div>
 
           <div class="layui-form-item">
-            <div class="layui-inline">
+            <!-- <div class="layui-inline">
               <label class="layui-form-label label_big">考试日期</label>
               <div class="layui-input-inline">
                 <input type="text" name="ksriqi" id="ksriqi" class="layui-input" placeholder="yyyy-MM-dd" lay-verify="date" value=''>
               </div>
-            </div>
+            </div> -->
             <div class="layui-inline">
               <label class="layui-form-label label_big">考试时间</label>
               <div class="layui-input-inline">
@@ -129,7 +129,7 @@
 $(function(){
 
   let ksname = getCookie('ksname'),
-              ksriqi = getCookie('ksriqi'),
+              // ksriqi = getCookie('ksriqi'),
               ksshijian = getCookie('ksshijian'),
               danxuan_fenzhi = getCookie('danxuan_fenzhi'),
               danxuan_num = getCookie('danxuan_num'),
@@ -140,7 +140,7 @@ $(function(){
               sjfz = getCookie('sjfz'),
               ckcs = getCookie('ckcs')
           console.log('有没有值-->',ksname)
-          console.log('有没有值-->',ksriqi)
+          // console.log('有没有值-->',ksriqi)
           console.log('有没有值-->',ksshijian)
           console.log('有没有值-->',danxuan_fenzhi)
           console.log('有没有值-->',danxuan_num)
@@ -151,7 +151,7 @@ $(function(){
           console.log('有没有值-->',sjfz)
           console.log('有没有值-->',ckcs)
           $('#ksname').val(ksname)
-          $('#ksriqi').val(ksriqi)
+          //$('#ksriqi').val(ksriqi)
           $('#ksshijian').val(ksshijian)
           $('#danxuan_fenzhi').val(danxuan_fenzhi)
           $('#danxuan_num').val(danxuan_num)
@@ -203,11 +203,11 @@ $(function(){
         date = year + '-' + month + '-' + day
 
         //日期
-        laydate.render({
-          elem: '#ksriqi'
-          ,min: date
-          ,max: '2020-01-01'
-        });
+        // laydate.render({
+        //   elem: '#ksriqi'
+        //   ,min: date
+        //   ,max: '2020-01-01'
+        // });
 
         //自定义验证规则  
         form.verify({  
@@ -303,7 +303,7 @@ $(function(){
           
           //获取所有的值
           let ksname = $('#ksname').val(),
-              ksriqi = $('#ksriqi').val(),
+              //ksriqi = $('#ksriqi').val(),
               ksshijian = $('#ksshijian').val(),
               danxuan_fenzhi = $('#danxuan_fenzhi').val(),
               danxuan_num = $('#danxuan_num').val(),
@@ -343,14 +343,14 @@ $(function(){
             return false
           }
           
-          console.log('all args-->',ksname,ksriqi,ksshijian,danxuan_num,danxuan_fenzhi,duoxuan_num,duoxuan_fenzhi,panduan_num,panduan_fenzhi,tem_arr)
+          //console.log('all args-->',ksname,ksriqi,ksshijian,danxuan_num,danxuan_fenzhi,duoxuan_num,duoxuan_fenzhi,panduan_num,panduan_fenzhi,tem_arr)
           console.log('tem_arr-->',tem_arr)
           $.ajax({
             url:'/dxxxhjs/manage/new_firststep',
             method:'post',
             data:{
               ksname : ksname,
-              ksriqi : ksriqi,
+              //ksriqi : ksriqi,
               ksshijian : ksshijian,
               danxuan_fenzhi : danxuan_fenzhi,
               danxuan_num : danxuan_num,
@@ -396,7 +396,7 @@ $(function(){
             return false;
           }
           setCookie('ksname',$('#ksname').val())
-          setCookie('ksriqi',$('#ksriqi').val())
+          //setCookie('ksriqi',$('#ksriqi').val())
           setCookie('ksshijian',$('#ksshijian').val())
           setCookie('danxuan_fenzhi',$('#danxuan_fenzhi').val())
           setCookie('danxuan_num',$('#danxuan_num').val())
