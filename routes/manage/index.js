@@ -924,12 +924,38 @@ router.get('/new_firststep',function(req,res){
 		        ckcs : ckcs
 		    })
 		    console.log('new_sjsz-->',new_sjsz)
-			new_sjsz.save(function(err){
+			new_sjsz.save(function(err,docc){
 				if(err){
 					console.log('save err-->',err)
 					return res.json({'code':-1,'msg':err})
 				}
-				return res.json({'code':0,'msg':'设置成功'})
+				let search = sjsz.find({ '_id' : { '$ne' : docc._id } })
+				search.exec(function(err,doc){
+	   				if(err){
+	   					console.log('sjsz find dangqian!=0 err---->',err)
+	   					return res.json({'code':-1,'msg':err})
+	   				}
+	   				console.log('doc length ---->',doc.length)
+	   				async.eachLimit(doc,1,function(item,callback){
+	   					sjsz.update({'_id':item._id},{'dangqian':0},function(e){
+	   						if(e){
+	   							console.log('sjsz eachLimit e ---->',e)
+	   							return res.json({'code':1,'msg':e})
+	   							callback(e)
+	   						}
+	   						console.log('sjsz eachLimit success ')
+	   						callback()
+	   					})
+	   				},function(error){
+	   					if(error){
+	   						console.log('sjsz eachLimit error---->',error)
+	   						return res.json({'code':-1,'msg':error})
+	   					}
+	   					console.log('sjsz eachLimit success')
+	   					return res.json({'code':0,'msg':'设置成功'})
+	   				})
+	   			})
+				//return res.json({'code':0,'msg':'设置成功'})
 			})
 		})
 })
