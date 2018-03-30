@@ -83,6 +83,14 @@
       <strong id="minute_show">0分</strong>
       <strong id="second_show">0秒</strong>
     </div>
+    <div>
+    <div class="container-fluid">
+      <div class="row" style="padding: 0 15px;">
+        <div class="col-12" style="min-height: 100px;background-color: #94003F;padding: 0 0;">
+          <img class="img-responsive" src="/dxxxhjs/stylesheets/yetou1.jpg">
+        </div>
+      </div>
+    </div>
     <div id="jqContent" class="" style="text-align: left; ">
         
         <div id="mainCss">
@@ -588,14 +596,85 @@
                         <!-- <script src="/dxxxhjs/javascripts/jquery.min.js"></script> -->
 
                         <script type="text/javascript">
+                        function setCookie (name, value)
+                        { 
+                            //设置名称为name,值为value的Cookie
+                            var expdate = new Date();   //初始化时间
+                            expdate.setTime(expdate.getTime() + 1 * 60 * 60 * 1000);   //时间 one hour
+                            document.cookie = name+"="+value+";expires="+expdate.toGMTString()+";path=http://qiandao.szu.edu.cn:81/dxxxhjs";
+                           //即document.cookie= name+"="+value+";path=/";   时间可以不要，但路径(path)必须要填写，因为JS的默认路径是当前页，如果不填，此cookie只在当前页面生效！~
+                        }
+                        function getCookie(c_name)
+                        {
+                          if (document.cookie.length>0)
+                          {
+                            c_start=document.cookie.indexOf(c_name + "=")
+                            console.log('check c_start-->',c_start)
+                            if (c_start!=-1)
+                            { 
+                              c_start=c_start + c_name.length+1 
+                              c_end=document.cookie.indexOf(";",c_start)
+                              if (c_end==-1) c_end=document.cookie.length
+                                console.log('check arg-->',unescape(document.cookie.substring(c_start,c_end)))
+                                return unescape(document.cookie.substring(c_start,c_end))
+                            } 
+                          }
+                          return ""
+                        }
                         function br2nl(txt){
                             var re=/(<br\s\/>|<br>|<BR>|<BR\/>)/g;
                             var s=txt.replace(re,"\n");
                             return s;                                  
                         }
-                        let min_ = '<%=ksinfo.ksshijian%>'
-                        var intDiff = parseInt(min_*60);//倒计时总秒数量
+                        let countdown = getCookie('countdown'),
+                            min_ = 0
+                        var intDiff = 0
+                        if(countdown && countdown !== null && countdown !== '' && typeof(countdown) !== 'undefined'){
+                          console.log('countdown存在cookie--->',countdown)
+                          intDiff = parseInt(countdown)
+                        }else{
+                          console.log('countdown 不存在 cookie')
+                          min_ = '<%=ksinfo.ksshijian%>'
+                          intDiff = parseInt(min_*60)
+                          countdown = intDiff
+                          setCookie('countdown',countdown)
+                          console.log('check cookie--->',document.cookie)
+                        }
+                        $(document).keydown(function () {
+                            if ((event.keyCode == 116) || //屏蔽 F5 刷新键
+                                (event.ctrlKey && event.keyCode == 82)) { //Ctrl + R
+                                event.keyCode = 0;
+                                event.returnValue = false;
+                            }
+                        });
+                         window.onbeforeunload=function(e){
+                          //window.event.clientY < 0表示鼠标已经离开了document的区域
+                         if(window.event.clientY < 0 || window.event.altKey) 
+                              {
+                                  //alert("是关闭而非刷新");
+                                  setCookie('countdown','')
+                                  //window.event.returnValue ="您是否要离开此页面？";   
+                              }else{
+                                console.log('是刷新而非关闭')
+                                 // alert("是刷新而非关闭");
+                                 // window.event.returnValue ="刷新";  
+                              }
+                          }
+                        //var intDiff = parseInt(min_*60);//倒计时总秒数量
                         function timer(intDiff){
+                          let countdown = 0
+                            window.setInterval(function(){
+                              countdown = parseInt(getCookie('countdown') - 60)
+                              
+                              if(countdown > 0){
+                                console.log('countdown---->',countdown)
+                                setCookie('countdown',countdown)
+                              }else{
+                                console.log('结束倒计时')
+                                //销毁cookie
+                                setCookie('countdown','')
+                              }
+                            },60000)
                             window.setInterval(function(){
                             var day=0,
                                 hour=0,
@@ -617,6 +696,7 @@
                             intDiff--;
                             //时间到，自动提交
                             if(intDiff == 0){
+                              setCookie('countdown','')
                               console.log('处理提交')
                               let temp_danxuan = [],
                                   temp_duoxuan = [],

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
 
-    <title></title>
+    <title><%=result.ksname%>(第<%=result.kscs%>次考试成绩)</title>
 
     <!-- Bootstrap -->
     <link rel='stylesheet' href='/dxxxhjs/stylesheets/bootstrap.css' />
@@ -69,6 +69,11 @@
   </head>
 
   <body>
+  <div class="row" style="padding: 0 15px;">
+        <div class="col-12" style="min-height: 100px;background-color: #94003F;padding: 0 0;">
+          <img class="img-responsive" src="/dxxxhjs/stylesheets/yetou.jpg">
+        </div>
+  </div>
     <div id="jqContent" class="" style="text-align: left; ">
         <div id="headerCss" style="overflow-x: hidden; overflow-y: hidden; ">
             <div id="ctl00_header">
@@ -81,7 +86,7 @@
                     <div class="survey" style="margin:0px auto;">
                         <div id="ctl00_ContentPlaceHolder1_JQ1_divHead" class="surveyhead" style="border: 0px;">
                             <div id="ctl00_ContentPlaceHolder1_JQ1_h1Name" style="position:relative;">
-                                <h1 id=""><%=result.ksname%>(第<%=result.kscs%>次考试成绩)</h1>
+                                <h1 id="" style="color:#94003F;"><%=result.ksname%>(第<%=result.kscs%>次考试成绩)</h1>
                                 <h3 id="">姓名：<%=result.xingming%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=result.gonghao%>&nbsp;&nbsp;&nbsp;&nbsp;本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分&nbsp;&nbsp;&nbsp;&nbsp;用时：<%=result.cha%></h3><br>
 
                                   <br><h4 id = "retry1" style="display:none;font-size: 14px;"><a href="/dxxxhjs/front/ks?code=<%=ksinfo.randomStr%>">&nbsp;&nbsp;&nbsp;&nbsp;点击此处再次考试</a></h4>
