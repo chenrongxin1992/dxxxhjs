@@ -29,8 +29,9 @@
         /*position: relative;    */
       }
       .footer{
+        text-align: center;
         position: fixed;
-        top: 90%;
+        top: 95%;
         left: 0px;
         right: 0px;
         width: 350px;
@@ -45,7 +46,7 @@
       }
       .loginbtn{ 
         position: fixed;
-        top: 50%;
+        top: 45%;
         left: 0px;
         right: 0px;
         width: 350px;
@@ -53,7 +54,18 @@
         margin-left:auto;
         margin-right:auto; 
       }
-
+      .info{
+            left: 100px;
+        position: fixed;
+        bottom: 145px;
+      }
+      .layui-btn-normal{
+            font-size: 20px;
+        background-color: #94003F !important;
+      }
+      .word{
+        color:#AEAEAE;
+      }
     </style>
   </head>
   <body>
@@ -61,13 +73,22 @@
         <div class="row">
           <div class="col-12">
             <div class="footer">
-              <span><img class="img-responsive footer-logo" src="/dxxxhjs/stylesheets/ks--logo.png">2018 © 深圳大学党委组织部</span>
+              <span>2018 © 深圳大学党委组织部</span>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-12">
-            <button class="layui-btn layui-btn-radius layui-btn-normal loginbtn" id="login">开始考试</button>
+            <button class="layui-btn layui-btn-radius layui-btn-normal loginbtn" id="login"><strong>进 &nbsp;&nbsp; 入 &nbsp;&nbsp; 考 &nbsp;&nbsp; 试</strong></button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 info">
+            <p class="word"><strong>考生须知：</strong></p>
+            <p class="word">1.点击“开始考试”，在登陆界面填写本人校园卡号和密码，登陆后开始考试</p>
+            <p class="word">2.考试题型包括单项选择题，多想选择题和判断题，共50道题目，答题时间40分钟</p>
+            <p class="word">3.每场考试共有两次机会，考试结束后系统会自动生成成绩，80分以上为合格，如第一次考试未通过，可继续进行第二次考试</p>
+            <p class="word">4.请严格遵守考场纪律，严禁作弊，考试期间如有考试内容以外的问题，可举手向监考老师说明，不得向其他考生询问</p>
           </div>
         </div>
       </div>
@@ -78,10 +99,11 @@
     <script src="/dxxxhjs/javascripts/layui.js"></script>
     <script type="text/javascript">
       $(function(){
+        'use strict'
         layui.use(['table','layer','form'], function(){
           $('#login').on('click',function(){
           
-            let kslianjie = '<%=kslianjie%>'
+            var kslianjie = '<%=kslianjie%>'
             if(!kslianjie){
               console.log('kslianjie---->',kslianjie)
               layer.open({

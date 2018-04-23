@@ -85,7 +85,7 @@
             </p>
           </div>
         </div>
-        <div class="col-12 col-md-11">
+        <div class="col-12 col-md-11" style="opacity:0.9; filter:alpha(opacity=90);  ">
           <div id="middle-container" class="row-fluid"></div>
         </div><!--middle-container-->
 
@@ -95,7 +95,7 @@
       <hr style="height:1px;border:none;border-top:1px dashed #F08080;">
 
       <footer>
-        <p class="text-center"><img class="img-responsive footer-logo" src="/dxxxhjs/stylesheets/logo.jpg">2018 &copy; 深圳大学党委组织部</p>
+        <p class="text-center"><!-- <img class="img-responsive footer-logo" src="/dxxxhjs/stylesheets/logo.jpg"> -->2018 &copy; 深圳大学党委组织部</p>
       </footer>
 
     </div><!--/.container-->
@@ -113,6 +113,7 @@
     <script src="/dxxxhjs/javascripts/ie10-viewport-bug-workaround.js"></script>
     <script type="text/javascript">
     $(function(){
+      'use strict'
       $('#middle-container').load('/dxxxhjs/manage/drtk',function(result){
         $result = $(result)
         $result.find("script").appendTo('#middle-container');

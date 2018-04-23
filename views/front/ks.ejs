@@ -40,9 +40,9 @@
       .time-item{
           position:fixed;
           margin-top:150px;
-          left: 1412px;
+          left: 309px;
           max-width: 250px;
-          background:#C71C60;
+          background:#812D4E;
           color:#fff;
           line-height:49px;
           font-size:36px;
@@ -52,12 +52,19 @@
           border-radius:5px;
           box-shadow:1px 1px 3px rgba(0,0,0,0.2);
       }
+      .leftbar{
+        left: 441px!important;
+      }
       body{
+        opacity:0.9;  
+        filter:alpha(opacity=70);  
         width: 100%;
-        height:auto;
-        background-color: #94003F;
-        /*background:url("/dxxxhjs/stylesheets/ks_bg.jpg") repeat-y;*/
+
+        background-color: white;
+        /*background-color: #94003F;*/
+        background:url("/dxxxhjs/stylesheets/guanli_bg.jpg") no-repeat;
         background-size: 100%;
+
       }
       .footercss{
         height: 120px;
@@ -68,12 +75,18 @@
         margin-top: 20px;
         text-align: center;
         height: 80px;
-        background-color: #94003F;
+        background-color: #812D4E;
       }
       .footer-logo{
         height: 50px;
         margin-right: 15px;
         display: inline-block;
+      }
+      #jqContent{
+            height: 810px;
+    overflow-y: scroll;
+        /*opacity:0.9;  
+        filter:alpha(opacity=70);  */
       }
     </style>
   </head>
@@ -86,8 +99,8 @@
     <div>
     <div class="container-fluid">
       <div class="row" style="padding: 0 15px;">
-        <div class="col-12" style="min-height: 100px;background-color: #94003F;padding: 0 0;">
-          <img class="img-responsive" src="/dxxxhjs/stylesheets/yetou1.jpg">
+        <div class="col-12" style="min-height: 100px;padding: 0 0;">
+          <img class="img-responsive" src="/dxxxhjs/stylesheets/header.jpg">
         </div>
       </div>
     </div>
@@ -405,6 +418,7 @@
                         </script>
                         <script src="/dxxxhjs/javascripts/jquery-1.10.2.min.js"></script>
                         <script type="text/javascript">
+                        
                           var qstr = '';
                           
                           qstr = '<%- JSON.stringify(result.qstr) %>';
@@ -608,37 +622,38 @@
                         {
                           if (document.cookie.length>0)
                           {
-                            c_start=document.cookie.indexOf(c_name + "=")
-                            console.log('check c_start-->',c_start)
+                            c_start=document.cookie.indexOf(c_name + "=");
+                            console.log('check c_start-->',c_start);
                             if (c_start!=-1)
                             { 
-                              c_start=c_start + c_name.length+1 
-                              c_end=document.cookie.indexOf(";",c_start)
-                              if (c_end==-1) c_end=document.cookie.length
-                                console.log('check arg-->',unescape(document.cookie.substring(c_start,c_end)))
-                                return unescape(document.cookie.substring(c_start,c_end))
+                              c_start=c_start + c_name.length+1 ;
+                              c_end=document.cookie.indexOf(";",c_start);
+                              if (c_end==-1) c_end=document.cookie.length;
+                                console.log('check arg-->',unescape(document.cookie.substring(c_start,c_end)));
+                                return unescape(document.cookie.substring(c_start,c_end));
                             } 
                           }
-                          return ""
+                          return "";
                         }
                         function br2nl(txt){
                             var re=/(<br\s\/>|<br>|<BR>|<BR\/>)/g;
                             var s=txt.replace(re,"\n");
                             return s;                                  
                         }
-                        let countdown = getCookie('countdown'),
-                            min_ = 0
-                        var intDiff = 0
+                        
+                        let countdown = getCookie('countdown');
+                        let min_ = 0;
+                        var intDiff = 0;
                         if(countdown && countdown !== null && countdown !== '' && typeof(countdown) !== 'undefined'){
-                          console.log('countdown存在cookie--->',countdown)
-                          intDiff = parseInt(countdown)
+                          console.log('countdown存在cookie--->',countdown);
+                          intDiff = parseInt(countdown);
                         }else{
-                          console.log('countdown 不存在 cookie')
-                          min_ = '<%=ksinfo.ksshijian%>'
-                          intDiff = parseInt(min_*60)
-                          countdown = intDiff
-                          setCookie('countdown',countdown)
-                          console.log('check cookie--->',document.cookie)
+                          console.log('countdown 不存在 cookie');
+                          min_ = '<%=ksinfo.ksshijian%>';
+                          intDiff = parseInt(min_*60);
+                          countdown = intDiff;
+                          setCookie('countdown',countdown);
+                          console.log('check cookie--->',document.cookie);
                         }
                         $(document).keydown(function () {
                             if ((event.keyCode == 116) || //屏蔽 F5 刷新键
@@ -652,27 +667,27 @@
                          if(window.event.clientY < 0 || window.event.altKey) 
                               {
                                   //alert("是关闭而非刷新");
-                                  setCookie('countdown','')
+                                  setCookie('countdown','');
                                   //window.event.returnValue ="您是否要离开此页面？";   
                               }else{
-                                console.log('是刷新而非关闭')
+                                console.log('是刷新而非关闭');
                                  // alert("是刷新而非关闭");
                                  // window.event.returnValue ="刷新";  
                               }
                           }
                         //var intDiff = parseInt(min_*60);//倒计时总秒数量
                         function timer(intDiff){
-                          let countdown = 0
+                          let countdown = 0;
                             window.setInterval(function(){
-                              countdown = parseInt(getCookie('countdown') - 60)
+                              countdown = parseInt(getCookie('countdown') - 60);
                               
                               if(countdown > 0){
-                                console.log('countdown---->',countdown)
-                                setCookie('countdown',countdown)
+                                console.log('countdown---->',countdown);
+                                setCookie('countdown',countdown);
                               }else{
-                                console.log('结束倒计时')
+                                console.log('结束倒计时');
                                 //销毁cookie
-                                setCookie('countdown','')
+                                setCookie('countdown','');
                               }
                             },60000)
                             window.setInterval(function(){
@@ -711,20 +726,20 @@
                                 //提交答案格式 timu_id:daan_id  d.xuanxiang2.indexOf('true')) > 0
                                 console.log($(this).attr('timuid').indexOf('panduanti'))
                                 if($(this).attr('timuid').indexOf('panduanti') > -1){
-                                  console.log('---判断题---')
-                                  temp_panduan.push(($(this).attr('timuid').substring(9)) + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1) )
-                                  console.log('temp_panduan--',temp_panduan)
+                                  console.log('---判断题---');
+                                  temp_panduan.push(($(this).attr('timuid').substring(9)) + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1) );
+                                  console.log('temp_panduan--',temp_panduan);
                                 }else{
-                                  console.log('---单选题---')
-                                  temp_danxuan.push($(this).attr('timuid') + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1))
-                                  console.log('temp_danxuan---->',temp_danxuan)
+                                  console.log('---单选题---');
+                                  temp_danxuan.push($(this).attr('timuid') + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1));
+                                  console.log('temp_danxuan---->',temp_danxuan);
                                 }
                               });
                               let temp_duoxuan_arr_1 =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
                                   //temp_duoxuan_arr = temp_duoxuan_arr_1.replace(/\n/g,'<br />'),
                                   duoxuan_arr = JSON.parse(temp_duoxuan_arr_1),
                                   //duoxuan_arr = eval('(' + temp_duoxuan_arr_1 + ')'),
-                                  temp_name = ''
+                                  temp_name = '';
                               console.log('11111',temp_duoxuan_arr_1)
                               console.log('type of duoxuan_arr',typeof(duoxuan_arr))
                               for(let i=0;i<duoxuan_arr.length;i++){
@@ -787,6 +802,7 @@
                               }else{
                                 console.log('题目没有选齐')
                                 console.log('题目没有选齐,强制ajax 了')
+                                setCookie('countdown','')
                                 let randomStr = GetQueryString('code')
                                 console.log('check randomStr-->',randomStr)
                                 $.ajax({
@@ -833,7 +849,7 @@
                         }); 
                         </script>
                         <script type="text/javascript">
-                        'use strict';
+                        
                         function GetQueryString(name)
                         {
                             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
@@ -841,6 +857,7 @@
                             if(r!=null)return  unescape(r[2]); return null;
                         }
                           $(function(){
+                            'use strict';
                             //处理提交
                             $('#submit_button').on('click',function(){
                               console.log('处理提交')

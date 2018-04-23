@@ -50,8 +50,8 @@
       body{
         width: 100%;
         height:auto;
-        background-color: #94003F;
-        /*background:url("/dxxxhjs/stylesheets/ks_bg.jpg") repeat-y;*/
+        background-color: white;
+        background:url("/dxxxhjs/stylesheets/guanli_bg.jpg") no-repeat;
         background-size: 100%;
       }
       footer{
@@ -65,13 +65,20 @@
         margin-right: 15px;
         display: inline-block;
       }
+      #jqContent{
+        height: 810px;
+    overflow-y: scroll;
+        opacity:0.9;  
+        filter:alpha(opacity=70);  
+      }
+
     </style>
   </head>
 
   <body>
   <div class="row" style="padding: 0 15px;">
-        <div class="col-12" style="min-height: 100px;background-color: #94003F;padding: 0 0;">
-          <img class="img-responsive" src="/dxxxhjs/stylesheets/yetou.jpg">
+        <div class="col-12" style="min-height: 100px;padding: 0 0;">
+          <img class="img-responsive" src="/dxxxhjs/stylesheets/header.jpg">
         </div>
   </div>
     <div id="jqContent" class="" style="text-align: left; ">
@@ -434,6 +441,7 @@
 
                             </div>
                             <script type="text/javascript">
+                            'use strict'
                                 var timerq;
                                 var surveycontent = document.getElementById("ctl00_ContentPlaceHolder1_JQ1_question");
                                 var divPromote = document.getElementById("ctl00_ContentPlaceHolder1_JQ1_divPromote");
@@ -536,6 +544,7 @@
                         </script>
                         <script src="/dxxxhjs/javascripts/jquery-1.10.2.min.js"></script>
                         <script type="text/javascript">
+                        'use strict'
                           var qstr = ''
                           
                           qstr = '<%- JSON.stringify(result.qstr) %>'
@@ -746,6 +755,7 @@
 
                             //处理提交
                             $('#submit_button').on('click',function(){
+                              'use strict'
                               console.log('处理提交')
                               let temp_danxuan = [],
                                   temp_duoxuan = [],
