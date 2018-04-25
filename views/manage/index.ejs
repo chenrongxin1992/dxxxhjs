@@ -115,7 +115,8 @@
     $(function(){
       'use strict'
       $('#middle-container').load('/dxxxhjs/manage/drtk',function(result){
-        $result = $(result)
+        console.log('result-->',result)
+        let $result = $(result)
         $result.find("script").appendTo('#middle-container');
       })
       layui.use(['table','layer','form'], function(){
@@ -132,7 +133,7 @@
             layer.close(mask);
             $('#'+current_active_a_id).toggleClass('active')
             $('#'+current_id).toggleClass('active')
-            $result = $(result)
+            let $result = $(result)
             $result.find("script").appendTo('#middle-container')
             $('.row-offcanvas').toggleClass('active')
           })

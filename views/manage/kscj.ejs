@@ -4,8 +4,241 @@
     </div>
 </div>
 <div class="col-12">
-  <div class="jumbotron">
-      <h3>考生成绩</h3>
-      <h4>该功能尚在完善</h4> 
-  </div>
+  <form class="layui-form" action="">
+    <div class="layui-form-item">
+      <div class="layui-inline">
+      <label class="layui-form-label" style="width:98px;">考试主题</label>
+        <div class="layui-input-inline">
+          <select name="catname" id="catname" lay-filter="catname">
+            <option value="">全部主题</option>
+            <% for(let i=0;i<catname.length;i++) { %>
+                <option value='<%=catname[i]%>'><%=catname[i]%></option>
+            <% } %>
+          </select>
+        </div>
+        <label class="layui-form-label" style="width:98px;">姓名</label>
+        <div class="layui-input-inline">
+          <input class="layui-input" name="xingming" id="xingming" autocomplete="off" placeholder="请输入姓名">
+        </div>
+        <button class="layui-btn" lay-submit="" lay-filter="search">搜索</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+    </div>  
+  </form>
+  <div style="clear: both;"></div>
+  <p id='choose_catname' class="text-center" style='font-weight:bold;color:#94003F;width:85%;float:left;'></P>
+  <p class='text-center' style='width:15%;float:right;'><a id='a_id' href='' style='display:none;'>导出</a></p>
+  <div style="clear: both;"></div>
+  <table id="cxtk_tb" lay-filter="cxtk_table"></table>
 </div>
+
+<script type="text/html" id="toolbar">
+  <a class="layui-btn layui-btn-primary layui-btn-xs special-btn" lay-event="detail" >查看</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit" style="color:#fff;">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" style="color:#fff;">删除</a>
+</script>
+
+<script>
+'use strict'
+$(function(){
+  layui.use(['table','layer','form'], function(){
+    let table = layui.table,
+        layer = layui.layer,
+        form = layui.form;
+
+    form.render('select')
+
+    //执行实例
+    table.render({
+      elem: '#cxtk_tb'
+      ,height: 'full-200'//高度最大化
+      ,cellMinWidth: 50//列宽自动分配
+      ,url: '/dxxxhjs/manage/kscj_data' //数据接口
+      ,page: true //开启分页
+      ,id: 'reload_tb'
+      ,cols:  [[ //标题栏
+        {field: 'catid', title: '序号', align: 'center', rowspan: 1} 
+        ,{field: 'xingming', title: '姓名', align: 'center', rowspan:1} 
+        ,{field: 'gonghao', title: '校园卡号', align: 'center', rowspan: 1}
+        ,{field: 'ksriqi', title: '日期', align: 'center', rowspan: 1}
+        ,{field: 'ksname', title: '考试主题', align: 'center', rowspan: 1}
+        ,{field: 'kscs', title: '答题次数', align: 'center', rowspan: 1}
+        ,{field: 'zongfen',align: 'center', title: '得分', colspan: 1} //
+      ]]
+    })
+    //监听下拉框
+    form.on('select(catname)', function(data){
+      console.log('监听下拉框-->catname',data)
+      var s_xingming = $('#xingming').val(),
+      	  s_catname = $('#catname option:selected').val()
+      table.reload('reload_tb', {
+        where: {
+            xingming: $('#xingming').val(),
+            catname: $('#catname option:selected').val()
+        }
+      });
+      $('#choose_catname').text(data.value)
+      //显示下载链接
+      var a_link = '/dxxxhjs/manage/downkscj?xingming=' + s_xingming + '&catname=' + s_catname
+      $('#a_id').attr('href',a_link)
+      $('#a_id').show()
+      //form.render('select')
+      return false;
+    })
+    form.on('select(leixing)', function(data){
+      console.log('监听下拉框-->leixing',data)
+      table.reload('reload_tb', {
+        where: {
+            timu: $('#timu').val(),
+            catname: $('#catname option:selected').val(),
+            leixing: $('#leixing option:selected').val()
+        }
+      });
+      //form.render('select')
+      return false;
+    })
+    //搜索
+    form.on('submit(search)', function(data){
+      console.log('data-->',data)
+      table.reload('reload_tb', {
+        page:1,
+        where: {
+            xingming: $('#xingming').val()
+        }
+      });
+      return false;
+    });
+    //监听复选框操作
+    table.on('checkbox(cxtk_table)', function(obj){
+      console.log('选择复选框')
+      console.log('obj-->',obj)
+      console.log('obj data-->',obj.data)
+    });
+    //监听工具条
+    table.on('tool(cxtk_table)', function(obj){
+      console.log('obj-->',obj)
+      let data = obj.data;
+      console.log('工具条监听-->',data)
+      if(obj.event === 'detail'){
+        console.log('监听详情-->',data.catid)
+        console.log('能取到_id吗-->',data._id)
+        //layer.msg('ID：'+ data.catid + ' 的查看操作');
+       let if_index = layer.open({
+          skin: 'layui-layer-molv',
+          type: 2,
+          title: '查看',
+          shadeClose: false,
+          shade: [0.8, '#393D49'],
+          offset: '10px',
+          maxmin: true, //开启最大化最小化按钮
+          area: '850px',
+          maxHeight:'900px',
+          content: '/dxxxhjs/manage/iframe_mb?_id=' + data._id,
+          success: function(layero, index) {
+            console.log('layero-->',layero)
+            console.log('index-->',index)
+            layer.iframeAuto(index);
+          }
+        }); 
+      } 
+      else if(obj.event === 'del'){
+        console.log('监听删除-->',data.catid)
+        layer.confirm('确定要删除该条数据吗?', function(index){
+          console.log('删除index-->',index)
+          //obj.del();
+          $.ajax({
+            url:'/dxxxhjs/manage/delete_item',
+            method:'post',
+            data:{
+              _id:data._id
+            },
+            success:function(res){
+              if(res.code === 0){
+                console.log(res.msg)
+                obj.del()
+                layer.close(index);
+              }else{
+                console.log('删除失败')
+              }
+            },
+            error:function(err){
+              console.log('delete err',err)
+            }
+          }) 
+        });
+      } 
+      else if(obj.event === 'edit'){
+        console.log('编辑-->',JSON.stringify(data))
+        layer.alert('该功能尚在完善')
+        //layer.alert('编辑行：<br>'+ JSON.stringify(data))
+      }
+    });
+  });
+})
+</script>
+<script type="text/html" id="xuanxiang0Tpl">
+  {{#  if((d.xuanxiang0) && ((d.xuanxiang0.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang0 }}</span>
+  {{#  } else if(d.xuanxiang0) { }}
+    {{ d.xuanxiang0 }}
+  {{#  } else { }}
+    {{  }}
+  {{#  } }}
+
+</script>
+<script type="text/html" id="xuanxiang1Tpl">
+  {{#  if((d.xuanxiang1) && ((d.xuanxiang1.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang1 }}</span>
+  {{#  } else if(d.xuanxiang1){ }}
+    {{ d.xuanxiang1 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang2Tpl">
+  {{#  if((d.xuanxiang2) && ((d.xuanxiang2.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang2 }}</span>
+  {{#  } else  if(d.xuanxiang2){ }}
+    {{ d.xuanxiang2 }}
+  {{#  }else{} }}
+</script>
+<script type="text/html" id="xuanxiang3Tpl">
+  {{#  if((d.xuanxiang3) && ((d.xuanxiang3.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang3 }}</span>
+  {{#  } else if(d.xuanxiang3) { }}
+    {{ d.xuanxiang3 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang4Tpl">
+  {{#  if((d.xuanxiang4) && ((d.xuanxiang4.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang4 }}</span>
+  {{#  } else if(d.xuanxiang4) { }}
+    {{ d.xuanxiang4 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang5Tpl">
+  {{#  if((d.xuanxiang5) && ((d.xuanxiang5.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang5 }}</span>
+  {{#  } else if(d.xuanxiang5) { }}
+    {{ d.xuanxiang5 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang6Tpl">
+  {{#  if((d.xuanxiang6) && ((d.xuanxiang6.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang6 }}</span>
+  {{#  } else if(d.xuanxiang6) { }}
+    {{ d.xuanxiang6 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang7Tpl">
+  {{#  if((d.xuanxiang7) && ((d.xuanxiang7.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang7 }}</span>
+  {{#  } else if(d.xuanxiang7){ }}
+    {{ d.xuanxiang7 }}
+  {{#  } else{} }}
+</script>
+<script type="text/html" id="xuanxiang8Tpl">
+  {{#  if((d.xuanxiang8) && ((d.xuanxiang8.indexOf('true')) > 0)) { }}
+    <span style="color: red;">{{ d.xuanxiang8 }}</span>
+  {{#  } else if(d.xuanxiang8) { }}
+    {{ d.xuanxiang8 }}
+  {{#  } else{} }}
+</script>

@@ -3,9 +3,98 @@
       <p class="pull-right" style="font-size:14px;">当前用户：<span style="color:red;" id="user"><%=user.cn%></span> &nbsp;&nbsp;&nbsp;校园卡号：<span style="color:red;" id="xiaoyuankahao"><%=user.alias%></span> &nbsp;&nbsp;&nbsp;单位：<span style="color:red;" id="danwei"><%=user.eduPersonOrgDN%></span></p>
     </div>
 </div>
-<div class="col-12">
-  <div class="jumbotron">
-      <h3>成绩统计</h3>
-      <h4>该功能尚在完善</h4> 
+
+<div class="row" style="text-align:center;">
+    <div class="col-12">
+      <form class="layui-form" action="">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+          <label class="layui-form-label" style="width:98px;">考试主题</label>
+            <div class="layui-input-inline" style="width: auto;">
+              <select name="catname" id="catname" lay-filter="catname">
+                <option value=""></option>
+                <% for(let i=0;i<catname.length;i++) { %>
+                    <option value='<%=catname[i]%>'><%=catname[i]%></option>
+                <% } %>
+              </select>
+            </div>
+          </div>
+        </div>  
+      </form>
+    </div>
+</div>
+<div class="row" style="text-align:center;">
+  <div class="col-12">
+    <div id="mokuai_chart" class="chart" style="width: 600px;height:400px;margin:15px auto"></div>
   </div>
 </div>
+
+
+<script>
+'use strict'
+$(function(){
+  layui.use(['table','layer','form'], function(){
+    let table = layui.table,
+        layer = layui.layer,
+        form = layui.form;
+
+    form.render('select')
+
+    //监听下拉框
+    form.on('select(catname)', function(data){
+      console.log('监听下拉框-->catname',data)
+      var s_catname = $('#catname option:selected').val()
+      $.ajax({
+        url:'/dxxxhjs/manage/cjtj_data',
+        method:'POST',
+        async:'TRUE',
+        data:{
+          ksname:s_catname
+        },
+        success:function(data){
+          console.log(data.dataArr)
+          let mokuai_chart = echarts.init(document.getElementById('mokuai_chart'))
+          let mokuai_chart_option = {
+              title : {
+                  text: '分值区间比例',
+                  subtext: '',
+                  x:'center'
+              },
+              tooltip : {
+                  trigger: 'item',
+                  formatter: "{a} <br/>{b} : {c} ({d}%)"
+              },
+              legend: {
+                  orient: 'vertical',
+                  left: 'left',
+                  data: ['60分以下','60-69分','70-79分','80-89分','90-100分']
+              },
+              series : [
+                  {
+                      name: '分值区间比例',
+                      type: 'pie',
+                      radius : '55%',
+                      center: ['50%', '60%'],
+                      data:data.dataArr,
+                      itemStyle: {
+                          emphasis: {
+                              shadowBlur: 10,
+                              shadowOffsetX: 0,
+                              shadowColor: 'rgba(0, 0, 0, 0.5)'
+                          }
+                      }
+                  }
+              ]
+              };
+              // 使用刚指定的配置项和数据显示图表。
+              mokuai_chart.setOption(mokuai_chart_option);
+        },
+        error:function(data){
+          console.log('error-->',data)
+        }
+      })
+      
+    })
+  });
+})
+</script>

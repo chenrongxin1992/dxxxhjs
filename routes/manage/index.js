@@ -11,6 +11,9 @@ const urlencode = require('urlencode')
 const moment = require('moment')
 const sjsz = require('../../db/cat').sjsz
 const request = require('request')
+const stu_exam = require('../../db/cat').stu_exam
+const nodeExcel = require('excel-export')
+
 
 let MyServer = "http://116.13.96.53:81",
 	//CASserver = "https://auth.szu.edu.cn/cas.aspx/",
@@ -577,6 +580,228 @@ router.get('/cxtk_data',function(req,res){
 		return res.json({'code':0,'msg':'获取数据成功','count':count,'data':result})
 	})
 })
+//考生成绩
+router.get('/kscj_data',function(req,res){	
+	let page = req.query.page,
+		limit = req.query.limit,
+		xingming = req.query.xingming,
+		kszt = req.query.kszt,
+		catname = req.query.catname
+	page ? page : 1;//当前页
+	limit ? limit : 15;//每页数据
+	xingming ? xingming : ''
+	kszt ? kszt : null
+	catname ? catname : null
+
+	const reg = new RegExp(catname, 'i') 
+	console.log('check-->reg',reg)
+	async.waterfall([
+		function(cb){
+			let search = stu_exam.find({}).count()
+				search.exec(function(err,total){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('记录总数-->',total)
+					cb(null,total)
+				})
+		},
+		function(total,cb){
+			let numSkip = (page-1)*limit
+			limit = parseInt(limit)
+			console.log('check -- >',limit,page,numSkip)
+			if(xingming || catname){
+				console.log('有搜索参数')
+				let qs_xingming = new RegExp(xingming),
+					qs_kszt = new RegExp(kszt),
+					qs_catname = new RegExp(catname)
+				console.log('qs_xingming-->',qs_xingming)
+				console.log('qs_kszt-->',qs_kszt)
+				console.log('qs_catname-->',qs_catname)
+
+				let search = stu_exam.find({})
+					search.where('xingming',qs_xingming)
+					search.where('ksname',qs_catname)
+					//search.where('qs_catname',qs_catname)
+					search.sort({'ksriqi':1})
+					search.sort({'xingming':1})
+					search.sort({'kscs':1})//升序
+					search.limit(limit)
+					search.skip(numSkip)
+					search.exec(function(err,docs){
+						if(err){
+							console.log('search err-->',err.stack)
+							cb(err)
+						}
+						console.log('check docs-->',docs.length)
+						//增加一步获取数量
+						let search1 = stu_exam.find({})
+							search1.where('xingming',qs_xingming)
+							search1.where('ksname',qs_catname)
+							search1.count()
+							search1.exec(function(e,d){
+								if(e){
+									console.log('获取数量出错-->',e)
+									cb(e)
+								}
+								console.log('有参数查询，数量-->',d)
+								cb(null,docs,d)
+							})
+						//total = docs.length
+						//cb(null,docs,docs.length)
+					})
+				}else{
+					console.log('无搜索参数')
+					let search = stu_exam.find({})
+					search.sort({'ksriqi':1})
+						search.sort({'xingming':1})
+						search.sort({'kscs':1})//升序
+						search.limit(limit)
+						search.skip(numSkip)
+						search.exec(function(err,docs){
+							if(err){
+								console.log('search err-->',err.stack)
+								cb(err)
+							}
+							//console.log('check docs-->',docs)
+							cb(null,docs,total)
+					})
+				}
+		},
+		function(docs,total,cb){
+			//重新封装数据
+			let data = []//最终数据
+			docs.forEach(function(item,index){
+				let tempdata = {}
+				//console.log('item-->',item)
+				tempdata._id = item._id
+				tempdata.catid = index+1
+				tempdata.xingming = item.xingming
+				tempdata.gonghao = item.gonghao
+				tempdata.ksriqi = item.ksriqi
+				tempdata.ksname = item.ksname
+				tempdata.kscs = item.kscs
+				tempdata.zongfen = item.zongfen
+				// item.xuanxiang.forEach(function(it,ind){
+				// 	//console.log(it)
+				// 	tempdata['xuanxiang' + ind] = it.content +'(' + it.is_correct + ')'
+				// 	//tempdata['is_correct' + ind] = it.is_correct
+				// 	//console.log(tempdata)
+				// })
+				data.push(tempdata)
+				delete tempdata
+			})
+			data.count = total
+			//console.log('返回数据-->',data)
+			cb(null,data)
+		}
+	],function(error,result){
+		if(error){
+			console.log('search err-->',err.stack)
+			return res.json({'code':-1,'msg':err.stack,'count':0,'data':''})
+		}
+		let count = result.count
+		console.log('数据条数-->',count)
+		delete result.count
+		return res.json({'code':0,'msg':'获取数据成功','count':count,'data':result})
+	})
+})
+//导出成绩
+router.get('/downkscj',function(req,res){
+	let xingming = req.query.xingming,
+		catname = req.query.catname
+
+	xingming ? xingming : ''
+	catname ? catname : null
+
+	const reg = new RegExp(catname, 'i') 
+	console.log('check-->reg',reg)
+	let qs_xingming = new RegExp(xingming),
+		qs_catname = new RegExp(catname)
+		console.log('qs_xingming-->',qs_xingming)
+		console.log('qs_catname-->',qs_catname)
+
+	let search = stu_exam.find({})
+		search.where('xingming',qs_xingming)
+		search.where('ksname',qs_catname)
+		search.sort({'ksriqi':1})
+		search.sort({'xingming':1})
+		search.sort({'kscs':1})//升序
+		search.exec(function(err,docs){
+			if(err){
+				console.log('search err-->',err.stack)
+				cb(err)
+			}
+			if(docs){
+				//以下为将数据封装成array数组。因为下面的方法里头只接受数组。
+				let vac = new Array();
+	            for (let i = 0; i < docs.length; i++) {
+	                let temp = new Array();
+	                temp[0] = i + 1
+	                temp[1] = docs[i].xingming
+	                temp[2] = docs[i].gonghao
+	                temp[3] = docs[i].ksriqi
+	                temp[4] = docs[i].ksname,
+	                temp[5] = docs[i].kscs,
+	                temp[6] = docs[i].zongfen,
+	                vac.push(temp);
+	            };
+				console.log('check vac -- >',vac)
+				//处理excel
+			var conf = {};
+            conf.stylesXmlFile = "styles.xml";
+            //设置表头
+            conf.cols = [{
+                    caption: '序号',
+                    type: 'number',
+                    width: 10.6
+                }, 
+	            {
+	                caption: '姓名',
+	                type: 'string',
+	                width: 28
+	            }, 
+	            {
+                    caption: '校园卡号',
+                    type: 'string',
+                    width: 35
+                }, 
+                {
+                    caption: '日期',
+                    type: 'string',
+                    width:35
+                },{
+                	caption:'考试主题',
+                	type:'string',
+                	width:35
+                },
+                {
+                    caption: '答题次数',
+                    type: 'number',
+                    width: 35
+                },
+                {
+                    caption: '得分',
+                    type: 'number',
+                    width: 35
+                }
+			];
+			conf.rows = vac;//conf.rows只接受数组
+			 let excelResult = nodeExcel.execute(conf),
+            	excelName = docs[0].ksname
+            	console.log(excelName)
+            	console.log(urlencode(excelName))
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats');
+            res.setHeader("Content-Disposition", "attachment; filename=" + urlencode(excelName) + ".xlsx")
+            res.end(excelResult, 'binary');
+			}
+			if(!docs){
+				return res.json({'code':-1,'msg':'结果为空'})
+			}
+		})
+	
+})
 router.post('/delete_item',function(req,res){
 	let _id = req.body._id
 	console.log('_id-->',_id)
@@ -1059,13 +1284,141 @@ router.get('/tktj',function(req,res){
 })
 
 router.get('/kscj',function(req,res){
-	console.log('kscj')
-	res.render('manage/kscj')
+	//返回题库模块，题目类型
+	let search = stu_exam.distinct('ksname',function(err,docs){
+		if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err.stack})
+			}
+			console.log('docs-->',docs)
+			return res.render('manage/kscj',{'catname':docs})
+	})
+	// console.log('kscj')
+	// res.render('manage/kscj')
 })
 
 router.get('/cjtj',function(req,res){
-	console.log('cjtj')
-	res.render('manage/cjtj')
+	console.log('---------------cjtj')
+		//返回题库模块，题目类型
+	let search = stu_exam.distinct('ksname',function(err,docs){
+		if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err.stack})
+			}
+			console.log('docs-->',docs)
+			return res.render('manage/cjtj',{'catname':docs})
+	})
+
+})
+//成绩统计图表
+router.post('/cjtj_data',function(req,res){
+	let ksname = req.body.ksname
+	let nameArr = ['60分以下','60-69分','70-79分','80-89分','90-100分']
+	let dataArr = [],tempobj={}
+	async.waterfall([
+		function(cb){
+			let search = stu_exam.find({})
+				search.where('ksname').equals(ksname)
+				search.where('zongfen').lt(60)
+				search.count()
+				search.exec(function(err,count){
+					if(err){
+						console.log('60-----err',err)
+						return res.json({'code':-1,'msg':err})
+					}
+					console.log('60----->',count)
+					tempobj.name = '60分以下'
+					tempobj.value = count
+					dataArr.push(tempobj)
+					tempobj = {}
+					cb()
+				})
+		},
+		function(cb){
+			let search = stu_exam.find({})
+				search.where('ksname').equals(ksname)
+				search.where('zongfen').lte(69)
+				search.where('zongfen').gte(60)
+				search.count()
+				search.exec(function(err,count){
+					if(err){
+						console.log('60-----err',err)
+						cb(err)
+					}
+					console.log('60-69----->',count)
+					tempobj.name = '60-69'
+					tempobj.value = count
+					dataArr.push(tempobj)
+					tempobj = {}
+					cb()
+				})
+		},
+		function(cb){
+			let search = stu_exam.find({})
+				search.where('ksname').equals(ksname)
+				search.where('zongfen').lte(79)
+				search.where('zongfen').gte(70)
+				search.count()
+				search.exec(function(err,count){
+					if(err){
+						console.log('60-----err',err)
+						cb(err)
+					}
+					console.log('70-79----->',count)
+					tempobj.name = '70-79'
+					tempobj.value = count
+					dataArr.push(tempobj)
+					tempobj = {}
+					cb()
+				})
+		},
+		function(cb){
+			let search = stu_exam.find({})
+				search.where('ksname').equals(ksname)
+				search.where('zongfen').lte(89)
+				search.where('zongfen').gte(80)
+				search.count()
+				search.exec(function(err,count){
+					if(err){
+						console.log('60-----err',err)
+						cb(err)
+					}
+					console.log('80-89----->',count)
+					tempobj.name = '80-89'
+					tempobj.value = count
+					dataArr.push(tempobj)
+					tempobj = {}
+					cb()
+				})
+		},
+		function(cb){
+			let search = stu_exam.find({})
+				search.where('ksname').equals(ksname)
+				search.where('zongfen').lte(100)
+				search.where('zongfen').gte(90)
+				search.count()
+				search.exec(function(err,count){
+					if(err){
+						console.log('60-----err',err)
+						cb(err)
+					}
+					console.log('90-100----->',count)
+					tempobj.name = '90-100'
+					tempobj.value = count
+					dataArr.push(tempobj)
+					tempobj = {}
+					cb()
+				})
+		}
+	],function(error,result){
+		if(error){
+			console.log('async error',error)
+			return res.json({'code':-1,'msg':error})
+		}
+		console.log('dataArr--->',dataArr)
+		return res.json({'code':0,'nameArr':nameArr,'dataArr':dataArr})
+	})
+	
 })
 router.post('/editsj',function(req,res){
 	let _id = req.body._id,
