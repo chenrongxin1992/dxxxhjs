@@ -70,6 +70,7 @@ router.get('/', function(req, res, next) {
 			let url = CASserver + 'serviceValidate?ticket=' + ticket + '&service=' + ReturnURL
 			console.log('check url -->',url)
 			request(url, function (error, response, body) {
+				console.log('dddddd')
 				    if (!error && response.statusCode == 200) {
 				    	console.log('body -- >',body)
 				       let user = pipei(body,'user'),//工号
@@ -991,6 +992,83 @@ router.get('/sjlb_data',function(req,res){
 		return res.json({'code':0,'msg':'获取数据成功','count':result.length,'data':result})
 	})
 })
+router.get('/newsjlb_data',function(req,res){
+	let page = req.query.page,
+		limit = req.query.limit
+	page ? page : 1;//当前页
+	limit ? limit : 15;//每页数据
+	console.log(page,limit)
+	async.waterfall([
+		function(cb){
+			let search = sjsz.find({}).count()
+				search.exec(function(err,total){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('记录总数-->',total)
+					cb(null,total)
+				})
+		},
+		function(total,cb){
+			let numSkip = (page-1)*limit
+			limit = parseInt(limit)
+			console.log('check -- >',limit,page,numSkip)
+			let search = sjsz.find({})
+				search.sort({'id':1})
+				search.limit(limit)
+				search.skip(numSkip)
+				search.exec(function(err,docs){
+					if(err){
+						console.log('search err-->',err.stack)
+						cb(err)
+					}
+					console.log('check docs-->',docs)
+					cb(null,docs)
+				})
+		},
+		function(docs,cb){
+			//重新封装数据
+			//重新封装数据
+			let data = []//最终数据
+			docs.forEach(function(item,index){
+				let tempdata = {}
+					console.log('item-->',item)
+					tempdata._id = item._id
+					tempdata.id = item.id
+					tempdata.ksname = item.ksname
+					tempdata.ksriqi = item.ksriqi
+					tempdata.ksshijian = item.ksshijian
+					tempdata.danxuan_fenzhi = item.danxuan_fenzhi
+					tempdata.danxuan_num = item.danxuan_num
+					tempdata.duoxuan_num = item.duoxuan_num
+					tempdata.duoxuan_fenzhi = item.duoxuan_fenzhi
+					tempdata.panduan_fenzhi = item.panduan_fenzhi
+					tempdata.panduan_num = item.panduan_num
+					tempdata.kslianjie = item.kslianjie
+					tempdata.ckcs = item.ckcs
+					item.per_of_modal.forEach(function(it,ind){
+						console.log(it)
+						tempdata['mokuai' + ind] = it.name +' (单选:' + it.num_danxuan + ',多选:'+ it.num_duoxuan + ',判断:' + it.num_panduan+')'
+						//tempdata['mokuai' + ind] = it.name +' (' + it.percent + '%)'
+						//tempdata['is_correct' + ind] = it.is_correct
+						console.log(tempdata)
+					})
+					data.push(tempdata)
+					delete tempdata
+				})
+				//data.count = total
+				console.log('返回数据-->',data)
+				cb(null,data)
+		}
+	],function(error,result){
+		if(error){
+			console.log('search err-->',err.stack)
+			return res.json({'code':-1,'msg':err.stack,'count':0,'data':''})
+		}
+		return res.json({'code':0,'msg':'获取数据成功','count':result.length,'data':result})
+	})
+})
 router.post('/delete_sjlbitem',function(req,res){
 	let _id = req.body._id
 	console.log('_id-->',_id)
@@ -1118,6 +1196,122 @@ router.get('/new_firststep',function(req,res){
     }
 
     console.log('tem_arr-->',tem_arr)
+
+    let sjsz_id = 1
+    let search = sjsz.find({},{'id':1})
+		search.sort({'id':-1})
+		search.limit(1)
+		search.exec(function(err,doc){
+			if(err){
+				console.log('search err-->',err)
+				return res.json({'code':-1,'msg':err,stack})
+			}
+			if(doc && doc.length != 0){
+				sjsz_id = doc[0].id + 1
+			}
+
+			let new_sjsz = new sjsz({
+				id : sjsz_id,
+		    	ksname : req.body.ksname,
+		        ksriqi : req.body.ksriqi,
+		        ksshijian : req.body.ksshijian,
+		        danxuan_fenzhi : req.body.danxuan_fenzhi,
+		        danxuan_num : req.body.danxuan_num,
+		        duoxuan_fenzhi : req.body.duoxuan_fenzhi,
+		        duoxuan_num : req.body.duoxuan_num,
+		        panduan_fenzhi : req.body.panduan_fenzhi,
+		        panduan_num : req.body.panduan_num,
+		        per_of_modal : tem_arr,
+		        kslianjie:baselink+randomStr,
+		        randomStr:randomStr,
+		        ckcs : ckcs
+		    })
+		    console.log('new_sjsz-->',new_sjsz)
+			new_sjsz.save(function(err,docc){
+				if(err){
+					console.log('save err-->',err)
+					return res.json({'code':-1,'msg':err})
+				}
+				let search = sjsz.find({ '_id' : { '$ne' : docc._id } })
+				search.exec(function(err,doc){
+	   				if(err){
+	   					console.log('sjsz find dangqian!=0 err---->',err)
+	   					return res.json({'code':-1,'msg':err})
+	   				}
+	   				console.log('doc length ---->',doc.length)
+	   				async.eachLimit(doc,1,function(item,callback){
+	   					sjsz.update({'_id':item._id},{'dangqian':0},function(e){
+	   						if(e){
+	   							console.log('sjsz eachLimit e ---->',e)
+	   							return res.json({'code':1,'msg':e})
+	   							callback(e)
+	   						}
+	   						console.log('sjsz eachLimit success ')
+	   						callback()
+	   					})
+	   				},function(error){
+	   					if(error){
+	   						console.log('sjsz eachLimit error---->',error)
+	   						return res.json({'code':-1,'msg':error})
+	   					}
+	   					console.log('sjsz eachLimit success')
+	   					return res.json({'code':0,'msg':'设置成功'})
+	   				})
+	   			})
+				//return res.json({'code':0,'msg':'设置成功'})
+			})
+		})
+}).post('/new_step',function(req,res){
+	let ksname = req.body.ksname,
+        ksriqi = req.body.ksriqi,
+        ksshijian = req.body.ksshijian,
+        danxuan_fenzhi = req.body.danxuan_fenzhi,
+        danxuan_num = req.body.danxuan_num,
+        duoxuan_fenzhi = req.body.duoxuan_fenzhi,
+        duoxuan_num = req.body.duoxuan_num,
+        panduan_fenzhi = req.body.panduan_fenzhi,
+        panduan_num = req.body.panduan_num,
+        per_of_modal = req.body.modal_arr,
+        ckcs = req.body.ckcs ? req.body.ckcs : 3
+    console.log('ckcs-->',ckcs)
+    console.log('per_of_modal-->',JSON.parse(per_of_modal))
+    //console.log('req.body-->',req.body)
+    //console.log('req.body-->',JSON.parse(req.body))
+    //return false
+    let temp_timeStamp = moment().format('X'),
+		temp_num = temp_timeStamp.substring(6),
+		temp_randomStr = random_str(),
+		randomStr = temp_num + temp_randomStr
+
+    let tem_arr = [],
+    	fuck = JSON.parse(per_of_modal)
+
+    fuck.forEach(function(item,index){
+    	let temp_per_of_modal = {}
+    	console.log('item-->',item)
+    	temp_per_of_modal.id = item.id
+    	temp_per_of_modal.name = item.name
+    	temp_per_of_modal.percent =0//都设为0
+    	//计算各模块对应题型的抽取数量
+    	//temp_per_of_modal.num_danxuan = Math.round(danxuan_num*item.percent/100)
+    	//temp_per_of_modal.num_duoxuan = Math.round(duoxuan_num*item.percent/100)
+    	//temp_per_of_modal.num_panduan = Math.round(panduan_num*item.percent/100)
+    	temp_per_of_modal.num_danxuan = item.danxuan
+    	temp_per_of_modal.num_duoxuan = item.duoxuan
+    	temp_per_of_modal.num_panduan = item.panduan
+    	temp_per_of_modal.mokuaizongfen = item.mokuaizongfen
+    	tem_arr.push(temp_per_of_modal)
+    	delete temp_per_of_modal
+    	//console.log('tem_arr-->',tem_arr)
+    })
+    let check_danxuan = 0,
+    	check_duoxuan = 0,
+    	check_panduan = 0
+    console.log('tem_arr',tem_arr)
+    console.log()
+    console.log()
+
+    //console.log('tem_arr-->',tem_arr)
 
     let sjsz_id = 1
     let search = sjsz.find({},{'id':1})
@@ -1435,8 +1629,7 @@ router.post('/editsj',function(req,res){
         ckcs = req.body.ckcs ? req.body.ckcs : 3,
         youxiao = req.body.youxiao,
         dangqian = req.body.dangqian
-    console.log('panduan_num-->',panduan_num)
-    console.log('per_of_modal-->',JSON.parse(per_of_modal))
+    
 
     let tem_arr = [],
     	fuck = JSON.parse(per_of_modal)
@@ -1446,81 +1639,20 @@ router.post('/editsj',function(req,res){
     	console.log('item-->',item)
     	temp_per_of_modal.id = item.id
     	temp_per_of_modal.name = item.name
-    	temp_per_of_modal.percent = item.percent
+    	temp_per_of_modal.percent = 0
     	//计算各模块对应题型的抽取数量
-    	temp_per_of_modal.num_danxuan = Math.round(danxuan_num*item.percent/100)
-    	temp_per_of_modal.num_duoxuan = Math.round(duoxuan_num*item.percent/100)
-    	temp_per_of_modal.num_panduan = Math.round(panduan_num*item.percent/100)
+    	temp_per_of_modal.num_danxuan = item.danxuan
+    	temp_per_of_modal.num_duoxuan = item.duoxuan
+    	temp_per_of_modal.num_panduan = item.panduan
+    	temp_per_of_modal.mokuaizongfen = item.mokuaizongfen
     	tem_arr.push(temp_per_of_modal)
     	delete temp_per_of_modal
     	//console.log('tem_arr-->',tem_arr)
     })
-    let check_danxuan = 0,
-    	check_duoxuan = 0,
-    	check_panduan = 0
-    console.log('tem_arr',tem_arr)
-    console.log()
-    console.log()
-    tem_arr.forEach(function(item,index){
-    	check_danxuan += item.num_danxuan
-    	check_duoxuan += item.num_duoxuan
-    	check_panduan += item.num_panduan
-    	if(check_danxuan>danxuan_num){
-    		console.log('danxuan超过咯')
-    		let chaoguo = check_danxuan - danxuan_num
-    		if(item.percent != 0){
-    			item.num_danxuan = item.num_danxuan - chaoguo
-    			if(item.num_danxuan < 0){
-    				item.num_danxuan = 0
-    			}
-    		}
-    		console.log('单选超过多少---->',chaoguo)
-    	}
-    	if(check_duoxuan>duoxuan_num){
-    		console.log('duoxuan超过咯')
-    		let chaoguo = check_duoxuan - duoxuan_num
-    		if(item.percent != 0){
-    			item.num_duoxuan = item.num_duoxuan - chaoguo
-    			if(item.num_duoxuan < 0){
-    				item.num_duoxuan = 0
-    			}
-    		}
-    		console.log('多选超过多少---->',chaoguo)
-    	}
-    	if(check_panduan>panduan_num){
-    		console.log('panduan超过咯')
-    		let chaoguo = check_panduan - panduan_num
-    		if(item.percent != 0){
-    			item.num_panduan = item.num_panduan - chaoguo
-    			if(item.num_panduan < 0){
-    				item.num_panduan = 0
-    			}
-    		}
-    		console.log('判断超过多少---->',chaoguo)
-    	}
-    })
-    if(check_panduan < panduan_num){
-    	console.log('判断题数不够')
-    	let queshao = panduan_num - check_panduan
-    		tem_arr[0].num_panduan = tem_arr[0].num_panduan + queshao
-    		console.log('判断缺少多少---->',queshao)
-    }
-    if(check_danxuan<danxuan_num){
-    	console.log('danxuan还缺少咯')
-    	let queshao = danxuan_num - check_danxuan
-    	tem_arr[0].num_danxuan = tem_arr[0].num_danxuan + queshao
-    	console.log('单选缺少多少---->',queshao)
-    }
-    if(check_duoxuan<duoxuan_num){
-    	console.log('duoxuan还缺少咯')
-    	let queshao = duoxuan_num - check_duoxuan
-    	tem_arr[0].num_duoxuan = tem_arr[0].num_duoxuan + queshao
-    	console.log('多选缺少多少---->',queshao)
-    }
 
     console.log('tem_arr-->',tem_arr)
-
-   sjsz.update({'_id':_id},{'dangqian':dangqian,'youxiao':youxiao,'ksname':ksname,'ksshijian':ksshijian,'danxuan_num':danxuan_num,'danxuan_fenzhi':danxuan_fenzhi,'duoxuan_num':duoxuan_num,'duoxuan_fenzhi':duoxuan_fenzhi,'panduan_num':panduan_fenzhi,'panduan_num':panduan_num,'ckcs':ckcs,'per_of_modal':tem_arr},function(err){
+    console.log(_id,dangqian,youxiao)
+   sjsz.update({'_id':_id},{'dangqian':dangqian,'youxiao':youxiao,'ksname':ksname,'ksshijian':ksshijian,'danxuan_fenzhi':danxuan_fenzhi,'danxuan_num':danxuan_num,'duoxuan_fenzhi':duoxuan_fenzhi,'duoxuan_num':duoxuan_num,'panduan_fenzhi':panduan_fenzhi,'panduan_num':panduan_num,'per_of_modal':tem_arr,'ckcs':ckcs},function(err){
 	   	if(err){
 	   		console.log('update sjsz err-->',err)
 	   		return res.json({'code':-1,'msg':err})

@@ -128,25 +128,50 @@
           </div>
           
           <div class="layui-form-item">
-          <%detail.per_of_modal.forEach(function(item,index){%>
               <div class="layui-inline">
-                <label class="layui-form-label"><%=item.name%></label>
-                <div class="layui-input-inline">
-                  <input type="text" name="<%=item.name%>" id="<%=index%>" class="layui-input" value="<%=item.percent%>" lay-verify="<%=index%>" >
+                <label class="layui-form-label">模块\题型</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="" id="mkdanxuan" placeholder="" class="layui-input" lay-verify="" value='单选' disabled="" style="color:red;font-weight: bold;">
                 </div>
-                <div class="layui-form-mid layui-word-aux">%</div>
+                <div class="layui-form-mid">+</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="" id="mkduoxuan" placeholder="" class="layui-input" lay-verify="" value='多选' disabled="" style="color:red;font-weight: bold;">
+                </div>
+                <div class="layui-form-mid">+</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="" id="mkpanduan" placeholder="" class="layui-input" lay-verify="" value='判断' disabled="" style="color:red;font-weight: bold;">
+                </div>
+                <div class="layui-form-mid">=</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="" id="mkzongfen" placeholder="" class="layui-input" lay-verify="" value='模块总分' disabled="" style="color:red;font-weight: bold;">
+                </div>
               </div>
-              
-          <%})%>
           </div>
 
-          <div class="layui-form-item">
-              <label class="layui-form-label">百分比之和</label>
-              <div class="layui-input-block">
-                <input type="text" name="all_percent" id="all_percent" placeholder="" class="layui-input" value='<%=detail.allpercent%>' style="color: red;" disabled>
+          <%detail.per_of_modal.forEach(function(item,index){%>
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <label class="layui-form-label"><%=item.name%></label>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="<%=index+1%>" id="<%=index+1%>" placeholder="单选" class="layui-input" lay-verify="<%=index+1%>" value='<%=item.num_danxuan%>'>
+                </div>
+                <div class="layui-form-mid">+</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="<%=index+1%><%=index%>" id="<%=index+1%><%=index%>" placeholder="多选" class="layui-input" lay-verify="<%=index+1%><%=index%>" value='<%=item.num_duoxuan%>'>
+                </div>
+                <div class="layui-form-mid">+</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="<%=index+1%><%=index%><%=index%>" id="<%=index+1%><%=index%><%=index%>" placeholder="判断" class="layui-input" lay-verify="<%=index+1%><%=index%><%=index%>" value='<%=item.num_panduan%>'>
+                </div>
+                <div class="layui-form-mid">=</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                  <input type="text" name="<%=index+1%><%=index%><%=index%><%=index%>" id="<%=index+1%><%=index%><%=index%><%=index%>" placeholder="模块总分" class="layui-input" lay-verify="<%=index+1%><%=index%><%=index%><%=index%>" value='<%=item.mokuaizongfen%>' disabled="" style="color: red;">
+                </div>
               </div>
-              <!-- <div class="layui-form-mid layui-word-aux">%</div> -->
             </div>
+          <%})%>
+
+          
 
           <div class="layui-form-item">
             <label class="layui-form-label">考试链接</label>
@@ -178,14 +203,24 @@ $(function(){
     var all_percent = 0,
       temp_choose = ''
   //自定义验证规则  
-        form.verify({  
+        form.verify({ 
           <%detail.per_of_modal.forEach(function(item,index){%>
-            <%=index%>:function(value){
+            <%=index+1%>:function(value){
               if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
                     return '必须是大于0的整数';  
                   }
             },
-            <%})%>
+            <%=index+1%><%=index%>:function(value){
+              if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                    return '必须是大于0的整数';  
+                  }
+            },
+            <%=index+1%><%=index%><%=index%>:function(value){
+              if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                    return '必须是大于0的整数';  
+                  }
+            },
+            <%})%> 
               ksshijian: function(value){  
                 if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
                   return '考试时间必须是大于0的整数';  
@@ -227,6 +262,7 @@ $(function(){
                 } 
               }
         });
+  var temp_choose_1='',temp_choose_2='',temp_choose_3='',temp_mokuai='';
   $('input').on('input propertychange',function(data){
           let temp1 = $('#danxuan_fenzhi').val() ? $('#danxuan_fenzhi').val() : 0,
               temp2 = $('#danxuan_num').val() ? $('#danxuan_num').val() : 0,
@@ -241,27 +277,41 @@ $(function(){
           console.log('试卷分值-->',sjfz)
           console.log('sjsz-->',$('#sjfz').attr("value"))
           $('#sjfz').attr("value",sjfz)
-          let all_percent_1 = 0
+          let all_percent_1 = 0,mokuaizongfen = 0
+          var mkdanxuan = 0,mkduoxuan = 0,mkpanduan = 0,mkzongfen = 0
+
           <%for(let i=0;i<detail.per_of_modal.length;i++){%>
-            
-            temp_choose = '#' + <%=i%>
-            console.log('temp_choose-->',temp_choose)
-            if($(temp_choose).val()){
-              if(typeof(parseInt($(temp_choose).val()))==='number'){
-                console.log(typeof(parseInt($(temp_choose).val())))
-                console.log($(temp_choose).val())
-                all_percent_1 += parseInt($(temp_choose).val())
-                console.log('all_percent_1-->',all_percent_1)
-                console.log(<%=i%>)
-              }else{
-                console.log('没有值')
-                console.log(typeof(parseInt($(temp_choose).val())))
-              }
+            //获取每个模块总分
+            temp_choose_1 = '#' + <%=i+1%>
+            console.log('模块单选选择器-->',temp_choose_1)
+            temp_choose_2 = '#' + <%=i+1%><%=i%>
+            console.log('模块多选选择器-->',temp_choose_2)
+            temp_choose_3 = '#' + <%=i+1%><%=i%><%=i%>
+            console.log('模块判断选择器-->',temp_choose_3)
+            temp_mokuai = '#' + <%=i+1%><%=i%><%=i%><%=i%>
+            if($(temp_choose_1).val() && $(temp_choose_2).val() && $(temp_choose_3).val()){
+              mokuaizongfen = parseInt($(temp_choose_1).val()*$('#danxuan_fenzhi').val())+parseInt($(temp_choose_2).val()*$('#duoxuan_fenzhi').val())+parseInt($(temp_choose_3).val()*$('#panduan_fenzhi').val())
+              console.log('模块总分-->',mokuaizongfen)
+              $(temp_mokuai).attr("value",mokuaizongfen)
+              mkzongfen += mokuaizongfen
+              $(temp_mokuai).attr("value",mokuaizongfen)
+              $('#mkzongfen').attr("value",'总分：'+mkzongfen)
+            }else{
+              console.log('还没填写完整')
             }
-            console.log('dddd-->',all_percent_1)
-            console.log('ffff-->',parseInt($(temp_choose).val()))
+            if($(temp_choose_1).val()){
+              mkdanxuan += parseInt($(temp_choose_1).val())
+              $('#mkdanxuan').attr("value",'单选：'+mkdanxuan)
+            }
+            if($(temp_choose_2).val()){
+              mkduoxuan += parseInt($(temp_choose_2).val())
+              $('#mkduoxuan').attr("value",'多选：'+mkduoxuan)
+            }
+            if($(temp_choose_3).val()){
+              mkpanduan += parseInt($(temp_choose_3).val())
+              $('#mkpanduan').attr("value",'多选：'+mkpanduan)
+            }
           <%}%>
-          $('#all_percent').attr("value",all_percent_1)
           
           //$('#all_percent').attr("value",all_percent_1)
   })//input
@@ -277,6 +327,8 @@ $(function(){
                 }); 
             return false;
           }
+
+          //获取所有的值
           //获取所有的值
           let ksname = $('#ksname').val(),
               _id = '<%=detail._id%>',
@@ -295,36 +347,81 @@ $(function(){
               obj = {},
               tem_arr = [],
               tem_choose = ''
-          
+
+          let te_danxuan = 0,
+              te_duoxuan = 0,
+              te_panduan = 0
+
           <%detail.per_of_modal.forEach(function(item,index){%>
-              console.log('item,index-->')
               obj.id = <%=index%>
-              
-              tem_choose = '#' + <%=index%>
-              console.log('tem_choose$-->',tem_choose)
-              obj.percent = $(tem_choose).val()
-              all_percent += parseInt($(tem_choose).val())
-              console.log('all_percent-->',all_percent)
-              obj.name = $(tem_choose).attr('name')
+              obj.name = '<%=item.name%>'
+              obj.danxuan = parseInt($('#' + (<%=index%>+1)).val())
+              obj.duoxuan = parseInt($('#' + (<%=index%>+1) + <%=index%>).val())
+              obj.panduan = parseInt($('#' + (<%=index%>+1)+ <%=index%>+ <%=index%>).val())
+              obj.mokuaizongfen = parseInt($('#' + (<%=index%>+1)+ <%=index%>+ <%=index%>+ <%=index%>).val())
               tem_arr.push(obj)
+              te_danxuan += parseInt($('#' + (<%=index%>+1)).val())
+              te_duoxuan += parseInt($('#' + (<%=index%>+1) + <%=index%>).val())
+              te_panduan += parseInt($('#' + (<%=index%>+1)+ <%=index%>+ <%=index%>).val())
               obj = {}
           <%})%>
-          console.log('tem_arr-->',tem_arr)
-          if(all_percent!==100){
-            layer.open({
+
+          console.log('te_danxuan-->',te_danxuan)
+          console.log('te_duoxuan-->',te_danxuan)
+          console.log('te_panduan-->',te_panduan)
+          //console.log('tem_arr-->',tem_arr)
+          //return false
+          if(te_danxuan!=$('#danxuan_num').val()){
+            if(te_danxuan>parseInt($('#danxuan_num').val())){
+              layer.open({
                   title: '提示',
-                  content: '模块百分比之和需为100%',
-                  end:function(){
-                    all_percent = 0
-                    $('#all_percent').attr('value',0)
-                    //$('#clear_per').click()
-                  }
+                  content: '模块单选题超出设置，请检查',
+                  end:function(){}                 
+              }); 
+              return false
+            }else{
+              layer.open({
+                  title: '提示',
+                  content: '模块单选题少于设置，请检查',
+                  end:function(){}
                 }); 
-            
-            return false
+              return false
+            }
           }
-          
-          console.log('all args-->',_id,ksname,ksshijian,danxuan_num,danxuan_fenzhi,duoxuan_num,duoxuan_fenzhi,panduan_num,panduan_fenzhi,ckcs)
+          if(te_duoxuan!=$('#duoxuan_num').val()){
+            if(te_danxuan>parseInt($('#duoxuan_num').val())){
+              layer.open({
+                  title: '提示',
+                  content: '模块多选题超出设置，请检查',
+                  end:function(){}                 
+              }); 
+              return false
+            }else{
+              layer.open({
+                  title: '提示',
+                  content: '模块多选题少于设置，请检查',
+                  end:function(){}
+                }); 
+              return false
+            }
+          }
+          if(te_panduan!=$('#panduan_num').val()){
+            if(te_panduan>parseInt($('#panduan_num').val())){
+              layer.open({
+                  title: '提示',
+                  content: '模块判断题超出设置，请检查',
+                  end:function(){}                 
+              }); 
+              return false
+            }else{
+              layer.open({
+                  title: '提示',
+                  content: '模块判断题少于设置，请检查',
+                  end:function(){}
+                }); 
+              return false
+            }
+          }
           //console.log('tem_arr-->',tem_arr)
           $.ajax({
             url:'/dxxxhjs/manage/editsj',

@@ -34,7 +34,8 @@ $(function(){
       ,style: 'background-color: #5FB878; color: #fff;'//高度最大化
       ,height: 'full-200'//高度最大化
       ,cellMinWidth: 50//列宽自动分配
-      ,url: '/dxxxhjs/manage/sjlb_data' //数据接口
+      ,url: '/dxxxhjs/manage/newsjlb_data' //数据接口
+      //,url: '/dxxxhjs/manage/sjlb_data' //数据接口
       ,page: true //开启分页
       ,id: 'reload_tb'
       ,cols:  [[ //标题栏
@@ -47,7 +48,7 @@ $(function(){
         ,{field: 'panduan_num', title: '判断题', align: 'center',rowspan: 2}
         ,{field: 'kslianjie', title: '考试链接', align: 'center',rowspan: 2}
         ,{field: 'ckcs', title: '可考次数', align: 'center',rowspan: 2}
-        ,{align: 'center', title: '模块比例', colspan: 9}
+        ,{align: 'center', title: '模块题数详情', colspan: 9}
         ,{align: 'center',field:'caozuo', title: '操作', width:180,toolbar:"#toolbar" ,rowspan: 2}
       ],
       [
@@ -55,11 +56,11 @@ $(function(){
         ,{field: 'mokuai1', align: 'center', title: '模块2',templet: '#mokuai1Tpl'}
         ,{field: 'mokuai2', align: 'center', title: '模块3',templet: '#mokuai2Tpl'}
         ,{field: 'mokuai3', align: 'center', title: '模块4',templet: '#mokuai3Tpl'}
-        ,{field: 'mokuai4', align: 'center', title: '模块5',templet: '#mokuai5Tpl'}
-        ,{field: 'mokuai5', align: 'center', title: '模块6',templet: '#mokuai6Tpl'}
-        ,{field: 'mokuai6', align: 'center', title: '模块7',templet: '#mokuai7Tpl'}
-        ,{field: 'mokuai7', align: 'center', title: '模块8',templet: '#mokuai8Tpl'}
-        ,{field: 'mokuai8', align: 'center', title: '模块9',templet: '#mokuai9Tpl'}
+        ,{field: 'mokuai4', align: 'center', title: '模块5',templet: '#mokuai4Tpl'}
+        ,{field: 'mokuai5', align: 'center', title: '模块6',templet: '#mokuai5Tpl'}
+        ,{field: 'mokuai6', align: 'center', title: '模块7',templet: '#mokuai6Tpl'}
+        ,{field: 'mokuai7', align: 'center', title: '模块8',templet: '#mokuai7Tpl'}
+        ,{field: 'mokuai8', align: 'center', title: '模块9',templet: '#mokuai8Tpl'}
       ]]
     })//table
 

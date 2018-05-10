@@ -24,6 +24,29 @@
       <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     <style type="text/css">
+      .layui-layer-dialog .layui-layer-content{
+        text-align: left;
+        
+      }
+      .layui-layer-title{
+        font-size: 22px!important;
+        font-weight: bold;
+      }
+      .layui-layer-content p{
+        font-size: 14px;
+        margin-top: 14px;
+      }
+      /*.layui-layer-btn a{
+        height: 40px !important;
+        line-height: 40px !important;
+      }
+      .layui-layer-btn{
+        position: absolute;
+        right: 400px;
+        top: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }*/
       .has-success .form-control-feedback{
         display: none;
         color: #333!important;
@@ -40,7 +63,7 @@
       .time-item{
           position:fixed;
           margin-top:150px;
-          left: 309px;
+          left: 15px;
           max-width: 250px;
           background:#812D4E;
           color:#fff;
@@ -53,7 +76,11 @@
           box-shadow:1px 1px 3px rgba(0,0,0,0.2);
       }
       .leftbar{
-        left: 441px!important;
+        left: 15px!important;
+      }
+      #loadprogress{
+            color: red;
+        font-size: 14px;
       }
       body{
         /*opacity:0.9;  
@@ -88,6 +115,21 @@
     overflow-y: scroll;
         /*opacity:0.9;  
         filter:alpha(opacity=70);  */
+      }
+      .layui-layer-page .layui-layer-content{
+        text-align: left;
+            padding: 10px 25px;
+      }
+      /*.layui-layer-content{
+        height: 405px!important;
+      }*/
+      .layui-layer-content p{
+        font-size: 15px;
+      }
+      .layui-layer-btn-c{
+        position: absolute;
+        top: 400px;
+        left: 310px;
       }
     </style>
   </head>
@@ -141,7 +183,7 @@
                                 <fieldset class='fieldset' id='fieldset1'>
                                     <!-- 一个DIV一个题目 -->
                                     <div class="page-header">
-                                      <h4>一、单选题(该部分共有<%=result.res_danxuan_arr.length%>小题,每小题<%=ksinfo.danxuan_fenzhi%>分)</h4>
+                                      <h4>一、单选题(该部分共有<%=result.res_danxuan_arr.length%>小题)</h4>
                                     </div>
                                     <%result.res_danxuan_arr.forEach(function(item,index){%>
                                       <div class='div_question' id='div<%=index+1%>'>
@@ -178,7 +220,7 @@
                                       </div>
                                     <%})%>
                                     <div class="page-header">
-                                      <h4>二、多选题(该部分共有<%=result.res_duoxuan_arr.length%>小题,每小题<%=ksinfo.duoxuan_fenzhi%>分)</h4>
+                                      <h4>二、多选题(该部分共有<%=result.res_duoxuan_arr.length%>小题)</h4>
                                     </div>
                                     <%result.res_duoxuan_arr.forEach(function(item,index){%>
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+index+1%>'>
@@ -215,7 +257,7 @@
                                       </div>
                                     <%})%>
                                     <div class="page-header">
-                                      <h4>三、判断题(该部分共有<%=result.res_panduan_arr.length%>小题,每小题<%=ksinfo.panduan_fenzhi%>分)</h4>
+                                      <h4>三、判断题(该部分共有<%=result.res_panduan_arr.length%>小题)</h4>
                                     </div>
                                     <%result.res_panduan_arr.forEach(function(item,index){%>
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
@@ -642,20 +684,9 @@
                             return s;                                  
                         }
                         
-                        var countdown = getCookie('countdown');
-                        var min_ = 0;
-                        var intDiff = 0;
-                        if(countdown && countdown !== null && countdown !== '' && typeof(countdown) !== 'undefined'){
-                          console.log('countdown存在cookie--->',countdown);
-                          intDiff = parseInt(countdown);
-                        }else{
-                          console.log('countdown 不存在 cookie');
-                          min_ = '<%=ksinfo.ksshijian%>';
-                          intDiff = parseInt(min_*60);
-                          countdown = intDiff;
-                          setCookie('countdown',countdown);
-                          console.log('check cookie--->',document.cookie);
-                        }
+                        var min_ = '<%=ksinfo.ksshijian%>';
+                        var intDiff = parseInt(min_*60);
+
                         $(document).keydown(function () {
                             if ((event.keyCode == 116) || //屏蔽 F5 刷新键
                                 (event.ctrlKey && event.keyCode == 82)) { //Ctrl + R
@@ -663,39 +694,10 @@
                                 event.returnValue = false;
                             }
                         });
-                         window.onbeforeunload=function(e){
-                          //window.event.clientY < 0表示鼠标已经离开了document的区域
-                         if(window.event.clientX>document.body.clientWidth && window.event.clientY < 0 || window.event.altKey) 
-                              {
-                                  alert("是关闭而非刷新");
-                                  setCookie('countdown','');
-                                  //window.event.returnValue ="您是否要离开此页面？";   
-                              }else{
-                                console.log(window.event.clientX)
-                                console.log(document.body.clientWidth)
-                                console.log(window.event.clientY)
-                                console.log(window.event.altKey)
-                                console.log('是刷新而非关闭');
-                                 // alert("是刷新而非关闭");
-                                 // window.event.returnValue ="刷新";  
-                              }
-                          }
+
                         //var intDiff = parseInt(min_*60);//倒计时总秒数量
                         function timer(intDiff){
-                          var countdown = 0;
-                            window.setInterval(function(){
-                              countdown = parseInt(getCookie('countdown') - 60);
-                              
-                              if(countdown > 0){
-                                console.log('countdown---->',countdown);
-                                setCookie('countdown',countdown);
-                              }else{
-                                console.log('结束倒计时');
-                                //销毁cookie
-                                setCookie('countdown','');
-                              }
-                            },60000)
-                            window.setInterval(function(){
+                          window.setInterval(function(){
                             var day=0,
                                 hour=0,
                                 minute=0,
@@ -716,7 +718,6 @@
                             intDiff--;
                             //时间到，自动提交
                             if(intDiff == 0){
-                              setCookie('countdown','')
                               console.log('处理提交')
                               var temp_danxuan = [],
                                   temp_duoxuan = [],
@@ -739,7 +740,7 @@
                                   temp_danxuan.push($(this).attr('timuid') + ':' + $(this).val() + ':' + $(this).attr('daan').substring(0,1));
                                   console.log('temp_danxuan---->',temp_danxuan);
                                 }
-                              });
+                              });//each 判断和单选
                               var temp_duoxuan_arr_1 =  '<%- JSON.stringify(result.res_duoxuan_arr) %>',
                                   //temp_duoxuan_arr = temp_duoxuan_arr_1.replace(/\n/g,'<br />'),
                                   duoxuan_arr = JSON.parse(temp_duoxuan_arr_1),
@@ -765,7 +766,7 @@
                                   temp_duoxuan.push(temp_name + ':' + temp_arr + ':' + temp_choose)
                                   console.log('check temp_duoxuan--->',temp_duoxuan)
                                   temp_arr = []
-                              }
+                              }//for
                               if((danxuan_num==temp_danxuan.length) && (duoxuan_num==temp_duoxuan.length) && (panduan_num==temp_panduan.length)){
                                 console.log('ajax 了')
                                 var randomStr = GetQueryString('code')
@@ -784,17 +785,24 @@
                                       console.log('res.result-->',res.result)
                                       layui.use(['layer'], function(){
                                         var temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
-                                        var layer = layui.layer
-                                            layer.open({
-                                              skin: 'layui-layer-molv', //样式类名
-                                              title: '时间截止，本次考试结果',
-                                              content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span>分</div><div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
-                                              end:function(){
-                                                //跳转
-                                                location.href = '/dxxxhjs/front/myexamlist?w=w' 
-                                                //location.reload()
-                                              }
-                                          }); 
+                                        var layer3 = layui.layer
+                                        layer3.open({
+                                                title: '考试结束',
+                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span>',
+                                                end:function(){
+                                                  location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                                }
+                                            }); 
+                                          //   layer.open({
+                                          //     skin: 'layui-layer-molv', //样式类名
+                                          //     title: '时间截止，本次考试结果',
+                                          //     content: '<div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
+                                          //     end:function(){
+                                          //       //跳转
+                                          //       location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                          //       //location.reload()
+                                          //     }
+                                          // }); 
                                       });
                                     }else{
                                       //console.log('试卷设置成功')
@@ -807,7 +815,6 @@
                               }else{
                                 console.log('题目没有选齐')
                                 console.log('题目没有选齐,强制ajax 了')
-                                setCookie('countdown','')
                                 var randomStr = GetQueryString('code')
                                 console.log('check randomStr-->',randomStr)
                                 $.ajax({
@@ -824,17 +831,24 @@
                                       console.log('res.result-->',res.result)
                                       layui.use(['layer'], function(){
                                         var temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
-                                        var layer = layui.layer
-                                            layer.open({
-                                              skin: 'layui-layer-molv', //样式类名
-                                              title: '时间截止，本次考试结果',
-                                              content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span>分</div><div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
-                                              end:function(){
-                                                //跳转
-                                                location.href = '/dxxxhjs/front/myexamlist?w=w' 
-                                                //location.reload()
-                                              }
-                                          }); 
+                                        var layer4 = layui.layer
+                                            layer4.open({
+                                                title: '考试结束',
+                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span>',
+                                                end:function(){
+                                                  location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                                }
+                                            }); 
+                                          //   layer.open({
+                                          //     skin: 'layui-layer-molv', //样式类名
+                                          //     title: '时间截止，本次考试结果',
+                                          //     content: '<div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
+                                          //     end:function(){
+                                          //       //跳转
+                                          //       location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                          //       //location.reload()
+                                          //     }
+                                          // }); 
                                       });
                                     }else{
                                       //console.log('试卷设置成功')
@@ -848,9 +862,64 @@
                             }
                             }, 1000);
                         } 
+
                         $(function(){
                           console.log('ddddd')
-                            timer(intDiff);
+                          layui.use(['layer'], function(){
+                            var layer1 = layui.layer
+                                layer1.open({
+                                    type: 1
+                                    ,title: '考生须知' //不显示标题栏
+                                    ,closeBtn: false
+                                    ,area: ['780px', '550px']
+                                    ,shade: 0.8,
+                                    offset: '287px'
+                                    ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                                    ,resize: false
+                                    ,btn: ['开始考试']
+                                    ,btnAlign: 'c'
+                                    ,moveType: 1 //拖拽模式，0或者1
+                                    ,content: '<p>1、点击“进入考试”，在登录界面准确填写本人校园卡号和密码，登录后开始考试；在此之前严禁打开其他无关应用程序，以免影响正常考试。</p><p>2、考试题型包括单项选择题、多项选择题以及判断题，共80道题，答题时间为60分钟。</p><p>3、考生完成答题后，点击“提交”，提交成功后方可离开考场。</p><p>4、考生有两次考试机会，如第一次考试没通过，可参加第二次考试，第二次考试时间请留意学校相关通知。</p><p>5、本次考试成绩将结合党课培训的考勤纪律情况评定是否取得结业证书。</p><p>6、考试期间如出现系统故障等考试内容以外的问题，请及时向监考老师反映，不得向其他考生询问。</p><p>7、请严格遵守考场纪律，严禁作弊，一经发现，结业考试成绩无效，并将严肃处理。</p>'
+                                    ,success: function(layero){
+                                      // var btn = layero.find('.layui-layer-btn');
+                                      // btn.find('.layui-layer-btn0').attr({
+                                      //   href: 'http://www.layui.com/'
+                                      //   ,target: '_blank'
+                                      // });
+                                    },
+                                    end:function(){
+                                      console.log('点击确定，计时开始')
+                                      timer(intDiff);
+                                    }
+                                  });
+                            // layer1.open({
+                            //     skin: 'layui-layer-rim', //样式类名
+                            //     title: '考生须知',
+                            //     area: ['780px', '550px'], //宽高
+                            //     btn: ['开始考试'], //只是为了演示
+                            //     offset: '287px',
+                            //     content: '<p>1、点击“进入考试”，在登录界面准确填写本人校园卡号和密码，登录后开始考试；在此之前严禁打开其他无关应用程序，以免影响正常考试。</p><p>2、考试题型包括单项选择题、多项选择题以及判断题，共80道题，答题时间为60分钟。</p><p>3、考生完成答题后，点击“提交”，提交成功后方可离开考场。</p><p>4、考生有两次考试机会，如第一次考试没通过，可参加第二次考试，第二次考试时间请留意学校相关通知。</p><p>5、本次考试成绩将结合党课培训的考勤纪律情况评定是否取得结业证书。</p><p>6、考试期间如出现系统故障等考试内容以外的问题，请及时向监考老师反映，不得向其他考生询问。</p><p>7、请严格遵守考场纪律，严禁作弊，一经发现，结业考试成绩无效，并将严肃处理。</p>',
+                            //     end:function(){
+                            //       console.log('点击确定，计时开始')
+                            //       timer(intDiff);
+                            //     }
+                            // }); 
+                            //$('.layui-layer-btn0').html('开始考试')
+                           })
+                          //加一个layer，点击确定的时候在开始计时
+                          // layui.use(['layer'], function(){
+                          //   var layer = layui.layer
+                          //       layer.open({
+                          //           skin: 'layui-layer-rim', //样式类名
+                          //           title: '考生须知',
+                          //           area: ['840px', '420px'], //宽高
+                          //           content: '<p>1、点击“登录系统”，在登录界面准确填写本人校园卡号和密码，登录后开始考试；在此之前严禁打开其他无关应用程序，以免影响正常考试。</p><p>2、考试题型包括单项选择题、多项选择题以及判断题，共80道题，答题时间为60分钟。</p><p>3、本次考试与党校结业证书挂钩，考试成绩需达到合格及以上水平。</p><p>4、考生完成作答后，请点击“提交”，提交成功后方可离开考场。</p><p>5、考生有两次考试机会，如第一次考试没通过，可参加第二次考试，第二次考试时间请留意学校相关通知。</p><p>6、考试期间如出现系统故障等考试内容以外的问题，请及时向监考老师反映，不得向其他考生询问。</p><p>7、请严格遵守考场纪律，严禁作弊，一经发现，结业考试成绩无效，并将严肃处理。</p>',
+                          //           end:function(){
+                          //             console.log('点击确定，计时开始')
+                                     
+                          //           }
+                          //       }); 
+                          // });
                         }); 
                         </script>
                         <script type="text/javascript">
@@ -932,17 +1001,24 @@
                                       console.log('res.result-->',res.result)
                                       layui.use(['layer'], function(){
                                         var temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
-                                        var layer = layui.layer
-                                            layer.open({
-                                              skin: 'layui-layer-molv', //样式类名
-                                              title: '考试结果',
-                                              content: '<div>本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span>分</div><div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
-                                              end:function(){
-                                                //跳转
-                                                location.href = '/dxxxhjs/front/myexamlist?w=w' 
-                                                //location.reload()
-                                              }
-                                          }); 
+                                        var layer2 = layui.layer
+                                            layer2.open({
+                                                title: '考试结果',
+                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span>',
+                                                end:function(){
+                                                  location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                                }
+                                            }); 
+                                          //   layer.open({
+                                          //     skin: 'layui-layer-molv', //样式类名
+                                          //     title: '考试结果',
+                                          //     content: '<div>用时：<span style="color:red;">' + res.result.res_cha + '</span></div>',
+                                          //     end:function(){
+                                          //       //跳转
+                                          //       location.href = '/dxxxhjs/front/myexamlist?w=w' 
+                                          //       //location.reload()
+                                          //     }
+                                          // }); 
                                       });
                                     }else{
                                       //console.log('试卷设置成功')

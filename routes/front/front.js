@@ -142,6 +142,7 @@ router.get('/ks',function(req,res){//乱序版本
 		console.log('跳转获取ticket')
 
 		if(req.session.student){
+			console.log('11111111111111')
 			console.log('没有ticket,考生有session,直接返回试卷流程')
 			console.log('session-->',req.session.student)
 			let randomStr = req.query.code
@@ -225,7 +226,7 @@ router.get('/ks',function(req,res){//乱序版本
 										})
 								
 							}
-							if(doc && doc.youxiao ==0){
+							if(doc && doc.dangqian ==0){
 								console.log('该考试还没启用')
 								return res.render('front/kserror',{'code':-6,'msg':'该考试还没启用'})
 							}
@@ -324,6 +325,7 @@ router.get('/ks',function(req,res){//乱序版本
 										let name = item.name
 										let e = {}
 										 e.message = name + '这种类型题目数量不足'
+										 //return res.json({'errCode':-1,'msg':item.name+'多选题目数量不足(需要'+num+'道，只有'+docs.length+'道)'})
 										cb(item.name+'多选题目数量不足(需要'+num+'道，只有'+docs.length+'道)')
 										//return res.json({'code':-1,'msg':name + '这种类型题目数量不足'})
 									}
@@ -336,7 +338,7 @@ router.get('/ks',function(req,res){//乱序版本
 					//第三次循环找判断题
 					console.log('第三次循环找判断题')
 					doc.per_of_modal.forEach(function(item,index){
-						let num = parseInt(item.num_duoxuan)
+						let num = parseInt(item.num_panduan)
 						console.log('需要取',num,'道判断题目',item.name)
 						let search = cat.find({})
 							search.where('catname').equals(item.name)
@@ -649,11 +651,14 @@ router.get('/ks',function(req,res){//乱序版本
 			})
 		}
 		else{
+			console.log('222222222222222222222')
 			console.log('没有ticket，去获取ticket')
 			return res.redirect(url)
 		}
 	}else{
+		console.log('3333333333333333333333')
 		if(req.session.student){
+			console.log('4444444444444')
 			console.log('有ticket,也有session')
 			console.log('session-->',req.session.student)
 			let randomStr = req.query.code
@@ -738,7 +743,7 @@ router.get('/ks',function(req,res){//乱序版本
 										})
 								
 							}
-							if(doc && doc.youxiao ==0){
+							if(doc && doc.dangqian ==0){
 								console.log('该考试还没启用')
 								return res.render('front/kserror',{'code':-6,'msg':'该考试还没启用'})
 							}
@@ -1170,6 +1175,7 @@ router.get('/ks',function(req,res){//乱序版本
 			})
 		}
 		else{
+			console.log('555555555555555555555')
 			let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl,
 				//finalReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + 
 				temparr = req.originalUrl.split('&')
@@ -1464,90 +1470,132 @@ router.post('/checkks',function(req,res){
 		},
 		function(cb){
 			console.log('检查单选')
-			async.eachLimit(danxuan_arr,1,function(item,callback){
+			danxuan_arr.forEach(function(item,index){
 				console.log('item---->',item)
 				let temp = item.split(':'),
 					timuid = temp[0],
 					timuda = temp[1],
 					choose = temp[2]
-				console.log('题目id-->',timuid)
-				console.log('对应答案-->',timuda)
-				async.eachLimit(shijuan.res_danxuan_arr,1,function(ite,callback1){
+					console.log('题目id-->',timuid)
+					console.log('对应答案-->',timuda)
+				shijuan.res_danxuan_arr.forEach(function(ite,inde){
 					if(ite._id == timuid){
 						console.log('找到该题,下面判断该题答案是否正确',ite)
-						async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+						ite.xuanxiang.forEach(function(it,ind){
 							if(it._id == timuda && it.is_correct == true){
 								console.log('该题答对了,该题是',it)
 								danxuan_defen += danxuan_fenzhi 
 								danxuan_dadui++
 								console.log('danxuan_defen',danxuan_defen)
 								ite.correct = 1
-								callback2()
-							}
-							else{
-								//ite.correct = 0
+							}else{
 								console.log('该题答错了')
-								callback2()
 							}
-						},function(e){
-							if(e){
-								console.log('xuanxiang eachLimit e',e)
-								callback1(e)
-							}
-							ite.choose = choose
-							console.log('检查选择的答案-->',choose)
-							console.log('检查ite-->',ite)
-							callback1()
 						})
+						ite.choose = choose
+						console.log('检查选择的答案-->',choose)
+						console.log('检查ite-->',ite)
 					}
-					else{
-						console.log('还在循环找题')
-						callback1()
-					}
-				},function(er){
-					if(er){
-						console.log('shijuan.res_danxuan_arr eachLimit er',er)
-						callback(er)
-					}
-					callback()
 				})
-				//callback()
-			},function(err){
-				if(err){
-					console.log('eachLimit danxuan_arr err-->',err)
-					cb(err)
-				}
-				else{
-					console.log('单选检查结束,每道题分值,答对,共得分',danxuan_fenzhi,danxuan_dadui,danxuan_defen)
-					//这里更新一下试卷
-					stu_exam.update({'_id':shijuan._id},{'res_danxuan_arr':shijuan.res_danxuan_arr},function(err){
-						if(err){
-							console.log('update shijuan.res_danxuan_arr err',err)
-							cb(err)
-						}
+			})
+			console.log('单选检查结束,每道题分值,答对,共得分',danxuan_fenzhi,danxuan_dadui,danxuan_defen)
+				//这里更新一下试卷
+				stu_exam.update({'_id':shijuan._id},{'res_danxuan_arr':shijuan.res_danxuan_arr},function(err){
+					if(err){
+						console.log('update shijuan.res_danxuan_arr err',err)
+						cb(err)
+					}else{
 						console.log('update shijuan.res_danxuan_arr success')
 						console.log()
 						console.log()
 						console.log()
 						cb()
-					})
-				}
-			})
+					}
+				})
+			// async.eachLimit(danxuan_arr,1,function(item,callback){
+			// 	console.log('item---->',item)
+			// 	let temp = item.split(':'),
+			// 		timuid = temp[0],
+			// 		timuda = temp[1],
+			// 		choose = temp[2]
+			// 	console.log('题目id-->',timuid)
+			// 	console.log('对应答案-->',timuda)
+			// 	async.eachLimit(shijuan.res_danxuan_arr,1,function(ite,callback1){
+			// 		if(ite._id == timuid){
+			// 			console.log('找到该题,下面判断该题答案是否正确',ite)
+			// 			async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+			// 				if(it._id == timuda && it.is_correct == true){
+			// 					console.log('该题答对了,该题是',it)
+			// 					danxuan_defen += danxuan_fenzhi 
+			// 					danxuan_dadui++
+			// 					console.log('danxuan_defen',danxuan_defen)
+			// 					ite.correct = 1
+			// 					callback2()
+			// 				}
+			// 				else{
+			// 					//ite.correct = 0
+			// 					console.log('该题答错了')
+			// 					callback2()
+			// 				}
+			// 			},function(e){
+			// 				if(e){
+			// 					console.log('xuanxiang eachLimit e',e)
+			// 					callback1(e)
+			// 				}
+			// 				ite.choose = choose
+			// 				console.log('检查选择的答案-->',choose)
+			// 				console.log('检查ite-->',ite)
+			// 				callback1()
+			// 			})
+			// 		}
+			// 		else{
+			// 			//console.log('还在循环找题')
+			// 			callback1()
+			// 		}
+			// 	},function(er){
+			// 		if(er){
+			// 			console.log('shijuan.res_danxuan_arr eachLimit er',er)
+			// 			callback(er)
+			// 		}
+			// 		callback()
+			// 	})
+			// 	//callback()
+			// },function(err){
+			// 	if(err){
+			// 		console.log('eachLimit danxuan_arr err-->',err)
+			// 		cb(err)
+			// 	}
+			// 	else{
+			// 		console.log('单选检查结束,每道题分值,答对,共得分',danxuan_fenzhi,danxuan_dadui,danxuan_defen)
+			// 		//这里更新一下试卷
+			// 		stu_exam.update({'_id':shijuan._id},{'res_danxuan_arr':shijuan.res_danxuan_arr},function(err){
+			// 			if(err){
+			// 				console.log('update shijuan.res_danxuan_arr err',err)
+			// 				cb(err)
+			// 			}
+			// 			console.log('update shijuan.res_danxuan_arr success')
+			// 			console.log()
+			// 			console.log()
+			// 			console.log()
+			// 			cb()
+			// 		})
+			// 	}
+			// })
 		},
 		function(cb){
 			console.log('检查判断')
-			async.eachLimit(panduan_arr,1,function(item,callback){
+			panduan_arr.forEach(function(item,index){
 				console.log('item---->',item)
 				let temp = item.split(':'),
 					timuid = temp[0],
 					timuda = temp[1],
 					choose = temp[2]
-				console.log('题目id-->',timuid)
-				console.log('对应答案-->',timuda)
-				async.eachLimit(shijuan.res_panduan_arr,1,function(ite,callback1){
+					console.log('题目id-->',timuid)
+					console.log('对应答案-->',timuda)
+				shijuan.res_panduan_arr.forEach(function(ite,inde){
 					if(ite._id == timuid){
 						console.log('找到该题,下面判断该题答案是否正确',ite)
-						async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+						ite.xuanxiang.forEach(function(it,ind){
 							if(it._id == timuda && it.is_correct == true){
 								console.log('该题答对了,该题是',it)
 								panduan_defen += panduan_fenzhi 
@@ -1555,62 +1603,104 @@ router.post('/checkks',function(req,res){
 								ite.correct = 1
 								console.log('ite.correct--->',ite.correct)
 								console.log('panduan_defen',panduan_defen)
-								callback2()
-							}
-							else{
-								//ite.correct = 0
+							}else{
 								console.log('该题答错了')
-								console.log('ite.correct--->',ite.correct)
-								callback2()
 							}
-						},function(e){
-							if(e){
-								console.log('xuanxiang eachLimit e',e)
-								callback1(e)
-							}
-							ite.choose = choose
-							console.log('检查选择的答案-->',choose)
-							console.log('检查ite-->',ite)
-							callback1()
 						})
+						ite.choose = choose
+						console.log('检查选择的答案-->',choose)
+						console.log('检查ite-->',ite)
 					}
-					else{
-						console.log('还在循环找题')
-						callback1()
-					}
-				},function(er){
-					if(er){
-						console.log('shijuan.res_panduan_arr eachLimit er',er)
-						callback(er)
-					}
-					callback()
 				})
-				//callback()
-			},function(err){
-				if(err){
-					console.log('eachLimit panduan_arr err-->',err)
-					cb(err)
-				}
-				else{
-					console.log('判断检查结束,每道题分值,答对,共得分',panduan_fenzhi,panduan_dadui,panduan_defen)
-					//这里更新一下试卷
-					stu_exam.update({'_id':shijuan._id},{'res_panduan_arr':shijuan.res_panduan_arr},function(err){
-						if(err){
-							console.log('update shijuan.res_panduan_arr err',err)
-							cb(err)
-						}
-						console.log('update shijuan.res_panduan_arr success')
-						console.log()
-						console.log()
-						console.log()
-						cb()
-					})
-				}
 			})
+			console.log('判断检查结束,每道题分值,答对,共得分',panduan_fenzhi,panduan_dadui,panduan_defen)
+				//这里更新一下试卷
+				stu_exam.update({'_id':shijuan._id},{'res_panduan_arr':shijuan.res_panduan_arr},function(err){
+					if(err){
+						console.log('update shijuan.res_panduan_arr err',err)
+						cb(err)
+					}
+					console.log('update shijuan.res_panduan_arr success')
+					console.log()
+					console.log()
+					console.log()
+					cb()
+				})
+			// async.eachLimit(panduan_arr,1,function(item,callback){
+			// 	console.log('item---->',item)
+			// 	let temp = item.split(':'),
+			// 		timuid = temp[0],
+			// 		timuda = temp[1],
+			// 		choose = temp[2]
+			// 	console.log('题目id-->',timuid)
+			// 	console.log('对应答案-->',timuda)
+			// 	async.eachLimit(shijuan.res_panduan_arr,1,function(ite,callback1){
+			// 		if(ite._id == timuid){
+			// 			console.log('找到该题,下面判断该题答案是否正确',ite)
+			// 			async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+			// 				if(it._id == timuda && it.is_correct == true){
+			// 					console.log('该题答对了,该题是',it)
+			// 					panduan_defen += panduan_fenzhi 
+			// 					panduan_dadui++
+			// 					ite.correct = 1
+			// 					console.log('ite.correct--->',ite.correct)
+			// 					console.log('panduan_defen',panduan_defen)
+			// 					callback2()
+			// 				}
+			// 				else{
+			// 					//ite.correct = 0
+			// 					console.log('该题答错了')
+			// 					console.log('ite.correct--->',ite.correct)
+			// 					callback2()
+			// 				}
+			// 			},function(e){
+			// 				if(e){
+			// 					console.log('xuanxiang eachLimit e',e)
+			// 					callback1(e)
+			// 				}
+			// 				ite.choose = choose
+			// 				console.log('检查选择的答案-->',choose)
+			// 				console.log('检查ite-->',ite)
+			// 				callback1()
+			// 			})
+			// 		}
+			// 		else{
+			// 			//console.log('还在循环找题')
+			// 			callback1()
+			// 		}
+			// 	},function(er){
+			// 		if(er){
+			// 			console.log('shijuan.res_panduan_arr eachLimit er',er)
+			// 			callback(er)
+			// 		}
+			// 		callback()
+			// 	})
+			// 	//callback()
+			// },function(err){
+			// 	if(err){
+			// 		console.log('eachLimit panduan_arr err-->',err)
+			// 		cb(err)
+			// 	}
+			// 	else{
+			// 		console.log('判断检查结束,每道题分值,答对,共得分',panduan_fenzhi,panduan_dadui,panduan_defen)
+			// 		//这里更新一下试卷
+			// 		stu_exam.update({'_id':shijuan._id},{'res_panduan_arr':shijuan.res_panduan_arr},function(err){
+			// 			if(err){
+			// 				console.log('update shijuan.res_panduan_arr err',err)
+			// 				cb(err)
+			// 			}
+			// 			console.log('update shijuan.res_panduan_arr success')
+			// 			console.log()
+			// 			console.log()
+			// 			console.log()
+			// 			cb()
+			// 		})
+			// 	}
+			// })
 		},
 		function(cb){
 			console.log('检查多选')
-			async.eachLimit(duoxuan_arr,1,function(item,callback){
+			duoxuan_arr.forEach(function(item,index){
 				console.log('item---->',item)
 				let temp = item.split(':'),
 					timuid = temp[0],
@@ -1621,78 +1711,137 @@ router.post('/checkks',function(req,res){
 					zhengque_arr = []
 				console.log('题目id-->',timuid)
 				console.log('对应答案-->',timuda_arr)
-				async.eachLimit(shijuan.res_duoxuan_arr,1,function(ite,callback1){
+				shijuan.res_duoxuan_arr.forEach(function(ite,inde){
 					if(ite._id == timuid){
 						console.log('找到该题,下面判断该题答案是否正确',ite)
-						async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+						ite.xuanxiang.forEach(function(it,ind){
 							if(it.is_correct == true){
 								console.log('找到一个正确答案',it)
 								zhengque_arr.push(it._id)
 								console.log('zhengque_arr-->',zhengque_arr)
-								callback2()
 							}else{
-								callback2()
-							}
-						},function(e){
-							if(e){
-								console.log('xuanxiang eachLimit e',e)
-								callback1(e)
-							}
-							zhengque_arr = zhengque_arr.sort().toString()
-							if(timuda_duibi == zhengque_arr){
-								console.log('该题答对了')
-								ite.correct = 1
-								duoxuan_defen += duoxuan_fenzhi 
-								duoxuan_dadui++
-								console.log('duoxuan_defen',duoxuan_defen)
-								ite.choose = timuda_choose
-								console.log('检查选择的答案-->',timuda_choose)
-								console.log('检查ite-->',ite)
-								callback1()
-							}
-							else{
-								//ite.correct = 0
-								console.log('该题错了')
-								ite.choose = timuda_choose
-								console.log('检查选择的答案-->',timuda_choose)
-								console.log('检查ite-->',ite)
-								callback1()
+								console.log('该题答错了')
 							}
 						})
+						zhengque_arr = zhengque_arr.sort().toString()
+						if(timuda_duibi == zhengque_arr){
+							console.log('该题答对了')
+							ite.correct = 1
+							duoxuan_defen += duoxuan_fenzhi 
+							duoxuan_dadui++
+							console.log('duoxuan_defen',duoxuan_defen)
+							ite.choose = timuda_choose
+							console.log('检查选择的答案-->',timuda_choose)
+							console.log('检查ite-->',ite)
+							//callback1()
+						}
+						else{
+							//ite.correct = 0
+							console.log('该题错了')
+							ite.choose = timuda_choose
+							console.log('检查选择的答案-->',timuda_choose)
+							console.log('检查ite-->',ite)
+							//callback1()
+						}
 					}
-					else{
-						console.log('还在循环找题')
-						callback1()
-					}
-				},function(er){
-					if(er){
-						console.log('shijuan.res_duoxuan_arr eachLimit er',er)
-						callback(er)
-					}
-					callback()
 				})
-				//callback()
-			},function(err){
+			})
+			console.log('多选检查结束,每道题分值,答对,共得分',duoxuan_fenzhi,duoxuan_dadui,duoxuan_defen)
+				//这里更新一下试卷
+			stu_exam.update({'_id':shijuan._id},{'res_duoxuan_arr':shijuan.res_duoxuan_arr},function(err){
 				if(err){
-					console.log('eachLimit duoxuan_arr err-->',err)
+					console.log('update shijuan.res_duoxuan_arr err',err)
 					cb(err)
 				}
-				else{
-					console.log('多选检查结束,每道题分值,答对,共得分',duoxuan_fenzhi,duoxuan_dadui,duoxuan_defen)
-					//这里更新一下试卷
-					stu_exam.update({'_id':shijuan._id},{'res_duoxuan_arr':shijuan.res_duoxuan_arr},function(err){
-						if(err){
-							console.log('update shijuan.res_duoxuan_arr err',err)
-							cb(err)
-						}
-						console.log('update shijuan.res_duoxuan_arr success')
-						console.log()
-						console.log()
-						console.log()
-						cb()
-					})
-				}
+				console.log('update shijuan.res_duoxuan_arr success')
+				console.log()
+				console.log()
+				console.log()
+				cb()
 			})
+			// async.eachLimit(duoxuan_arr,1,function(item,callback){
+			// 	console.log('item---->',item)
+			// 	let temp = item.split(':'),
+			// 		timuid = temp[0],
+			// 		timuda_str = temp[1],
+			// 		timuda_choose = temp[2]
+			// 	let timuda_arr = timuda_str.split(','),
+			// 		timuda_duibi = timuda_arr.sort().toString(),
+			// 		zhengque_arr = []
+			// 	console.log('题目id-->',timuid)
+			// 	console.log('对应答案-->',timuda_arr)
+			// 	async.eachLimit(shijuan.res_duoxuan_arr,1,function(ite,callback1){
+			// 		if(ite._id == timuid){
+			// 			console.log('找到该题,下面判断该题答案是否正确',ite)
+			// 			async.eachLimit(ite.xuanxiang,1,function(it,callback2){
+			// 				if(it.is_correct == true){
+			// 					console.log('找到一个正确答案',it)
+			// 					zhengque_arr.push(it._id)
+			// 					console.log('zhengque_arr-->',zhengque_arr)
+			// 					callback2()
+			// 				}else{
+			// 					callback2()
+			// 				}
+			// 			},function(e){
+			// 				if(e){
+			// 					console.log('xuanxiang eachLimit e',e)
+			// 					callback1(e)
+			// 				}
+			// 				zhengque_arr = zhengque_arr.sort().toString()
+			// 				if(timuda_duibi == zhengque_arr){
+			// 					console.log('该题答对了')
+			// 					ite.correct = 1
+			// 					duoxuan_defen += duoxuan_fenzhi 
+			// 					duoxuan_dadui++
+			// 					console.log('duoxuan_defen',duoxuan_defen)
+			// 					ite.choose = timuda_choose
+			// 					console.log('检查选择的答案-->',timuda_choose)
+			// 					console.log('检查ite-->',ite)
+			// 					callback1()
+			// 				}
+			// 				else{
+			// 					//ite.correct = 0
+			// 					console.log('该题错了')
+			// 					ite.choose = timuda_choose
+			// 					console.log('检查选择的答案-->',timuda_choose)
+			// 					console.log('检查ite-->',ite)
+			// 					callback1()
+			// 				}
+			// 			})
+			// 		}
+			// 		else{
+			// 			//console.log('还在循环找题')
+			// 			callback1()
+			// 		}
+			// 	},function(er){
+			// 		if(er){
+			// 			console.log('shijuan.res_duoxuan_arr eachLimit er',er)
+			// 			callback(er)
+			// 		}
+			// 		callback()
+			// 	})
+			// 	//callback()
+			// },function(err){
+			// 	if(err){
+			// 		console.log('eachLimit duoxuan_arr err-->',err)
+			// 		cb(err)
+			// 	}
+			// 	else{
+			// 		console.log('多选检查结束,每道题分值,答对,共得分',duoxuan_fenzhi,duoxuan_dadui,duoxuan_defen)
+			// 		//这里更新一下试卷
+			// 		stu_exam.update({'_id':shijuan._id},{'res_duoxuan_arr':shijuan.res_duoxuan_arr},function(err){
+			// 			if(err){
+			// 				console.log('update shijuan.res_duoxuan_arr err',err)
+			// 				cb(err)
+			// 			}
+			// 			console.log('update shijuan.res_duoxuan_arr success')
+			// 			console.log()
+			// 			console.log()
+			// 			console.log()
+			// 			cb()
+			// 		})
+			// 	}
+			// })
 		},
 		function(cb){
 			let tempresult = {}
@@ -3132,11 +3281,11 @@ let search_data = [],//该数组为将从数据库取数据的参数[{模块名,
 							search.exec(function(err,docs){
 								if(err){
 									console.log('找单选题出错 err-->',err)
-									return res.json({'code':-1,'msg':err})
+									return res.writeHeader(404)
 								}
 								if(!docs){
 									console.log('没有该种单选题',item.name)
-									return res.json({'code':-1,'msg':item.name})
+									return res.writeHeader(404)
 								}
 								if(docs){
 									console.log('总共有多少道单选题',docs.length,item.name)
@@ -3185,11 +3334,11 @@ let search_data = [],//该数组为将从数据库取数据的参数[{模块名,
 							search.exec(function(err,docs){
 								if(err){
 									console.log('找多选题出错 err-->',err)
-									return res.json({'code':-1,'msg':err})
+									return res.writeHeader(404)
 								}
 								if(!docs){
 									console.log('没有该种多选题',item.name)
-									return res.json({'code':-1,'msg':item.name})
+									return res.writeHeader(404)
 								}
 								if(docs){
 									console.log('总共有多少道多选题',docs.length,item.name)
@@ -3234,11 +3383,11 @@ let search_data = [],//该数组为将从数据库取数据的参数[{模块名,
 							search.exec(function(err,docs){
 								if(err){
 									console.log('找判断题出错 err-->',err)
-									return res.json({'code':-1,'msg':err})
+									return res.writeHeader(404)
 								}
 								if(!docs){
 									console.log('没有该种判断题',item.name)
-									return res.json({'code':-1,'msg':item.name})
+									return res.writeHeader(404)
 								}
 								if(docs){
 									console.log('总共有多少道判断题',docs.length,item.name)
@@ -3439,17 +3588,18 @@ let search_data = [],//该数组为将从数据库取数据的参数[{模块名,
 						//console.log('check back-->',back)
 						//保存到数据库
 						console.timeEnd('countdown')
-						return res.json({'code':0,'msg':'true'})
+						return res.writeHeader(200)
 						//cbbb()
 					})
 				}
 			],function(err,result){
 				if(err){
 					console.log('async err-->',err)
-					return res.json({'code':-1,'msg':err})
+					return res.writeHeader(404)
+					//return res.json({'code':-1,'msg':err})
 				}
 				
-				return res.json({'code':0,'msg':'true'})
+				return res.writeHeader(200)
 				//return res.render('front/ks',{'code':0,'result':result,'ksinfo':ksinfo})
 				//return res.json({'code':-0,'msg':result})
 			})

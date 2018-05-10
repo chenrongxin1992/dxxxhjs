@@ -115,11 +115,26 @@
       .note_1{
         margin-top: 10px;
       }
+      @media screen and (max-width: 376px) {
+          .header1{
+            min-height: 100px;background-color: #94003F;padding: 0 0;
+          }
+      }
+      @media screen and (min-width: 375px) {
+          .header1{
+            background-color: #94003F;padding: 0 0;
+          }
+      }
     </style>
   </head>
   <body>
-    <div class="container">
-          
+    <div class="container" style="opacity:0.9; filter:alpha(opacity=70); ">
+      <div class="row" style="padding: 0 15px;">
+        <div class="col-12" style="">
+          <img class="img-responsive" src="/dxxxhjs/stylesheets/yetou.jpg">
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <p style="text-align: center;"><%=msg%></p>
@@ -138,7 +153,7 @@
 
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 footer">
-          <span>2017 © 计算机与软件学院</span>
+          <span><!-- <img class="img-responsive footer-logo" src="/dxxxhjs/stylesheets/ks--logo.png"> -->2018 © 深圳大学党委组织部</span>
         </div>
       </div>
     </div>

@@ -76,7 +76,8 @@ var sjszSchema = new Schema({
         percent:{type:Number},
         num_danxuan:{type:Number,default:0},
         num_duoxuan:{type:Number,default:0},
-        num_panduan:{type:Number,default:0}
+        num_panduan:{type:Number,default:0},
+        mokuaizongfen:{type:Number,default:0}
     }],
     randomStr : {type:String},
     kslianjie : {type:String},
