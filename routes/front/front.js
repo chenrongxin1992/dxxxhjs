@@ -3375,7 +3375,7 @@ let search_data = [],//该数组为将从数据库取数据的参数[{模块名,
 					//第三次循环找判断题
 					console.log('第三次循环找判断题')
 					doc.per_of_modal.forEach(function(item,index){
-						let num = parseInt(item.num_duoxuan)
+						let num = parseInt(item.num_panduan)
 						console.log('需要取',num,'道判断题目',item.name)
 						let search = cat.find({})
 							search.where('catname').equals(item.name)
@@ -3587,19 +3587,19 @@ let search_data = [],//该数组为将从数据库取数据的参数[{模块名,
 							back.qstr = qstr
 						//console.log('check back-->',back)
 						//保存到数据库
-						console.timeEnd('countdown')
-						return res.writeHeader(200)
+						//console.timeEnd('countdown')
+						return res.sendStatus(200)
 						//cbbb()
 					})
 				}
 			],function(err,result){
 				if(err){
 					console.log('async err-->',err)
-					return res.writeHeader(404)
+					return res.sendStatus(404)
 					//return res.json({'code':-1,'msg':err})
 				}
 				
-				return res.writeHeader(200)
+				return res.sendStatus(200)
 				//return res.render('front/ks',{'code':0,'result':result,'ksinfo':ksinfo})
 				//return res.json({'code':-0,'msg':result})
 			})
