@@ -46,6 +46,7 @@ app.use(session({
     })
 }));
 app.use(function(req,res,next){ 
+  console.log('进程 ' + process.pid + '处理......')
   if(!req.session){
     next(new Error('no session'))
   }else{

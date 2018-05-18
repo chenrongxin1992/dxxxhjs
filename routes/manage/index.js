@@ -150,6 +150,8 @@ router.get('/', function(req, res, next) {
 						   		//return res.json({'errCode':-1,'errMsg':'ticket is unvalid,请重新扫码！'})
 						   }else{
 						   		req.session.user = arg
+						   		req.session.student = arg
+						   		arg = null
 						   		return res.redirect(finalReturnURL)
 						   		//return res.redirect(ReturnURL)
 						  }
@@ -1481,6 +1483,15 @@ router.get('/new_firststep',function(req,res){
 	   						return res.json({'code':-1,'msg':error})
 	   					}
 	   					console.log('sjsz eachLimit success')
+	   					//生成试卷
+	   					request('http://qiandao.szu.edu.cn:81/dxxxhjs/front/newexam?_id='+_id,function(error,response,body){
+	   						if(error){
+	   							console.log('editsj 生成试卷错误')
+	   						}
+	   						console.log('editsj 生成试卷成功')
+	   						//console.log('response---->',response)
+	   						console.log('body---->',body)
+	   					})
 	   					return res.json({'code':0,'msg':'设置成功'})
 	   				})
 	   			})
@@ -1793,6 +1804,15 @@ router.post('/editsj',function(req,res){
 	   						return res.json({'code':-1,'msg':error})
 	   					}
 	   					console.log('sjsz eachLimit success')
+	   					//在这里生成试卷
+	   					request('http://qiandao.szu.edu.cn:81/dxxxhjs/front/newexam?_id='+_id,function(error,response,body){
+	   						if(error){
+	   							console.log('editsj 生成试卷错误')
+	   						}
+	   						console.log('editsj 生成试卷成功')
+	   						//console.log('response---->',response)
+	   						console.log('body---->',body)
+	   					})
 	   					return res.json({'code':0,'msg':'修改成功！'})
 	   				})
 	   			})

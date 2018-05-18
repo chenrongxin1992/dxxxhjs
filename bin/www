@@ -7,7 +7,9 @@
 var app = require('../app');
 var debug = require('debug')('dxxxhjs:server');
 var http = require('http');
-
+//test cluster
+var cluster = require('cluster');  
+var numCPUs = require('os').cpus().length;  
 /**
  * Get port from environment and store in Express.
  */
@@ -19,15 +21,43 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+
+if (cluster.isMaster) {
+    console.log("master start...");
+
+    // Fork workers.
+    for (var i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
+
+    cluster.on('listening',function(worker,address){
+        console.log('[master] ' + 'listening: worker' + worker.id + ',pid:' + worker.process.pid + ",port: " + address.port);
+    });
+    
+    cluster.on('online', function(worker) {
+        console.log('Worker ' + worker.process.pid + ' is online');
+    });
+
+    cluster.on('exit', function(worker, code, signal) {
+      console.log('Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal);
+      console.log('Starting a new worker');
+      cluster.fork();
+    });
+} else {
+    var server = http.createServer(app);
+        server.listen(port);
+        server.on('error', onError);
+        server.on('listening', onListening);
+}
+
+
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+
+
 
 /**
  * Normalize a port into a number, string, or false.
