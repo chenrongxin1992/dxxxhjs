@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');//express.bodyParser实际上包括了三部分：express.json, express.urlencoded, 和 express.multipart(就是处理了文件的部分)
 const session = require('express-session')
+var RedisStrore = require('connect-redis')(session);
 
 var index = require('./routes/manage/index');//后台管理路由
 var front = require('./routes/front/front')//前端路由
@@ -27,43 +28,38 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
 //add session
 app.use(session({ 
-	resave: false, //添加 resave 选项  
-  	saveUninitialized: true, //添加 saveUninitialized 选项 
+	  resave: true, //是指每次请求都重新设置session cookie，假设你的cookie是6000毫秒过期，每次请求都会再设置6000毫秒
+  	saveUninitialized: false, // 是指无论有没有session cookie，每次请求都设置个session cookie ，默认给个标示为 connect.sid。
     secret: 'dangxiaoxinxihuajianshe',
     cookie:{ 
-        maxAge: Date.now() + 60 * 60 * 1000//60分钟有效期
-    }
+        maxAge: 2 * 60 * 60 * 1000//120分钟有效期
+        //expires : new Date(Date.now() + 7200000)//默认是UTC时间，Date.now()获取当前时间的时间戳，输出是毫秒。
+    },
+    store:new RedisStrore({
+      host: "127.0.0.1",
+      port: 6379,
+      db: 0
+    })
 }));
 app.use(function(req,res,next){ 
+  if(!req.session){
+    next(new Error('no session'))
+  }else{
+
+    //console.log('-----------------',index.redis)
     res.locals.user = req.session.user;   // 从session 获取 user对象
     res.locals.student = req.session.student
-    
-    var ip;
-    if (req.headers['x-forwarded-for']) {
-        ip = req.headers['x-forwarded-for'].split(",")[0];
-    } else if (req.connection && req.connection.remoteAddress) {
-        ip = req.connection.remoteAddress;
-    } else {
-        ip = req.ip;
-    }
-    if(ip.split(',').length>0){
-      console.log('ip --- >',ip)
-        ip = ip.split(',')[0]
-    }
-    console.log('check client ip ---> ',req.connection.remoteAddress)
-    console.log('cookie.originalMaxAge----------------->',req.session.cookie.originalMaxAge)
-    // if(Date.now() < req.session.cookie.originalMaxAge){
-    //   console.log('会话还没过期,重新设置过期时间')
-    //   req.session.cookie.originalMaxAge = Date.now() + 1 * 60 * 1000
-    //   next(); 
-    // }else{
-    //   console.log('会话过期')
-    //   return res.redirect('http://qiandao.szu.edu.cn:81/dxxxhjs')
-    //   //next(); 
-    // }
+    // use this middleware to reset cookie expiration time
+    // when user hit page every time
+    //req.session._garbage = Date();
+    //req.session.touch();
+
     next() //中间件传递
+  }
 });
 
 app.use('/',redirect)

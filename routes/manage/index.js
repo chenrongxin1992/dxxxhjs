@@ -14,6 +14,18 @@ const request = require('request')
 const stu_exam = require('../../db/cat').stu_exam
 const nodeExcel = require('excel-export')
 
+//redis
+const redis = require('redis')
+const client = redis.createClient({host:'127.0.0.1', port: 6379,no_ready_check:true})
+// if you'd like to select database 3, instead of 0 (default), call 
+// client.select(3, function() { /* ... */ }); 
+
+client.on("error", function (err) {
+    console.log("redis connect Error " + err);
+});
+client.on('connect',function(err){
+	console.log("redis connect success " + err);
+})
 
 let MyServer = "http://116.13.96.53:81",
 	//CASserver = "https://auth.szu.edu.cn/cas.aspx/",
@@ -33,14 +45,32 @@ function pipei(str,arg){
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+	console.log('check req.session---->',req.session)
+	console.log('check req.cookies---->',req.cookies)
+
 	if(!req.query.ticket){
 		let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
 		console.log('ReturnURL url-->',ReturnURL)
 		let url = CASserver + 'login?service=' + ReturnURL
-		console.log('check redirecturl -->',url)
-		console.log('跳转获取ticket')
+		//console.log('check redirecturl -->',url)
+		console.log('---------- 没有ticket ----------')
 
-		if(req.session.user){
+		client.get('sess:'+req.sessionID,function(rediserr,redisres){
+	      if(rediserr){
+	        next(new Error(rediserr))
+	      }
+	      if(!redisres){
+	        console.log('redis 没有session ,跳转获取---->',url)
+	        return res.redirect(url)
+	      }
+	      if(redisres && redisres!='undefined'){
+	        let result = JSON.parse(redisres)
+	        console.log('redis session 信息---->',result)
+	        return res.render('manage/index', { 'user': result ,'student':result.student});
+	      }
+	    })
+
+		/*if(req.session.user){
 			console.log('没有ticket,学生有session')
 			console.log('session-->',req.session.user)
 			//返回页面让学困生填写联系方式，并将code对应的课程和学优生信息返回
@@ -51,10 +81,90 @@ router.get('/', function(req, res, next) {
 		else{
 			console.log('没有ticket，去获取ticket')
 			return res.redirect(url)
-		}
+		}*/
 	}
 	else{
-		if(req.session.user){
+		let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
+		console.log('ReturnURL url-->',ReturnURL)
+		let url = CASserver + 'login?service=' + ReturnURL
+		//console.log('check redirecturl -->',url)
+		console.log('---------- 有ticket ----------')
+
+		client.get('sess:'+req.sessionID,function(rediserr,redisres){
+	      if(rediserr){
+	        next(new Error(rediserr))
+	      }
+	      if(!redisres){
+	        console.log('redis 没有session ,request 获取---->')
+	        let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl,
+				finalReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs'
+			console.log('ReturnURL url-->',ReturnURL)
+			console.log('req-->',req.baseUrl)//finalReturnURL
+			console.log('you ticket, meiyou session')
+			let ticket = req.query.ticket
+			console.log('check ticket-->',ticket)
+			let url = CASserver + 'serviceValidate?ticket=' + ticket + '&service=' + ReturnURL
+			console.log('check url -->',url)
+			request(url, function (error, response, body) {
+				console.log('dddddd')
+				    if (!error && response.statusCode == 200) {
+				    	console.log('body -- >',body)
+				       let user = pipei(body,'user'),//工号
+						   eduPersonOrgDN = pipei(body,'eduPersonOrgDN'),//学院
+						   alias = pipei(body,'alias'),//校园卡号
+						   cn = pipei(body,'cn'),//姓名
+						   gender = pipei(body,'gender'),//性别
+						   containerId = pipei(body,'containerId'),//个人信息（包括uid，）
+						   nianji = null
+						if(containerId){
+							RankName = containerId.substring(18,21)//卡类别 jzg-->教职工
+						}else{
+							RankName = null
+						}
+						if(user){
+						   	nianji = user.substring(0,4)
+						}else{
+						   	nianji = null
+						}
+						console.log('check final result -->',user,eduPersonOrgDN,alias,cn,gender,containerId,RankName)
+						let arg = {}
+							arg.nianji = nianji
+						   	arg.user = user
+						   	arg.eduPersonOrgDN = eduPersonOrgDN
+						   	arg.alias = alias
+						   	arg.cn = cn
+						   	arg.gender = gender
+						   	arg.containerId = containerId
+						   	arg.RankName = RankName
+						   	//arg.code = code
+						   	//arg.stuXueHao = stuXueHao
+						    console.log('check arg-->',arg)
+
+						   console.log('check arg-->',arg)
+						   if(arg.user == null){
+						   		console.log('ticket is unvalid,重新回去获取ticket，清空session')
+						   		delete req.session.user
+						   		console.log('check req.session.user-->',req.session.user)
+						   		console.log('ticket is unvalid')
+						   		return res.redirect(finalReturnURL)
+						   		//return res.json({'errCode':-1,'errMsg':'ticket is unvalid,请重新扫码！'})
+						   }else{
+						   		req.session.user = arg
+						   		return res.redirect(finalReturnURL)
+						   		//return res.redirect(ReturnURL)
+						  }
+				     }else{
+				     	console.log(error)
+				     }
+			    })
+	      }
+	      if(redisres && redisres!='undefined'){
+	        let result = JSON.parse(redisres)
+	        console.log('redis session 信息---->',result)
+	        return res.render('manage/index', { 'user': result ,'student':result.student});
+	      }
+	    })
+		/*if(req.session.user){
 			console.log('有ticket,也有session')
 			console.log('session-->',req.session.user)
 			res.render('manage/index',{'user': req.session.user });
@@ -121,7 +231,7 @@ router.get('/', function(req, res, next) {
 				     	console.log(error)
 				     }
 			    })
-		}
+		}*/
 	}
   
 });

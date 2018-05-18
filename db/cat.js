@@ -88,7 +88,7 @@ var sjszSchema = new Schema({
 
 var stu_examSchema = new Schema({
     kscs : {type:Number,default:0},//已考次数
-    ckcs : {type:Number,default:3},//可重考次数
+    ckcs : {type:Number,default:1},//可重考次数
     qstr : {type:String},
     kaoshiyongshi:{type:Number},
     is_end : {type:Number,default:0},
@@ -161,7 +161,76 @@ var stu_examSchema = new Schema({
     tijiaoTimeStamp:{type:String},
     cha:{type:String}//完成时间
 })
+
+var testsaveSchema = new Schema({
+    randomStr : {type:String,default:null},
+    sj : [{
+            qstr : {type:String,default:null},
+            ksname : {type:String,default:null},
+            ksshijian : {type:String,default:null},
+            ksriqi : {type:String,default:null},
+            danxuan_num : {type:Number,default:null},
+            danxuan_fenzhi : {type:Number,default:null},
+            duoxuan_num : {type:Number,default:null},
+            duoxuan_fenzhi : {type:Number,default:null},
+            panduan_num : {type:Number,default:null},
+            panduan_fenzhi : {type:Number,default:null},
+            randomStr : {type:String,default:null},
+            kslianjie : {type:String,default:null},
+            sjid : {type:Number,default:0},
+            res_danxuan_arr : [{
+                    correct : {type:Number,default:0},
+                    choose:{type:String},//选择的答案
+                    id : {type:Number},
+                    catname : {type:String},//分类名:如党章、十九大         
+                    leixing : {type:String},//单选，多选，判断
+                    timu : {type:String},//题目(党章的意义是什么) 
+                    xuanxiang : [{
+                        id : {type:Number},//选项id
+                        content : {type:String,default:null},//选项内容
+                        is_correct : {type:Boolean,default:false}//是否为正确选项0错
+                    }],
+                    peopleinfo : {type:String,default:null},//录入人员信息
+                    createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+                    createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+                }],
+            res_duoxuan_arr : [{
+                correct : {type:Number,default:0},
+                choose:{type:String},//选择的答案
+                id : {type:Number},
+                catname : {type:String},//分类名:如党章、十九大         
+                leixing : {type:String},//单选，多选，判断
+                timu : {type:String},//题目(党章的意义是什么) 
+                xuanxiang : [{
+                    id : {type:Number},//选项id
+                    content : {type:String,default:null},//选项内容
+                    is_correct : {type:Boolean,default:false}//是否为正确选项0错
+                }],
+                peopleinfo : {type:String,default:null},//录入人员信息
+                createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+                createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+            }],
+            res_panduan_arr : [{
+                correct : {type:Number,default:0},
+                choose:{type:String},//选择的答案
+                id : {type:Number},
+                catname : {type:String},//分类名:如党章、十九大         
+                leixing : {type:String},//单选，多选，判断
+                timu : {type:String},//题目(党章的意义是什么) 
+                xuanxiang : [{
+                    id : {type:Number},//选项id
+                    content : {type:String,default:null},//选项内容
+                    is_correct : {type:Boolean,default:false}//是否为正确选项0错
+                }],
+                peopleinfo : {type:String,default:null},//录入人员信息
+                createTime : {type:String, default : moment().format('YYYY-MM-DD HH:mm:ss') },//创建时间
+                createTimeStamp : {type:String,default:moment().format('X')}//创建时间戳
+            }],
+            ckcs : {type:Number,default:3}
+        }],
+})
 //module.exports = mongoose.model('catinfo',catSchema);
 exports.stu_exam = mongoose.model('stu_exam',stu_examSchema);
 exports.catinfo = mongoose.model('catinfo',catSchema);
 exports.sjsz = mongoose.model('sjsz',sjszSchema)
+exports.sj = mongoose.model('sj',testsaveSchema);
