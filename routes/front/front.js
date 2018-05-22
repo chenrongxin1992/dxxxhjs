@@ -4906,7 +4906,7 @@ router.get('/newkstest',function(req,res){
 
 	console.time('总时间')
 
-		client.get('sess:uWJ0NJlxxnpMTibY1a-1-mNY1y_M4FKj',function(rediserr,redisres2){
+		client.get('sess:vv9CJacDHtvpKFm8hE-glWZ3Pr8x3cJk',function(rediserr,redisres2){
 	      if(rediserr){
 	        next(new Error(rediserr))
 	      }

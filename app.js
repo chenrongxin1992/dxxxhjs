@@ -12,16 +12,35 @@ var front = require('./routes/front/front')//前端路由
 var users = require('./routes/users');
 var redirect = require('./routes/index');
 
+//日志
+var FileStreamRotator = require('file-stream-rotator')
+var logDirectory = path.join(__dirname, 'log')
+var fs = require('fs')
+
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// ensure log directory exists
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+
+// create a rotating write stream
+var accessLogStream = FileStreamRotator.getStream({
+  date_format: 'YYYYMMDD',
+  filename: path.join(logDirectory, 'access-%DATE%.log'),
+  frequency: 'daily',
+  verbose: false
+})
+
+// setup the logger
+app.use(logger('short', {stream: accessLogStream}))
+
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 //
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(bodyParser.json());
 //app.use(express.bodyParser({uploadDir:'./uploads'}));
 app.use(bodyParser.urlencoded({ extended: false }));
