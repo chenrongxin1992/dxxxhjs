@@ -4251,7 +4251,12 @@ router.get('/ks',function(req,res){
 					//用Math.floor(Math.random()*10);时，可均衡获取0到9的随机整数。
 					let pos = Math.floor(Math.random()*100)
 					console.log('要取第',pos,'个试卷')
-					if(docc){
+					if(docc && docc.kscs >= doc.ckcs){
+						return res.json({'code':-1,'msg':'设置重考次数是：'+doc.ckcs+',已考次数是：'+docc.kscs})
+					}
+					if(docc && docc.kscs < doc.ckcs){//添加这个判断，当考试次数异常的时候不生成试卷
+						console.log('设置的冲考次数---->',doc.ckcs)
+						console.log('已考次数---->',docc.kscs)
 									console.time('redis中取缓存试卷耗时')
 									client.get(randomStr,function(rediserr,redisres1){
 										if(rediserr){
