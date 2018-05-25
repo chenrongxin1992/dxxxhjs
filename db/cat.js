@@ -57,6 +57,7 @@ var catSchema = new Schema({
 
 //试卷设置
 var sjszSchema = new Schema({ 
+    sjfs : {type:Number,default:1},//试卷份数，1只有一份，不是1就生成50份
     youxiao : {type:Number,default:1},//是否有效
     dangqian : {type:Number,default:0},//当前考试
     ckcs : {type:Number,default:3},//可重考次数

@@ -3643,7 +3643,7 @@ router.get('/newexam',function(req,res){
 					return res.json({'code':-1,'msg':searcherr})
 				}
 				if(searchres){
-					console.log('----- 提前生成试卷 100份 -----')
+					console.log('----- 提前生成试卷 -----')
 					let randomStr = searchres.randomStr
 					console.log('check randomStr-->',randomStr)
 					client.get(randomStr,function(err1,res1){
@@ -3652,22 +3652,499 @@ router.get('/newexam',function(req,res){
 							return res.json({'code':-1,'msg':err1})
 						}
 						if(res1 && res1 != 'undefined'){
-							console.log('redis 中已经有试卷了，不生成',JSON.parse(res1).length)
+							let compare1 = JSON.parse(res1).length,
+								compare2 = searchres.sjfs
+							console.log('redis 中已经有试卷了，试卷份数-->',compare1,'试卷设置的份数-->',compare2)
+							if(compare1 < compare2){
+								console.log('设置的份数 >> redis中的份数，需要删除后重新生成')
+								client.del(randomStr,function(delerr,delres){
+									if(delerr){
+										console.log('删除redis错误')
+									}else{
+										console.log('删除redis成功，开始重新生成')
+
+										let sjfs = 1
+										if(searchres.sjfs == 1){
+											console.log('只生成一份试卷')
+										}else{
+											sjfs = 50
+											console.log('生成50份试卷')
+										}
+										let search_data = [],//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
+											danxuan_arr = [],
+											duoxuan_arr = [],
+											panduan_arr = [],
+											ksinfo = {},
+											examnum = new Array(sjfs),
+											examarr = []
+										console.log('试卷份数--->',examnum.length)
+
+										let searchexam = sjsz.findOne({})
+											searchexam.where('randomStr').equals(randomStr)
+											searchexam.exec(function(err,doc){
+												//console.log('check doc---->',doc.length)
+												if(err){
+													console.log('searchexam err-->',err)
+													return res.json({'code':-1,'msg':err})
+												}
+												if(doc && doc.youxiao == 1 && doc.dangqian == 1){
+													ksinfo = doc 
+													//doc = null
+													async.eachLimit(examnum,1,function(item,callback){
+														console.log('check examnum item---->',item)
+														async.waterfall([
+															function(cb){
+																ksinfo.per_of_modal.forEach(function(item,index){
+																	let num = parseInt(item.num_danxuan)
+																	console.log('需要取',num,'道题目',item.name)
+																	let search = cat.find({})
+																		search.where('catname').equals(item.name)
+																		search.where('leixing').equals('单选')
+																		search.exec(function(err,docs){
+																			if(err){
+																				console.log('找单选题出错 err-->',err)
+																				cb(err)
+																				//return res.json({'code':-1,'msg':err})
+																			}
+																			if(!docs){
+																				console.log('没有该种单选题',item.name)
+																				cb(err)
+																				//return res.json({'code':-1,'msg':item.name})
+																			}
+																			if(docs){
+																				console.log('总共有多少道单选题',docs.length,item.name)
+																				docs = docs.sort(randomsort)
+																				if(docs.length >= num){
+																					console.log('题目足够')
+																					console.log('要取',num,'道题目')
+																					if(parseInt(num)){
+																						let te = docs.slice(0,parseInt(num))
+																						console.log('抽取了',te.length,'道题目')
+																						danxuan_arr.push(te)
+																						te = []
+																					}
+																					if(!parseInt(num)){
+																						danxuan_arr.push([])
+																					}
+																					if(danxuan_arr.length == doc.per_of_modal.length){
+																						console.log('danxuan_arr-->',danxuan_arr.length)
+																						console.log()
+																						console.log()
+																						console.log()
+																						cb(null)
+																					}
+																				}else{
+																					console.log('该种类型题目数量不足',docs.length,item.name,num)
+																					let name = item.name
+																					let e = {}
+																					 e.message = name + '这种类型题目数量不足'
+																					cb(item.name+'单选题目数量不足(需要'+num+'道，只有'+docs.length+'道)')
+																					//return res.json({'code':-1,'msg':name + '这种类型题目数量不足'})
+																				}
+																			}
+																			
+																		})
+																})
+															},
+															function(cb){
+																//第二次循环找多选题
+																console.log('找多选题')
+																doc.per_of_modal.forEach(function(item,index){
+																	let num = parseInt(item.num_duoxuan)
+																	console.log('需要取',num,'道多选题目',item.name)
+																	let search = cat.find({})
+																		search.where('catname').equals(item.name)
+																		search.where('leixing').equals('多选')
+																		search.exec(function(err,docs){
+																			if(err){
+																				console.log('找多选题出错 err-->',err)
+																				cb(err)
+																				//return res.json({'code':-1,'msg':err})
+																			}
+																			if(!docs){
+																				console.log('没有该种多选题',item.name)
+																				cb(err)
+																				//return res.json({'code':-1,'msg':item.name})
+																			}
+																			if(docs){
+																				console.log('总共有多少道多选题',docs.length,item.name)
+																				docs = docs.sort(randomsort)
+																				if(docs.length >= num){
+																					console.log('题目足够')
+																					console.log('要取',num,'道题目')
+																					if(parseInt(num)){
+																						let te = docs.slice(0,parseInt(num))
+																						console.log('抽取了',te.length,'道题目')
+																						duoxuan_arr.push(te)
+																						te = []
+																					}
+																					if(!parseInt(num)){
+																						duoxuan_arr.push([])
+																					}
+																					if(duoxuan_arr.length == doc.per_of_modal.length){
+																						console.log('duoxuan_arr-->',duoxuan_arr.length)
+																						console.log()
+																						console.log()
+																						console.log()
+																						cb(null)
+																					}
+																				}else{
+																					console.log('该种类型题目数量不足',docs.length,item.name,num)
+																					let name = item.name
+																					let e = {}
+																					 e.message = name + '这种类型题目数量不足'
+																					 //return res.json({'errCode':-1,'msg':item.name+'多选题目数量不足(需要'+num+'道，只有'+docs.length+'道)'})
+																					cb(item.name+'多选题目数量不足(需要'+num+'道，只有'+docs.length+'道)')
+																					//return res.json({'code':-1,'msg':name + '这种类型题目数量不足'})
+																				}
+																			}
+																			
+																		})
+																})
+															},
+															function(cb){
+																//第三次循环找判断题
+																console.log('第三次循环找判断题')
+																doc.per_of_modal.forEach(function(item,index){
+																	let num = parseInt(item.num_panduan)
+																	console.log('需要取',num,'道判断题目',item.name)
+																	let search = cat.find({})
+																		search.where('catname').equals(item.name)
+																		search.where('leixing').equals('判断')
+																		search.exec(function(err,docs){
+																			if(err){
+																				console.log('找判断题出错 err-->',err)
+																				cb(err)
+																				//return res.json({'code':-1,'msg':err})
+																			}
+																			if(!docs){
+																				console.log('没有该种判断题',item.name)
+																				cb(err)
+																				//return res.json({'code':-1,'msg':item.name})
+																			}
+																			if(docs){
+																				console.log('总共有多少道判断题',docs.length,item.name)
+																				docs = docs.sort(randomsort)
+																				if(docs.length >= num){
+																					console.log('题目足够')
+																					console.log('要取',num,'道题目')
+																					if(parseInt(num)){
+																						let te = docs.slice(0,parseInt(num))
+																						console.log('抽取了',te.length,'道题目')
+																						panduan_arr.push(te)
+																						te = []
+																					}
+																					if(!parseInt(num)){
+																						panduan_arr.push([])
+																					}
+																					if(panduan_arr.length == doc.per_of_modal.length){
+																						console.log('panduan_arr-->',panduan_arr.length)
+																						cb(null)
+																					}
+																				}else{
+																					console.log('该种类型题目数量不足',docs.length,item.name,num)
+																					let name = item.name
+																					let e = {}
+																					 e.message = name + '判断题目数量不足'
+																					cb(item.name+'判断题目数量不足(需要'+num+'道，只有'+docs.length+'道)')
+																					//return res.json({'code':-1,'msg':name + '这种类型题目数量不足'})
+																				}
+																			}
+																			
+																		})
+																})
+															},
+															function(cb){
+																let res_danxuan_arr = [],
+																	res_duoxuan_arr = [],
+																	res_panduan_arr = []
+																let num_of_danxuan = 0,//danxuan_arr中题目数量，用来跳出循环
+																	num_of_duoxuan = 0,
+																	num_of_panduan = 0
+																async.waterfall([//11111
+																	function(cbb){
+																		danxuan_arr.forEach(function(item,index){
+																			if(item.length!=0){
+																				num_of_danxuan += item.length
+																			}
+																			if((index+1) == danxuan_arr.length){
+																				console.log('num_of_danxuan---->',num_of_danxuan)
+																				cbb()
+																			}
+																		})
+																	},
+																	function(cbb){
+																		duoxuan_arr.forEach(function(item,index){
+																			if(item.length!=0){
+																				num_of_duoxuan += item.length
+																			}
+																			if((index+1) == duoxuan_arr.length){
+																				console.log('num_of_duoxuan---->',num_of_duoxuan)
+																				cbb()
+																			}
+																		})
+																	},
+																	function(cbb){
+																		panduan_arr.forEach(function(item,index){
+																			if(item.length!=0){
+																				num_of_panduan += item.length
+																			}
+																			if((index+1) == panduan_arr.length){
+																				console.log('num_of_panduan---->',num_of_panduan)
+																				cbb()
+																			}
+																		})
+																	},
+																	function(cbb){
+																		danxuan_arr.forEach(function(item,index){
+																			if(item.length!=0){
+																				item.forEach(function(it,ind){
+																					//console.log('it.xuanxiang---->单选',ind,it.xuanxiang)
+																					it.xuanxiang = it.xuanxiang.sort(randomsort)
+																					//console.log('单选答案乱序it.xuanxiang---->',it.xuanxiang)
+																					res_danxuan_arr.push(it)
+																				})
+																			}
+																			if((res_danxuan_arr.length == num_of_danxuan) && ((index+1) == danxuan_arr.length)){
+																				//console.log('res_danxuan_arr---->',res_danxuan_arr,res_danxuan_arr.length)
+																				console.log('-------------单选乱序完成---------------')
+																				cbb(null)
+																			}
+																		})
+																	},
+																	function(cbb){
+																		duoxuan_arr.forEach(function(item,index){
+																			if(item.length!=0){
+																				item.forEach(function(it,ind){
+																					//console.log('it.xuanxiang---->多选',ind,it.xuanxiang)
+																					it.xuanxiang = it.xuanxiang.sort(randomsort)
+																					//console.log('多选答案乱序it.xuanxiang---->',it.xuanxiang)
+																					res_duoxuan_arr.push(it)
+																				})
+																			}
+																			if((res_duoxuan_arr.length == num_of_duoxuan) && ((index+1) == duoxuan_arr.length)){
+																				//console.log('res_duoxuan_arr---->',res_duoxuan_arr,res_duoxuan_arr.length)
+																				console.log('-------------多选乱序完成---------------')
+																				cbb(null)
+																			}
+																		})
+																	},
+																	function(cbb){
+																		panduan_arr.forEach(function(item,index){
+																			if(item.length!=0){
+																				item.forEach(function(it,ind){
+																					//console.log('it.xuanxiang---->判断',ind,it.xuanxiang)
+																					it.xuanxiang = it.xuanxiang.sort(randomsort)
+																					//console.log('判断答案乱序it.xuanxiang---->',it.xuanxiang)
+																					res_panduan_arr.push(it)
+																				})
+																			}
+																			if((res_panduan_arr.length == num_of_panduan) && ((index+1) == panduan_arr.length)){
+																				//console.log('res_panduan_arr---->',res_panduan_arr,res_panduan_arr.length)
+																				console.log('-------------判断乱序完成---------------')
+																				cbb(null)
+																			}
+																		})
+																	},
+																	function(cbb){
+																		console.log('++++++++++++++++进来了没有++++++++++++++++')
+																		//增加一步，生成qstr
+																		let temp_danxuan_str = '',
+														                    temp_duoxuan_str = '',
+														                    temp_panduan_str = '',
+														                    danxuan_num = parseInt(res_danxuan_arr.length),
+														                    duoxuan_num = parseInt(res_duoxuan_arr.length),
+														                    panduan_num = parseInt(res_panduan_arr.length)
+														                async.waterfall([
+														                	function(cbbb){
+														                		let count = 0
+														                		res_danxuan_arr.forEach(function(item,index){
+														                			temp_danxuan_str += '¤radio§' + (index+1) + '§1§false§false§§true§§§0§§'
+														                			for(let i=0;i<item.xuanxiang.length;i++){
+														                				temp_danxuan_str += '§false〒0〒0'
+														                				if((index + 1 == res_danxuan_arr.length) && (i+1 == item.xuanxiang.length) ){
+															                				console.log('单选循环结束')
+																                   			//console.log('temp_danxuan_str-->',temp_danxuan_str)
+																                   			cbbb()
+															                			}
+														                			}
+														                		})
+														                	},
+														                	function(cbbb){
+														                		//console.log('ddddddddddddddddddddddddddddddddddd')
+														                		res_duoxuan_arr.forEach(function(ite,inde){
+														                			temp_duoxuan_str += '¤check§' + parseInt((danxuan_num+inde+1)) + '§1§false§false§§true,,§§§0§§'
+														                			//console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+														                			for(let i=0;i<ite.xuanxiang.length;i++){
+														                				//console.log('ddddddddddddddddddddddddddddddddddd')
+														                				temp_duoxuan_str += '§false〒0〒0〒'
+														                				if((inde + 1 == res_duoxuan_arr.length) && (i+1 == ite.xuanxiang.length)){
+															                				console.log('多选循环结束')
+																                        	//console.log('temp_duoxuan_str-->',temp_duoxuan_str)
+																                        	cbbb()
+															                			}
+														                			}
+														                			
+														                		})
+														                	},
+														                	function(cbbb){
+														                		res_panduan_arr.forEach(function(it,ind){
+														                			temp_panduan_str += '¤radio§' + parseInt(danxuan_num+duoxuan_num+ind+(1)) + '§1§false§false§§true§§§0§§'
+														                			for(let i=0;i<it.xuanxiang.length;i++){
+														                				temp_panduan_str += '§false〒0〒0'
+														                				if((ind + 1 == res_panduan_arr.length) && (i+1 == it.xuanxiang.length)){
+															                				console.log('判断循环结束')
+																			                //console.log('temp_panduan_str-->',temp_panduan_str)
+																			                cbbb()
+															                			}
+														                			}
+														                			
+														                		})
+														                	}
+														                ],function(error,result){
+														                	qstr = 'false§false¤page§1§§§' + temp_danxuan_str + temp_duoxuan_str + temp_panduan_str
+														                	temp_danxuan_str = ''
+														                	temp_duoxuan_str = ''
+														                	temp_panduan_str = ''
+																			//console.log('check qstr--->',qstr)
+																			cbb()
+														                })
+																	}
+																],function(err,result){//11111
+																	if(err){
+																		console.log('组成结果时async出错')
+																		console.log(err)
+																		cb(err)
+																	}
+																	//console.log('a最终返回结果-->',res_danxuan_arr,res_duoxuan_arr,res_panduan_arr)
+																	//console.log('check back-->',back)
+																	//保存到数据库
+																	let tempredisarr = {}
+																		tempredisarr.sjid = examarr.length
+																		tempredisarr.qstr = qstr
+																		tempredisarr.ksname = ksinfo.ksname
+																		tempredisarr.ksshijian = ksinfo.ksshijian
+																		tempredisarr.ksriqi = ksinfo.ksriqi
+																		tempredisarr.danxuan_num = ksinfo.danxuan_num
+																		tempredisarr.danxuan_fenzhi = ksinfo.danxuan_fenzhi
+																		tempredisarr.duoxuan_num = ksinfo.duoxuan_num
+																		tempredisarr.duoxuan_fenzhi = ksinfo.duoxuan_fenzhi
+																		tempredisarr.panduan_num = ksinfo.panduan_num
+																		tempredisarr.panduan_fenzhi = ksinfo.panduan_fenzhi
+																		tempredisarr.randomStr = ksinfo.randomStr
+																		tempredisarr.kslianjie = ksinfo.kslianjie
+																		tempredisarr.res_danxuan_arr = res_danxuan_arr
+																		tempredisarr.res_duoxuan_arr = res_duoxuan_arr
+																		tempredisarr.res_panduan_arr = res_panduan_arr
+																		ckcs = ksinfo.ckcs
+																	
+																	res_danxuan_arr = []
+																	res_duoxuan_arr = []
+																	res_panduan_arr = []
+
+																	examarr.push(tempredisarr)
+																	console.log('check examarr length---->',examarr.length)
+
+																	tempredisarr = {}
+																	danxuan_arr = []
+																	duoxuan_arr = []
+																	panduan_arr = []
+																	cb()
+																})//waterfall end
+															}
+														],function(error,result){
+															if(error){
+																console.log('eachLimit waterfall err---->',error)
+																callback(error)
+															}
+															console.log('eachLimit waterfall success')
+															callback()
+														})//waterfall end
+													},function(err){
+														if(err){
+															console.log('eachLimit err---->',err)
+															//next(new Error(err))
+															return res.json({'code':-1,'msg':err})
+														}
+														console.log('----- 将数据存一下吧 -----')
+														console.time('saveredis')
+														client.set(randomStr,JSON.stringify(examarr),function(rediserr,redisres){
+															if(rediserr){
+																console.log('redis save err---->',rediserr)
+															}else{
+																console.log('redis save success---->',redisres)
+																console.timeEnd('saveredis')
+																console.log()
+																console.log()
+																console.log()
+																console.log('type of examarr --->',examarr instanceof Array)
+																console.log('check examarr length---->',examarr.length)
+																console.time('savemongood')
+																let newsj = new sj({
+																	randomStr : randomStr,
+																	sj : examarr
+																})
+																newsj.save(function(err){
+																	if(err){
+																		console.log('save sj err---->',err)
+																	}else{
+																		console.log()
+																 		console.log()
+																 		console.log()
+																		console.log('save sj success')
+																		console.timeEnd('savemongood')
+																		console.timeEnd('newexam');
+																		return res.json({'code':0,'msg':examarr})
+																	}
+																	
+																})
+																//console.timeEnd('newexam');
+																//return res.json({'code':0,'msg':examarr})
+															}
+															//client.quit()
+														})
+														
+													})//eachlimit end
+												}
+												if(doc && doc.dangqian ==0){
+													console.log('该考试还没启用')
+													return res.render('front/kserror',{'code':-6,'msg':'该考试还没启用'})
+												}
+												if(doc == null || doc.length == 0 ){
+													console.log('不存在该randomStr')
+													return res.render('front/kserror',{'code':-2,'msg':'没有对应的考试'})
+												}
+											})
+										
+									
+									}//redis del else
+								})
+							}else{
+								console.log('设置的份数 == redis中的份数，不需要重新生成')
+							}
+							//console.log('redis 中已经有试卷了，不生成',JSON.parse(res1).length)
 						}
 						if(!res1){
+							let sjfs = 1
+							if(searchres.sjfs == 1){
+								console.log('只生成一份试卷')
+							}else{
+								sjfs = 50
+								console.log('生成50份试卷')
+							}
 							let search_data = [],//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
 								danxuan_arr = [],
 								duoxuan_arr = [],
 								panduan_arr = [],
 								ksinfo = {},
-								examnum = new Array(100),
+								examnum = new Array(sjfs),
 								examarr = []
 							console.log('试卷份数--->',examnum.length)
 
 							let searchexam = sjsz.findOne({})
 								searchexam.where('randomStr').equals(randomStr)
 								searchexam.exec(function(err,doc){
-									console.log('check doc---->',doc.length)
+									//console.log('check doc---->',doc.length)
 									if(err){
 										console.log('searchexam err-->',err)
 										return res.json({'code':-1,'msg':err})
@@ -4249,8 +4726,16 @@ router.get('/ks',function(req,res){
 					//生成随机数，取redis中的试卷
 					//Math.floor(n); 返回小于等于n的最大整数。
 					//用Math.floor(Math.random()*10);时，可均衡获取0到9的随机整数。
-					let pos = Math.floor(Math.random()*100)
+					let pos = 0
+						
+					if(doc.sjfs == 1){
+						console.log('大家试卷都一样')
+					}else{
+						pos = Math.floor(Math.random()*50)
+						console.log('试卷随机')
+					}
 					console.log('要取第',pos,'个试卷')
+					
 					if(docc && docc.kscs >= doc.ckcs){
 						return res.json({'code':-1,'msg':'设置重考次数是：'+doc.ckcs+',已考次数是：'+docc.kscs})
 					}
@@ -4263,47 +4748,60 @@ router.get('/ks',function(req,res){
 											console.log('rediserr --->',rediserr)
 											return res.json({'code':-1,'msg':rediserr})
 										}
-										let exam = JSON.parse(redisres1)[pos]
-											exam.gonghao = redisres.student.alias
-											exam.xingming = redisres.student.cn
-											//exam.kscs = parseInt(docc.kscs+1)
-										console.timeEnd('redis中取缓存试卷耗时')
-										console.time('save mongo耗时')
-										let new_stu_exam = new stu_exam({
-											qstr : exam.qstr,
-											gonghao : redisres.student.alias,//这里替换成session中的alias
-											xingming : redisres.student.cn,//这里替换成session中的cn
-											ksname : exam.ksname,
-											ksshijian : exam.ksshijian,
-											ksriqi : exam.ksriqi,
-											danxuan_num : exam.danxuan_num,
-											danxuan_fenzhi : exam.danxuan_fenzhi,
-											duoxuan_num : exam.duoxuan_num,
-											duoxuan_fenzhi : exam.duoxuan_fenzhi,
-											panduan_num : exam.panduan_num,
-											panduan_fenzhi : exam.panduan_fenzhi,
-											randomStr : exam.randomStr,
-											kslianjie : exam.kslianjie,
-											res_danxuan_arr : exam.res_danxuan_arr,
-											res_duoxuan_arr : exam.res_duoxuan_arr,
-											res_panduan_arr : exam.res_panduan_arr,
-											createTimeStamp : moment().format('X'),
-											ckcs : exam.ckcs,
-											kscs : parseInt(docc.kscs+1)
-										})
-										new_stu_exam.save(function(err){
-											if(err){
-												console.log('new_stu_exam save err---->',err)
-												return res.json({'code':0,'msg':err})
-												//cb(err)
-											}else{
-												console.timeEnd('save mongo耗时')
-												console.timeEnd('总时间')
-												return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
-												exam = null
-												//cb(null,back)
-											}
-										})//save
+										if(!redisres1){
+											console.log('redis 没有试卷，返回错误')
+											console.timeEnd('总时间')
+											return res.json({'code':-1,'msg':'redis has no exams,need to create'})
+										}
+										if(redisres1){
+											let exam = JSON.parse(redisres1)[pos]
+												exam.gonghao = redisres.student.alias
+												exam.xingming = redisres.student.cn
+												//exam.kscs = parseInt(docc.kscs+1)
+											console.timeEnd('redis中取缓存试卷耗时')
+											console.time('save mongo耗时')
+											
+											let new_stu_exam = new stu_exam({
+												qstr : exam.qstr,
+												gonghao : redisres.student.alias,//这里替换成session中的alias
+												xingming : redisres.student.cn,//这里替换成session中的cn
+												ksname : exam.ksname,
+												ksshijian : exam.ksshijian,
+												ksriqi : exam.ksriqi,
+												danxuan_num : exam.danxuan_num,
+												danxuan_fenzhi : exam.danxuan_fenzhi,
+												duoxuan_num : exam.duoxuan_num,
+												duoxuan_fenzhi : exam.duoxuan_fenzhi,
+												panduan_num : exam.panduan_num,
+												panduan_fenzhi : exam.panduan_fenzhi,
+												randomStr : exam.randomStr,
+												kslianjie : exam.kslianjie,
+												res_danxuan_arr : exam.res_danxuan_arr,
+												res_duoxuan_arr : exam.res_duoxuan_arr,
+												res_panduan_arr : exam.res_panduan_arr,
+												createTimeStamp : moment().format('X'),
+												ckcs : exam.ckcs,
+												kscs : parseInt(docc.kscs+1)
+											})
+											// res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+											new_stu_exam.save(function(err){
+												if(err){
+													console.log('new_stu_exam save err---->',err)
+													return res.json({'code':0,'msg':err})
+													//cb(err)
+												}else{
+													console.timeEnd('save mongo耗时')
+													console.timeEnd('总时间')
+													//console.log('先返回结果再保存到数据库')
+													return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+													doc = null
+													exam = null
+													//cb(null,back)
+												}
+											})//save
+											
+										}//redis if
+										
 									})//client
 								}else{	
 									//第一次生成试卷
@@ -4314,47 +4812,59 @@ router.get('/ks',function(req,res){
 											console.log('rediserr --->',rediserr)
 											return res.json({'code':-1,'msg':rediserr})
 										}
-										let exam = JSON.parse(redisres1)[pos]
-											exam.gonghao = redisres.student.alias
-											exam.xingming = redisres.student.cn
-											exam.kscs = 1
-										console.timeEnd('redis中取缓存试卷耗时')
-										console.time('save mongo耗时')
-										let new_stu_exam = new stu_exam({
-											qstr : exam.qstr,
-											gonghao : redisres.student.alias,//这里替换成session中的alias
-											xingming : redisres.student.cn,//这里替换成session中的cn
-											ksname : exam.ksname,
-											ksshijian : exam.ksshijian,
-											ksriqi : exam.ksriqi,
-											danxuan_num : exam.danxuan_num,
-											danxuan_fenzhi : exam.danxuan_fenzhi,
-											duoxuan_num : exam.duoxuan_num,
-											duoxuan_fenzhi : exam.duoxuan_fenzhi,
-											panduan_num : exam.panduan_num,
-											panduan_fenzhi : exam.panduan_fenzhi,
-											randomStr : exam.randomStr,
-											kslianjie : exam.kslianjie,
-											res_danxuan_arr : exam.res_danxuan_arr,
-											res_duoxuan_arr : exam.res_duoxuan_arr,
-											res_panduan_arr : exam.res_panduan_arr,
-											createTimeStamp : moment().format('X'),
-											ckcs : exam.ckcs,
-											kscs : 1
-										})
-										new_stu_exam.save(function(err){
-											if(err){
-												console.log('new_stu_exam save err---->',err)
-												return res.json({'code':0,'msg':err})
-												//cb(err)
-											}else{
-												console.timeEnd('save mongo耗时')
-												console.timeEnd('总时间')
-												return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
-												exam = null
-												//cb(null,back)
-											}
-										})//save
+										if(!redisres1){
+											console.log('redis 没有试卷，返回错误')
+											console.timeEnd('总时间')
+											return res.json({'code':-1,'msg':'redis has no exams,need to create'})
+										}
+										if(redisres1){
+											let exam = JSON.parse(redisres1)[pos]
+												exam.gonghao = redisres.student.alias
+												exam.xingming = redisres.student.cn
+												exam.kscs = 1
+											console.timeEnd('redis中取缓存试卷耗时')
+											console.time('save mongo耗时')
+											
+											let new_stu_exam = new stu_exam({
+												qstr : exam.qstr,
+												gonghao : redisres.student.alias,//这里替换成session中的alias
+												xingming : redisres.student.cn,//这里替换成session中的cn
+												ksname : exam.ksname,
+												ksshijian : exam.ksshijian,
+												ksriqi : exam.ksriqi,
+												danxuan_num : exam.danxuan_num,
+												danxuan_fenzhi : exam.danxuan_fenzhi,
+												duoxuan_num : exam.duoxuan_num,
+												duoxuan_fenzhi : exam.duoxuan_fenzhi,
+												panduan_num : exam.panduan_num,
+												panduan_fenzhi : exam.panduan_fenzhi,
+												randomStr : exam.randomStr,
+												kslianjie : exam.kslianjie,
+												res_danxuan_arr : exam.res_danxuan_arr,
+												res_duoxuan_arr : exam.res_duoxuan_arr,
+												res_panduan_arr : exam.res_panduan_arr,
+												createTimeStamp : moment().format('X'),
+												ckcs : exam.ckcs,
+												kscs : 1
+											})
+											 //res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+											new_stu_exam.save(function(err){
+												if(err){
+													console.log('new_stu_exam save err---->',err)
+													return res.json({'code':0,'msg':err})
+													//cb(err)
+												}else{
+													console.timeEnd('save mongo耗时')
+													console.timeEnd('总时间')
+													return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+													doc = null
+													exam = null
+													//cb(null,back)
+												}
+											})//save
+											
+										}//redis if
+										
 									})//client
 								}
 				}
@@ -4534,7 +5044,14 @@ router.get('/ks',function(req,res){
 					//生成随机数，取redis中的试卷
 					//Math.floor(n); 返回小于等于n的最大整数。
 					//用Math.floor(Math.random()*10);时，可均衡获取0到9的随机整数。
-					let pos = Math.floor(Math.random()*100)
+					let pos = 0
+						
+					if(doc.sjfs == 1){
+						console.log('大家试卷都一样')
+					}else{
+						pos = Math.floor(Math.random()*50)
+						console.log('试卷随机')
+					}
 					console.log('要取第',pos,'个试卷')
 					if(docc){
 									console.time('redis中取缓存试卷耗时')
@@ -4543,47 +5060,59 @@ router.get('/ks',function(req,res){
 											console.log('rediserr --->',rediserr)
 											return res.json({'code':-1,'msg':rediserr})
 										}
-										let exam = JSON.parse(redisres1)[pos]
-											exam.gonghao = redisres.student.alias
-											exam.xingming = redisres.student.cn
-											exam.kscs = parseInt(docc.kscs+1)
-										console.timeEnd('redis中取缓存试卷耗时')
-										console.time('savemongood耗时')
-										let new_stu_exam = new stu_exam({
-											qstr : exam.qstr,
-											gonghao : redisres.student.alias,//这里替换成session中的alias
-											xingming : redisres.student.cn,//这里替换成session中的cn
-											ksname : exam.ksname,
-											ksshijian : exam.ksshijian,
-											ksriqi : exam.ksriqi,
-											danxuan_num : exam.danxuan_num,
-											danxuan_fenzhi : exam.danxuan_fenzhi,
-											duoxuan_num : exam.duoxuan_num,
-											duoxuan_fenzhi : exam.duoxuan_fenzhi,
-											panduan_num : exam.panduan_num,
-											panduan_fenzhi : exam.panduan_fenzhi,
-											randomStr : exam.randomStr,
-											kslianjie : exam.kslianjie,
-											res_danxuan_arr : exam.res_danxuan_arr,
-											res_duoxuan_arr : exam.res_duoxuan_arr,
-											res_panduan_arr : exam.res_panduan_arr,
-											createTimeStamp : moment().format('X'),
-											ckcs : exam.ckcs,
-											kscs : parseInt(docc.kscs+1)
-										})
-										new_stu_exam.save(function(err){
-											if(err){
-												console.log('new_stu_exam save err---->',err)
-												return res.json({'code':0,'msg':err})
-												//cb(err)
-											}else{
-												console.timeEnd('savemongood耗时')
-												console.timeEnd('总时间')
-												return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
-												exam = null
-												//cb(null,back)
-											}
-										})//save
+										if(!redisres1){
+											console.log('redis 没有试卷，返回错误')
+											console.timeEnd('总时间')
+											return res.json({'code':-1,'msg':'redis has no exams,need to create'})
+										}
+										if(redisres1){
+											let exam = JSON.parse(redisres1)[pos]
+												exam.gonghao = redisres.student.alias
+												exam.xingming = redisres.student.cn
+												exam.kscs = parseInt(docc.kscs+1)
+											console.timeEnd('redis中取缓存试卷耗时')
+											console.time('savemongood耗时')
+											
+											let new_stu_exam = new stu_exam({
+												qstr : exam.qstr,
+												gonghao : redisres.student.alias,//这里替换成session中的alias
+												xingming : redisres.student.cn,//这里替换成session中的cn
+												ksname : exam.ksname,
+												ksshijian : exam.ksshijian,
+												ksriqi : exam.ksriqi,
+												danxuan_num : exam.danxuan_num,
+												danxuan_fenzhi : exam.danxuan_fenzhi,
+												duoxuan_num : exam.duoxuan_num,
+												duoxuan_fenzhi : exam.duoxuan_fenzhi,
+												panduan_num : exam.panduan_num,
+												panduan_fenzhi : exam.panduan_fenzhi,
+												randomStr : exam.randomStr,
+												kslianjie : exam.kslianjie,
+												res_danxuan_arr : exam.res_danxuan_arr,
+												res_duoxuan_arr : exam.res_duoxuan_arr,
+												res_panduan_arr : exam.res_panduan_arr,
+												createTimeStamp : moment().format('X'),
+												ckcs : exam.ckcs,
+												kscs : parseInt(docc.kscs+1)
+											})
+											//res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+											new_stu_exam.save(function(err){
+												if(err){
+													console.log('new_stu_exam save err---->',err)
+													return res.json({'code':0,'msg':err})
+													//cb(err)
+												}else{
+													console.timeEnd('savemongood耗时')
+													console.timeEnd('总时间')
+													return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+													doc = null
+													exam = null
+													//cb(null,back)
+												}
+											})//save
+											
+										}
+										
 									})//client
 								}else{	
 									//第一次生成试卷
@@ -4593,47 +5122,59 @@ router.get('/ks',function(req,res){
 											console.log('rediserr --->',rediserr)
 											return res.json({'code':-1,'msg':rediserr})
 										}
-										let exam = JSON.parse(redisres1)[pos]
-											exam.gonghao = redisres.student.alias
-											exam.xingming = redisres.student.cn
-											exam.kscs = 1
-										console.timeEnd('redis中取缓存试卷耗时')
-										console.time('savemongood耗时')
-										let new_stu_exam = new stu_exam({
-											qstr : exam.qstr,
-											gonghao : redisres.student.alias,//这里替换成session中的alias
-											xingming : redisres.student.cn,//这里替换成session中的cn
-											ksname : exam.ksname,
-											ksshijian : exam.ksshijian,
-											ksriqi : exam.ksriqi,
-											danxuan_num : exam.danxuan_num,
-											danxuan_fenzhi : exam.danxuan_fenzhi,
-											duoxuan_num : exam.duoxuan_num,
-											duoxuan_fenzhi : exam.duoxuan_fenzhi,
-											panduan_num : exam.panduan_num,
-											panduan_fenzhi : exam.panduan_fenzhi,
-											randomStr : exam.randomStr,
-											kslianjie : exam.kslianjie,
-											res_danxuan_arr : exam.res_danxuan_arr,
-											res_duoxuan_arr : exam.res_duoxuan_arr,
-											res_panduan_arr : exam.res_panduan_arr,
-											createTimeStamp : moment().format('X'),
-											ckcs : exam.ckcs,
-											kscs : 1
-										})
-										new_stu_exam.save(function(err){
-											if(err){
-												console.log('new_stu_exam save err---->',err)
-												return res.json({'code':0,'msg':err})
-												//cb(err)
-											}else{
-												console.timeEnd('savemongood耗时')
-												console.timeEnd('总时间')
-												return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
-												exam = null
-												//cb(null,back)
-											}
-										})//save
+										if(!redisres1){
+											console.log('redis 没有试卷，返回错误')
+											console.timeEnd('总时间')
+											return res.json({'code':-1,'msg':'redis has no exams,need to create'})
+										}
+										if(redisres1){
+											let exam = JSON.parse(redisres1)[pos]
+												exam.gonghao = redisres.student.alias
+												exam.xingming = redisres.student.cn
+												exam.kscs = 1
+											console.timeEnd('redis中取缓存试卷耗时')
+											console.time('savemongood耗时')
+											
+											let new_stu_exam = new stu_exam({
+												qstr : exam.qstr,
+												gonghao : redisres.student.alias,//这里替换成session中的alias
+												xingming : redisres.student.cn,//这里替换成session中的cn
+												ksname : exam.ksname,
+												ksshijian : exam.ksshijian,
+												ksriqi : exam.ksriqi,
+												danxuan_num : exam.danxuan_num,
+												danxuan_fenzhi : exam.danxuan_fenzhi,
+												duoxuan_num : exam.duoxuan_num,
+												duoxuan_fenzhi : exam.duoxuan_fenzhi,
+												panduan_num : exam.panduan_num,
+												panduan_fenzhi : exam.panduan_fenzhi,
+												randomStr : exam.randomStr,
+												kslianjie : exam.kslianjie,
+												res_danxuan_arr : exam.res_danxuan_arr,
+												res_duoxuan_arr : exam.res_duoxuan_arr,
+												res_panduan_arr : exam.res_panduan_arr,
+												createTimeStamp : moment().format('X'),
+												ckcs : exam.ckcs,
+												kscs : 1
+											})
+											
+											new_stu_exam.save(function(err){
+												if(err){
+													console.log('new_stu_exam save err---->',err)
+													return res.json({'code':0,'msg':err})
+													//cb(err)
+												}else{
+													console.timeEnd('savemongood耗时')
+													console.timeEnd('总时间')
+													return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+													doc = null
+													exam = null
+													//cb(null,back)
+												}
+											})//save
+											
+										}//redis if
+										
 									})//client
 								}
 				}

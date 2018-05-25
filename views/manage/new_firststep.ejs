@@ -32,6 +32,12 @@
                 <input type="text" name="ksshijian" id="ksshijian" class="layui-input" placeholder="单位为分钟" lay-verify="ksshijian" value=''>
               </div>
             </div>
+            <div class="layui-inline">
+              <label class="layui-form-label label_big">试卷份数</label>
+              <div class="layui-input-inline">
+                <input type="text" name="sjfs" id="sjfs" class="layui-input" placeholder="大于等于1份" lay-verify="sjfs" value=''>
+              </div>
+            </div>
           </div>
 
           <div class="layui-form-item">
@@ -280,6 +286,11 @@ $(function(){
                   return '考试时间必须是大于0的整数';  
                 }  
               } ,
+              sjfs:function(value){
+                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+                  return '试卷份数必须是大于0的整数';  
+                }  
+              },
               danxuan_num: function(value){  
                 if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
                   return '题目数量必须是大于0的整数';  
@@ -382,6 +393,7 @@ $(function(){
               panduan_fenzhi = $('#panduan_fenzhi').val(),
               panduan_num = $('#panduan_num').val(),
               ckcs = $('#ckcs').val(),
+              sjfs = $('#sjfs').val(),
               obj = {},
               tem_arr = [],
               tem_choose = '',
@@ -477,7 +489,8 @@ $(function(){
               panduan_fenzhi : panduan_fenzhi,
               panduan_num : panduan_num,
               modal_arr : JSON.stringify(tem_arr),
-              ckcs : ckcs
+              ckcs : ckcs,
+              sjfs:sjfs
             },
             success:function(res){
               if(res.code === 0){

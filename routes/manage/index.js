@@ -1384,7 +1384,8 @@ router.get('/new_firststep',function(req,res){
         panduan_fenzhi = req.body.panduan_fenzhi,
         panduan_num = req.body.panduan_num,
         per_of_modal = req.body.modal_arr,
-        ckcs = req.body.ckcs ? req.body.ckcs : 3
+        ckcs = req.body.ckcs ? req.body.ckcs : 3,
+        sjfs = req.body.sjfs
     console.log('ckcs-->',ckcs)
     console.log('per_of_modal-->',JSON.parse(per_of_modal))
     //console.log('req.body-->',req.body)
@@ -1452,7 +1453,8 @@ router.get('/new_firststep',function(req,res){
 		        per_of_modal : tem_arr,
 		        kslianjie:baselink+randomStr,
 		        randomStr:randomStr,
-		        ckcs : ckcs
+		        ckcs : ckcs,
+		        sjfs: sjfs
 		    })
 		    console.log('new_sjsz-->',new_sjsz)
 			new_sjsz.save(function(err,docc){
@@ -1484,13 +1486,13 @@ router.get('/new_firststep',function(req,res){
 	   					}
 	   					console.log('sjsz eachLimit success')
 	   					//生成试卷
-	   					request('http://qiandao.szu.edu.cn:81/dxxxhjs/front/newexam?_id='+_id,function(error,response,body){
+	   					request('http://qiandao.szu.edu.cn:81/dxxxhjs/front/newexam?_id='+docc._id,function(error,response,body){
 	   						if(error){
 	   							console.log('editsj 生成试卷错误')
 	   						}
 	   						console.log('editsj 生成试卷成功')
 	   						//console.log('response---->',response)
-	   						console.log('body---->',body)
+	   						//console.log('body---->',body)
 	   					})
 	   					return res.json({'code':0,'msg':'设置成功'})
 	   				})
@@ -1749,7 +1751,8 @@ router.post('/editsj',function(req,res){
         per_of_modal = req.body.modal_arr,
         ckcs = req.body.ckcs ? req.body.ckcs : 3,
         youxiao = req.body.youxiao,
-        dangqian = req.body.dangqian
+        dangqian = req.body.dangqian,
+        sjfs = req.body.sjfs
     
 
     let tem_arr = [],
@@ -1771,9 +1774,9 @@ router.post('/editsj',function(req,res){
     	//console.log('tem_arr-->',tem_arr)
     })
 
-    console.log('tem_arr-->',tem_arr)
-    console.log(_id,dangqian,youxiao)
-   sjsz.update({'_id':_id},{'dangqian':dangqian,'youxiao':youxiao,'ksname':ksname,'ksshijian':ksshijian,'danxuan_fenzhi':danxuan_fenzhi,'danxuan_num':danxuan_num,'duoxuan_fenzhi':duoxuan_fenzhi,'duoxuan_num':duoxuan_num,'panduan_fenzhi':panduan_fenzhi,'panduan_num':panduan_num,'per_of_modal':tem_arr,'ckcs':ckcs},function(err){
+    //console.log('tem_arr-->',tem_arr)
+    //console.log(_id,dangqian,youxiao)
+   sjsz.update({'_id':_id},{'sjfs':sjfs,'dangqian':dangqian,'youxiao':youxiao,'ksname':ksname,'ksshijian':ksshijian,'danxuan_fenzhi':danxuan_fenzhi,'danxuan_num':danxuan_num,'duoxuan_fenzhi':duoxuan_fenzhi,'duoxuan_num':duoxuan_num,'panduan_fenzhi':panduan_fenzhi,'panduan_num':panduan_num,'per_of_modal':tem_arr,'ckcs':ckcs},function(err){
 	   	if(err){
 	   		console.log('update sjsz err-->',err)
 	   		return res.json({'code':-1,'msg':err})
@@ -1811,7 +1814,7 @@ router.post('/editsj',function(req,res){
 	   						}
 	   						console.log('editsj 生成试卷成功')
 	   						//console.log('response---->',response)
-	   						console.log('body---->',body)
+	   						//console.log('body---->',body)
 	   					})
 	   					return res.json({'code':0,'msg':'修改成功！'})
 	   				})
