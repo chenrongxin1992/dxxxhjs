@@ -4131,7 +4131,7 @@ function submit(o) {
 	submit_tip.innerHTML = validate_info_submit2;
 	var A = 1;
 	if (o == 0) {
-		PromoteUser("正在处理，请稍候...", 3000, true);
+		PromoteUser("正在处理，请稍候...", 100000, true);
 	} else {
 		if (o == 2) {
 			A = cur_page;

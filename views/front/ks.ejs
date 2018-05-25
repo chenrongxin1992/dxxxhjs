@@ -1035,7 +1035,31 @@
                           })
 
                         </script>
-
+                        <script type="text/javascript">
+                          $(function(){
+                            setTimeout(function(){
+                              console.log('60秒后保存试卷')
+                               $.ajax({
+                                  url:'/dxxxhjs/front/saveexam',
+                                  method: 'POST',
+                                  data:{
+                                    exam : '<%- JSON.stringify(result) %>'
+                                  },
+                                  success:function(res){
+                                    if(res.code === 0){
+                                      console.log(res.msg)
+                                    }else{
+                                      console.log('试卷保存出错')
+                                      console.log(res.msg)
+                                    }
+                                  },
+                                  error:function(err){
+                                    console.log('save ajax err',err)
+                                  }
+                                }) 
+                            },60000)
+                          })
+                        </script>
                         <script type="text/javascript">
                             var maxCheatTimes = 0;
                         </script>
