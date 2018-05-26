@@ -34,9 +34,17 @@
               </div>
               <div class="layui-form-mid layui-word-aux">分钟</div>
             <div class="layui-inline">
-              <label class="layui-form-label">试卷份数</label>
-              <div class="layui-input-inline">
-                <input type="text" name="sjfs" id="sjfs" class="layui-input" value="<%=detail.sjfs%>" lay-verify="sjfs">
+              <label class="layui-form-label">试题一致</label>
+              <div class="layui-input-block">
+                <select name="sjfs" id="sjfs" lay-filter="sjfs">
+                    <%if(detail.sjfs==1){%>
+                    <option value="<%=detail.sjfs%>" selected>是</option>
+                    <option value="50">否</option>
+                    <%}else{%>
+                      <option value="<%=detail.sjfs%>" selected>否</option>
+                      <option value="1">是</option>
+                    <%}%>
+                </select>
               </div>
             </div>
           </div>
@@ -232,11 +240,11 @@ $(function(){
                   return '考试时间必须是大于0的整数';  
                 }  
               } ,
-              sjfs : function(value){
-                if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
-                  return '试卷份数必须是大于0的整数';  
-                }  
-              },
+              // sjfs : function(value){
+              //   if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
+              //     return '试卷份数必须是大于0的整数';  
+              //   }  
+              // },
               danxuan_num: function(value){  
                 if(!(/^(0|[1-9][0-9]*)$/.test(value))){  
                   return '题目数量必须是大于0的整数';  
@@ -352,7 +360,7 @@ $(function(){
               panduan_fenzhi = $('#panduan_fenzhi').val(),
               panduan_num = $('#panduan_num').val(),
               ckcs = $('#ckcs').val(),
-              sjfs = $('#sjfs').val(),
+              sjfs = $('#sjfs option:selected').val(),
               youxiao = $('#youxiao option:selected').val(),
               dangqian = $('#dangqian option:selected').val(),
               //all_percent = $('#all_percent').val(),

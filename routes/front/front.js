@@ -1249,6 +1249,7 @@ router.get('/ks_暂时替换',function(req,res){//乱序版本
 })
 //已完成考试列表
 router.get('/myexamlist',function(req,res){
+	console.log('in myexamlist router')
 	if(!req.query.ticket){
 		let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
 		console.log('ReturnURL url-->',ReturnURL)
@@ -1272,7 +1273,7 @@ router.get('/myexamlist',function(req,res){
 						return res.json({'code':-1,'msg':err})
 					}
 					if(doc){
-						console.log('check doc-->',doc)
+						//console.log('check doc-->',doc)
 						console.log('454444444')
 						return res.render('front/myexamlist', { 'user': req.session.user,'examinfo':doc });
 					}
@@ -1378,6 +1379,7 @@ router.get('/myexamlist',function(req,res){
 	}
 })
 router.get('/ksdonenew',function(req,res){
+	console.log('in ksdonenew router')
 	let _id = req.query._id
 	console.log('check _id-->',_id)
 	let search = stu_exam.findOne({'_id':_id})
@@ -1402,6 +1404,7 @@ function randomsort(a, b) {
    return Math.random()>.5 ? -1 : 1; //通过随机产生0到1的数，然后判断是否大于0.5从而影响排序，产生随机性的效果。
 }
 router.get('/test',function(req,res){
+	console.log('in test router')
 	let search = cat.find({})
 		search.where('catname').equals('党史')
 		search.where('leixing').equals('判断')
@@ -1415,6 +1418,7 @@ router.get('/test',function(req,res){
 	res.render('front/test')
 })
 router.get('/test1',function(req,res){
+	console.log('in test1 router')
 	// let search = cat.find({})
 	// 	search.where('catname').equals('党史')
 	// 	search.where('leixing').equals('判断')
@@ -3193,6 +3197,7 @@ router.get('/ks_bk',function(req,res){//循环版本
 })
 
 router.get('/ks_test',function(req,res){//乱序版本
+	console.log('in ks_test router')
 let search_data = [],//该数组为将从数据库取数据的参数[{模块名,题型,条数}]
 				danxuan_arr = [],
 				duoxuan_arr = [],
@@ -3627,6 +3632,7 @@ client.on('connect',function(err){
 })
 
 router.get('/newexam',function(req,res){
+	console.log('in newexam router')
 	console.time('newexam');
 	
 	let _id = req.query._id
@@ -4589,6 +4595,7 @@ router.get('/newexam',function(req,res){
 	}//else
 })
 router.get('/testgetbigdata',function(req,res){
+	console.log('in testgetbigdata router')
 	console.time('test')
 	let search = sj.findOne({})
 		search.where('randomStr').equals('2206bns4')
@@ -4604,6 +4611,7 @@ router.get('/testgetbigdata',function(req,res){
 		})
 })
 router.get('/getredisexam',function(req,res){
+	console.log('in getredisexam router')
 	console.time('redis')
 	client.get('2206bns4',function(rediserr,redisres){
 		if(rediserr){
@@ -4614,6 +4622,7 @@ router.get('/getredisexam',function(req,res){
 	})
 })
 router.get('/ks',function(req,res){
+	console.log('in ks router')
 	//console.log('check req.session---->',req.session)
 	//console.log('check req.cookies---->',req.cookies)
 	//console.log('check sessionID---->',req.sessionID)
@@ -5211,6 +5220,7 @@ router.get('/ks',function(req,res){
 	}//else !req.query.ticket
 })
 router.post('/checkks',function(req,res){//reids版本checkks
+	console.log('in checkks router')
 	console.time('检查redis是否有session耗时')
 	console.time('检查耗时')
 	client.get('sess:'+req.sessionID,function(rediserr,redisres2){
@@ -5470,10 +5480,11 @@ router.post('/checkks',function(req,res){//reids版本checkks
 	})//client
 })
 router.get('/newkstest',function(req,res){
+	console.log('in newkstest router')
 
 	console.time('总时间')
 
-		client.get('sess:vv9CJacDHtvpKFm8hE-glWZ3Pr8x3cJk',function(rediserr,redisres2){
+		client.get('sess:13UbguynyDSBmMkpUImu-fe3OWn5s4Ab',function(rediserr,redisres2){
 	      if(rediserr){
 	        next(new Error(rediserr))
 	      }
@@ -5556,7 +5567,7 @@ router.get('/newkstest',function(req,res){
 										if(rediserr){
 											return res.json({'code':-1,'msg':rediserr})
 										}
-										let exam = JSON.parse(redisres1)[pos]
+										let exam = JSON.parse(redisres1)[0]
 											exam.gonghao = redisres.student.alias
 											exam.xingming = redisres.student.cn
 											//exam.kscs = parseInt(docc.kscs+1)
@@ -5592,7 +5603,7 @@ router.get('/newkstest',function(req,res){
 											console.log('rediserr --->',rediserr)
 											return res.json({'code':-1,'msg':rediserr})
 										}
-										let exam = JSON.parse(redisres1)[pos]
+										let exam = JSON.parse(redisres1)[0]
 											exam.gonghao = redisres.student.alias
 											exam.xingming = redisres.student.cn
 											exam.kscs = 1
@@ -5635,6 +5646,7 @@ router.get('/newkstest',function(req,res){
 
 })
 router.post('/saveexam',function(req,res){
+	console.log('in saveexam router')
 	console.time('savemongood耗时')
 	let exam = JSON.parse(req.body.exam)
 	//console.log('check exam-->',exam)

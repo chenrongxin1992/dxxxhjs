@@ -45,8 +45,7 @@ function pipei(str,arg){
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	console.log('check req.session---->',req.session)
-	console.log('check req.cookies---->',req.cookies)
+	console.log('in index router')
 
 	if(!req.query.ticket){
 		let ReturnURL = 'http://qiandao.szu.edu.cn:81/dxxxhjs' + req.originalUrl
@@ -239,10 +238,12 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/managelogin',function(req,res){
+	console.log('in managelogin router')
 	res.render('manage/managelogin')
 })
 
 router.get('/drtk',function(req,res){
+	console.log('in drtk router')
 	res.render('manage/drtk')
 })
 
@@ -338,6 +339,7 @@ function inarr(arr, obj) {
     return false;  
 }
 router.post('/uploadtk',function(req,res){
+	console.log('in uploadtk router')
 	var form = new multiparty.Form();
     //设置编码
     form.encoding = 'utf-8';
@@ -536,6 +538,7 @@ router.post('/uploadtk',function(req,res){
 })
 //下载题库模板
 router.get('/download_tkmb',function(req, res, next){
+	console.log('in download_tkmb router')
 	let filename = '题库模板'
 	let currFile = uploadDir + '/题库模板.xlsx',
         fReadStream;
@@ -561,6 +564,7 @@ router.get('/download_tkmb',function(req, res, next){
 });
 //查看题库页面
 router.get('/cxtk',function(req,res){
+	console.log('in cxtk router')
 	//返回题库模块，题目类型
 	let search = cat.distinct('catname',function(err,docs){
 		if(err){
@@ -573,6 +577,7 @@ router.get('/cxtk',function(req,res){
 })
 //查看题库页面数据接口
 router.get('/cxtk_data',function(req,res){	
+	console.log('in cxtk_data router')
 	let page = req.query.page,
 		limit = req.query.limit,
 		timu = req.query.timu,
@@ -695,6 +700,7 @@ router.get('/cxtk_data',function(req,res){
 })
 //考生成绩
 router.get('/kscj_data',function(req,res){	
+	console.log('in kscj_data router')
 	let page = req.query.page,
 		limit = req.query.limit,
 		xingming = req.query.xingming,
@@ -822,6 +828,7 @@ router.get('/kscj_data',function(req,res){
 })
 //导出成绩
 router.get('/downkscj',function(req,res){
+	console.log('in downkscj router')
 	let xingming = req.query.xingming,
 		catname = req.query.catname
 
@@ -916,6 +923,7 @@ router.get('/downkscj',function(req,res){
 	
 })
 router.post('/delete_item',function(req,res){
+	console.log('in delete_item router')
 	let _id = req.body._id
 	console.log('_id-->',_id)
 	cat.remove({'_id':_id},function(err){
@@ -929,6 +937,7 @@ router.post('/delete_item',function(req,res){
 })
 
 router.get('/iframe_mb',function(req,res){
+	console.log('in iframe_mb router')
 	let _id = req.query._id
 	console.log('_id-->',_id)
 	let search = cat.findOne({})
@@ -943,6 +952,7 @@ router.get('/iframe_mb',function(req,res){
 		})
 })
 router.get('/iframe_mbbj',function(req,res){
+	console.log('in iframe_mbbj router')
 	let _id = req.query._id
 	console.log('_id-->',_id)
 	let search = sjsz.findOne({})
@@ -973,10 +983,12 @@ function random_str() {
 //const baselink = 'localhost:3000/front/ks?code='
 const baselink = 'qiandao.szu.edu.cn:81/dxxxhjs/front/ks?code='
 router.get('/sjsz',function(req,res){
+	console.log('in sjsz router')
 	console.log('sjsz')
 	res.render('manage/sjsz')
 }).post('/sjsz',function(req,res){
-	console.log('post sjsz')
+	console.log('in sjsz post router')
+	//console.log('post sjsz')
 	let ksname = req.body.ksname,
 		ksriqi = req.body.ksriqi,
 		ksshijian = req.body.ksshijian,
@@ -1029,6 +1041,7 @@ router.get('/sjsz',function(req,res){
 })
 
 router.get('/sjlb_data',function(req,res){
+	console.log('in sjlb_data router')
 	let page = req.query.page,
 		limit = req.query.limit
 	page ? page : 1;//当前页
@@ -1105,6 +1118,7 @@ router.get('/sjlb_data',function(req,res){
 	})
 })
 router.get('/newsjlb_data',function(req,res){
+	console.log('in newsjlb_data router')
 	let page = req.query.page,
 		limit = req.query.limit
 	page ? page : 1;//当前页
@@ -1182,6 +1196,7 @@ router.get('/newsjlb_data',function(req,res){
 	})
 })
 router.post('/delete_sjlbitem',function(req,res){
+	console.log('in delete_sjlbitem router')
 	let _id = req.body._id
 	console.log('_id-->',_id)
 	sjsz.remove({'_id':_id},function(err){
@@ -1195,6 +1210,7 @@ router.post('/delete_sjlbitem',function(req,res){
 })
 //新增试卷
 router.get('/new_firststep',function(req,res){
+	console.log('in new_firststep router')
 	//返回题库模块，题目类型
 	let search = cat.distinct('catname',function(err,docs){
 		if(err){
@@ -1206,6 +1222,7 @@ router.get('/new_firststep',function(req,res){
 	})
 	//return res.render('manage/new_firststep')
 }).post('/new_firststep',function(req,res){
+	console.log('in new_firststep post router')
 	let ksname = req.body.ksname,
         ksriqi = req.body.ksriqi,
         ksshijian = req.body.ksshijian,
@@ -1374,6 +1391,7 @@ router.get('/new_firststep',function(req,res){
 			})
 		})
 }).post('/new_step',function(req,res){
+	console.log('in new_step post router')
 	let ksname = req.body.ksname,
         ksriqi = req.body.ksriqi,
         ksshijian = req.body.ksshijian,
@@ -1506,6 +1524,7 @@ function trim_str(str){
     return str.replace(/\s|\xA0/g,"");    
 }
 router.get('/tktj',function(req,res){
+	console.log('in tktj router')
 	//题库提醒所属模块比例及数量
 	//返回题库模块，题目类型
 	let mokuai = [],
@@ -1601,6 +1620,7 @@ router.get('/tktj',function(req,res){
 })
 
 router.get('/kscj',function(req,res){
+	console.log('in kscj router')
 	//返回题库模块，题目类型
 	let search = stu_exam.distinct('ksname',function(err,docs){
 		if(err){
@@ -1615,6 +1635,7 @@ router.get('/kscj',function(req,res){
 })
 
 router.get('/cjtj',function(req,res){
+	console.log('in cjtj router')
 	console.log('---------------cjtj')
 		//返回题库模块，题目类型
 	let search = stu_exam.distinct('ksname',function(err,docs){
@@ -1629,6 +1650,7 @@ router.get('/cjtj',function(req,res){
 })
 //成绩统计图表
 router.post('/cjtj_data',function(req,res){
+	console.log('in cjtj_data router')
 	let ksname = req.body.ksname
 	let nameArr = ['60分以下','60-69分','70-79分','80-89分','90-100分']
 	let dataArr = [],tempobj={}
@@ -1738,6 +1760,7 @@ router.post('/cjtj_data',function(req,res){
 	
 })
 router.post('/editsj',function(req,res){
+	console.log('in editsj router')
 	let _id = req.body._id,
 		ksname = req.body.ksname,
         //ksriqi = req.body.ksriqi,

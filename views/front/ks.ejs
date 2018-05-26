@@ -719,6 +719,9 @@
                             //时间到，自动提交
                             if(intDiff == 0){
                               console.log('处理提交')
+                              layui.use(['layer'], function(){
+                                tjzhezhao1 = layer.load(1, {shade: [0.8, '#393D49']});    
+                              })//layui
                               var temp_danxuan = [],
                                   temp_duoxuan = [],
                                   temp_panduan = [],
@@ -784,6 +787,7 @@
                                     if(res.code === 0){
                                       console.log('res.result-->',res.result)
                                       layui.use(['layer'], function(){
+                                        layer.close(tjzhezhao1);
                                         var temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
                                         var layer3 = layui.layer
                                         layer3.open({
@@ -830,6 +834,7 @@
                                     if(res.code === 0){
                                       console.log('res.result-->',res.result)
                                       layui.use(['layer'], function(){
+                                        layer.close(tjzhezhao1);
                                         var temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
                                         var layer4 = layui.layer
                                             layer4.open({
@@ -923,7 +928,7 @@
                         }); 
                         </script>
                         <script type="text/javascript">
-                        
+                        var tjzhezhao1
                         function GetQueryString(name)
                         {
                             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
@@ -935,6 +940,10 @@
                             //处理提交
                             $('#submit_button').on('click',function(){
                               console.log('处理提交')
+                              layui.use(['layer'], function(){
+                                tjzhezhao1 = layer.load(1, {shade: [0.8, '#393D49']});    
+                              })//layui
+                              
                               var temp_danxuan = [],
                                   temp_duoxuan = [],
                                   temp_panduan = [],
@@ -999,7 +1008,9 @@
                                   success:function(res){
                                     if(res.code === 0){
                                       console.log('res.result-->',res.result)
+
                                       layui.use(['layer'], function(){
+                                        layer.close(tjzhezhao1);
                                         var temp_content = '<div class="ksresult">本次考试得分：<span style="color:red;">' + res.result.zongfen + '</span></div>'
                                         var layer2 = layui.layer
                                             layer2.open({
