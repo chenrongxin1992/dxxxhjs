@@ -1047,8 +1047,9 @@
 
                         </script>
                         <script type="text/javascript">
+                          var intervalsave;
                           $(function(){
-                            setTimeout(function(){
+                            intervalsave = setInterval(function(){
                               console.log('60秒后保存试卷')
                                $.ajax({
                                   url:'/dxxxhjs/front/saveexam',
@@ -1059,6 +1060,10 @@
                                   success:function(res){
                                     if(res.code === 0){
                                       console.log(res.msg)
+                                      console.log(intervalsave)
+                                      console.log('clear interval')
+                                      clearInterval(intervalsave)
+                                      console.log(intervalsave)
                                     }else{
                                       console.log('试卷保存出错')
                                       console.log(res.msg)
