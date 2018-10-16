@@ -4789,7 +4789,8 @@ router.get('/ks',function(req,res){
 						if(!redisres1){
 							console.log('redis 没有试卷，返回错误')
 							console.timeEnd('总时间')
-							return res.json({'code':-1,'msg':'redis has no exams,need to create'})
+							return res.render('front/kserror',{'code':-6,'msg':'redis has no exams,need to create'})
+							//return res.json({'code':-1,'msg':'redis has no exams,need to create'})
 						}
 						if(redisres1){
 							let exam = JSON.parse(redisres1)[pos]
@@ -5445,12 +5446,17 @@ router.post('/checkks',function(req,res){//reids版本checkks
 	    }
 	})//client
 })
+let alltime = 0
+let stutime2 = 0
+let redistime = 0
 router.get('/newkstest',function(req,res){
 	console.log('in newkstest router')
-
-	console.time('总时间')
-
-		client.get('sess:13UbguynyDSBmMkpUImu-fe3OWn5s4Ab',function(rediserr,redisres2){
+	let alltime1 = alltime++
+	console.time('总时间' + alltime1)
+		
+		client.get('sess:-fO83CZYBCJY5QH2YxqE0wBsaQSIzW2R',function(rediserr,redisres2){
+			
+			
 	      if(rediserr){
 	        next(new Error(rediserr))
 	      }
@@ -5464,6 +5470,7 @@ router.get('/newkstest',function(req,res){
 			if(!randomStr){
 				return res.json({'code':-5,'msg':'url有误'})
 			}
+			
 			async.waterfall([
 				function(cb){
 					let search = sjsz.findOne({})
@@ -5486,38 +5493,48 @@ router.get('/newkstest',function(req,res){
 			        
 				},
 				function(doc,cb){
+					let redistime1 = redistime++
+					console.time('检查学生是否有试卷耗时'+redistime1)
 					let search = stu_exam.findOne({})
 						search.where('randomStr').equals(randomStr)
 						search.where('gonghao').equals(redisres.student.alias)//这里替换成session中的alias
-						search.sort({'kscs':-1})//找最后一条考试记录
-			    		search.limit(1)
+						//search.sort({'kscs':-1})//找最后一条考试记录
+			    		//search.limit(1)
+			    		search.where('kscs').equals(doc.ckcs)
 						search.exec(function(errr,docc){
 							if(errr){
+								console.log('找学生试卷错误 errr',errr)
 								return res.json({'code':-1,'msg':err})
 							}
-							if(docc && docc.is_end == 0 && (docc.kscs<=doc.ckcs)){
-								return res.render('front/ks',{'code':0,'result':docc,'ksinfo':doc})
-							}
-							if(docc && docc.is_end == 0 && (docc.kscs>doc.ckcs)){
-								return res.render('front/kserror',{'code':-2,'msg':'考试次数不正常'})
-							}
-							if(docc && docc.is_end == 1 && (docc.kscs==doc.ckcs)){
+							if(docc && docc.is_end == 1){
+								console.timeEnd('检查学生是否有试卷耗时'+redistime1)
+								console.log('该试卷已经提交 && 重考次数已用完')
 								let search1 = stu_exam.find({})
 									search1.where('gonghao').equals(redisres.student.alias)
 									search1.where('is_end').equals(1)
 									search1.exec(function(err,doc1){
 										if(err){
+											console.log('err-->',err)
 											return res.json({'code':-1,'msg':err})
 										}
 										if(doc1){
-											return res.render('front/myexamlist', { 'user': redisres.student,'examinfo':doc1 });
+											console.log('check doc1-->',doc1)
+											return res.sendStatus(200)
 										}
 										if(!doc1){
 											return res.json({'code':-1,'msg':'暂无记录'})
 										}
 									})//search1
 							}
-							if(!docc || (docc.kscs<doc.ckcs)){
+							if(docc && docc.is_end == 0){
+								console.timeEnd('检查学生是否有试卷耗时'+redistime1)
+								console.log('试卷存在，尚未结束，直接返回试卷继续')
+								console.log('考试次数 && 重考次数-->',docc.kscs,doc.ckcs)
+								return res.sendStatus(200)
+							}
+							if(!docc){
+								console.timeEnd('检查学生是否有试卷耗时' +redistime1)
+								console.log('还没生成试卷,往下走吧')
 								cb(null,doc,docc)
 							}
 						})//search
@@ -5526,79 +5543,43 @@ router.get('/newkstest',function(req,res){
 					//生成随机数，取redis中的试卷
 					//Math.floor(n); 返回小于等于n的最大整数。
 					//用Math.floor(Math.random()*10);时，可均衡获取0到9的随机整数。
-					let pos = Math.floor(Math.random()*100)
+					let pos = 0
+						
+					let stutime22 = stutime2++
+					if(doc.sjfs == 1){
+						console.log('大家试卷都一样')
+					}else{
+						pos = Math.floor(Math.random()*50)
+						console.log('试卷随机')
+					}
 					console.log('要取第',pos,'个试卷')
-					if(docc){
-									client.get(randomStr,function(rediserr,redisres1){
-										if(rediserr){
-											return res.json({'code':-1,'msg':rediserr})
-										}
-										let exam = JSON.parse(redisres1)[0]
-											exam.gonghao = redisres.student.alias
-											exam.xingming = redisres.student.cn
-											//exam.kscs = parseInt(docc.kscs+1)
-										let new_stu_exam = new stu_exam({
-											qstr : exam.qstr,
-											gonghao : redisres.student.alias,//这里替换成session中的alias
-											xingming : redisres.student.cn,//这里替换成session中的cn
-											ksname : exam.ksname,
-											ksshijian : exam.ksshijian,
-											ksriqi : exam.ksriqi,
-											danxuan_num : exam.danxuan_num,
-											danxuan_fenzhi : exam.danxuan_fenzhi,
-											duoxuan_num : exam.duoxuan_num,
-											duoxuan_fenzhi : exam.duoxuan_fenzhi,
-											panduan_num : exam.panduan_num,
-											panduan_fenzhi : exam.panduan_fenzhi,
-											randomStr : exam.randomStr,
-											kslianjie : exam.kslianjie,
-											res_danxuan_arr : exam.res_danxuan_arr,
-											res_duoxuan_arr : exam.res_duoxuan_arr,
-											res_panduan_arr : exam.res_panduan_arr,
-											createTimeStamp : moment().format('X'),
-											ckcs : exam.ckcs,
-											kscs : parseInt(docc.kscs+1)
-										})
-										//console.timeEnd('总时间')
-										return res.sendStatus(200)
-									})//client
-								}else{	
-									//第一次生成试卷
-									client.get(randomStr,function(rediserr,redisres1){
-										if(rediserr){
-											console.log('rediserr --->',rediserr)
-											return res.json({'code':-1,'msg':rediserr})
-										}
-										let exam = JSON.parse(redisres1)[0]
-											exam.gonghao = redisres.student.alias
-											exam.xingming = redisres.student.cn
-											exam.kscs = 1
-										let new_stu_exam = new stu_exam({
-											qstr : exam.qstr,
-											gonghao : redisres.student.alias,//这里替换成session中的alias
-											xingming : redisres.student.cn,//这里替换成session中的cn
-											ksname : exam.ksname,
-											ksshijian : exam.ksshijian,
-											ksriqi : exam.ksriqi,
-											danxuan_num : exam.danxuan_num,
-											danxuan_fenzhi : exam.danxuan_fenzhi,
-											duoxuan_num : exam.duoxuan_num,
-											duoxuan_fenzhi : exam.duoxuan_fenzhi,
-											panduan_num : exam.panduan_num,
-											panduan_fenzhi : exam.panduan_fenzhi,
-											randomStr : exam.randomStr,
-											kslianjie : exam.kslianjie,
-											res_danxuan_arr : exam.res_danxuan_arr,
-											res_duoxuan_arr : exam.res_duoxuan_arr,
-											res_panduan_arr : exam.res_panduan_arr,
-											createTimeStamp : moment().format('X'),
-											ckcs : exam.ckcs,
-											kscs : 1
-										})
-										//console.timeEnd('总时间')
-										return res.sendStatus(200)
-									})//client
-								}
+					console.time('redis中取缓存试卷耗时'+stutime22)
+					client.get(randomStr,function(rediserr,redisres1){
+						
+						if(rediserr){
+							console.log('rediserr --->',rediserr)
+							return res.json({'code':-1,'msg':rediserr})
+						}
+						if(!redisres1){
+							console.log('redis 没有试卷，返回错误')
+							console.timeEnd('总时间')
+							return res.json({'code':-1,'msg':'redis has no exams,need to create'})
+						}
+						if(redisres1){
+							let exam = JSON.parse(redisres1)[pos]
+								exam.gonghao = redisres.student.alias
+								exam.xingming = redisres.student.cn
+								exam.kscs = doc.ckcs
+								console.timeEnd('redis中取缓存试卷耗时'+stutime22)
+								console.timeEnd('总时间'+ alltime1)
+								console.log('先返回结果再保存到数据库')
+							return res.sendStatus(200)
+							//return res.render('front/ks',{'code':0,'result':exam,'ksinfo':doc})
+							doc = null
+							exam = null
+											
+						}//redis if
+				})
 				}
 			],function(error,result){
 				if(error){

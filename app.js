@@ -55,7 +55,7 @@ app.use(session({
   	saveUninitialized: false, // 是指无论有没有session cookie，每次请求都设置个session cookie ，默认给个标示为 connect.sid。
     secret: 'dangxiaoxinxihuajianshe',
     cookie:{ 
-        maxAge: 2 * 60 * 60 * 1000//120分钟有效期
+        maxAge: 5 * 60 * 60 * 1000//120分钟有效期
         //expires : new Date(Date.now() + 7200000)//默认是UTC时间，Date.now()获取当前时间的时间戳，输出是毫秒。
     },
     store:new RedisStrore({
