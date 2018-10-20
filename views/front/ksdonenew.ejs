@@ -94,7 +94,7 @@
                         <div id="ctl00_ContentPlaceHolder1_JQ1_divHead" class="surveyhead" style="border: 0px;">
                             <div id="ctl00_ContentPlaceHolder1_JQ1_h1Name" style="position:relative;">
                                 <h1 id="" style="color:#94003F;"><%=result.ksname%>(第<%=result.kscs%>次考试成绩)</h1>
-                                <h3 id="">姓名：<%=result.xingming%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=result.gonghao%>&nbsp;&nbsp;&nbsp;&nbsp;本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分&nbsp;&nbsp;&nbsp;&nbsp; 用时：<%=result.cha%></h3><br>
+                                <h3 id="">姓名：<%=result.xingming%>&nbsp;&nbsp;&nbsp;&nbsp;校园卡号：<%=result.gonghao%>&nbsp;&nbsp;&nbsp;&nbsp;<!-- 本次考试得分：<span style="color: red;"><%=result.zongfen%></span>分 -->&nbsp;&nbsp;&nbsp;&nbsp; 用时：<%=result.cha%></h3><br>
 
                                  <!--  <br><h4 id = "retry1" style="display:none;font-size: 14px;"><a href="/dxxxhjs/front/ks?code=<%=ksinfo.randomStr%>">&nbsp;&nbsp;&nbsp;&nbsp;点击此处再次考试</a></h4> -->
                                 
@@ -129,25 +129,45 @@
                                         <div class='div_question' id='div<%=index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=index+1%>.</div>
-                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
+                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;">
+
+                                          <%var correct = '' %>
+                                          <%item.xuanxiang.forEach(function(itemxx,indexxx){%>
+                                            
+                                            <%if(itemxx.is_correct==true){%>
+                                              <%if(indexxx==0){correct='A'}%>
+                                              <%if(indexxx==1){correct='B',console.log('000000000')}%>
+                                              <%if(indexxx==2){correct='C'}%>
+                                              <%if(indexxx==3){correct='D'}%>
+                                              <%if(indexxx==4){correct='E'}%>
+                                              <%if(indexxx==5){correct='F'}%>
+                                              <%if(indexxx==6){correct='G'}%>
+                                              <%if(indexxx==7){correct='H'}%>
+                                              <%if(indexxx==8){correct='I'}%>
+                                            <%}%>
+                                           
+                                          <%})%>
+                                          <%=correct%>
+
+                                          </span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=index+1%>'>
                                           <div class='div_table_clear_top'></div>
                                           <ul class='ulradiocheck'>
                                           <%item.xuanxiang.forEach(function(it,ind){%>
-                                            <%var chooseitem = ''%>
-                                            <%if(ind == 0){chooseitem = 'A. '}%>
-                                            <%if(ind == 1){chooseitem = 'B. '}%>
-                                            <%if(ind == 2){chooseitem = 'C. '}%>
-                                            <%if(ind == 3){chooseitem = 'D. '}%>
-                                            <%if(ind == 4){chooseitem = 'E. '}%>
-                                            <%if(ind == 5){chooseitem = 'F. '}%>
-                                            <%if(ind == 6){chooseitem = 'G. '}%>
-                                            <%if(ind == 7){chooseitem = 'H. '}%>
-                                            <%if(ind == 8){chooseitem = 'I. '}%>
+                                            <%var chooseitem = '',exchange = '' %>
+                                            <%if(ind == 0){chooseitem = 'A. ',exchange = 'A'}%>
+                                            <%if(ind == 1){chooseitem = 'B. ',exchange = 'B'}%>
+                                            <%if(ind == 2){chooseitem = 'C. ',exchange = 'C'}%>
+                                            <%if(ind == 3){chooseitem = 'D. ',exchange = 'D'}%>
+                                            <%if(ind == 4){chooseitem = 'E. ',exchange = 'E'}%>
+                                            <%if(ind == 5){chooseitem = 'F. ',exchange = 'F'}%>
+                                            <%if(ind == 6){chooseitem = 'G. ',exchange = 'G'}%>
+                                            <%if(ind == 7){chooseitem = 'H. ',exchange = 'H'}%>
+                                            <%if(ind == 8){chooseitem = 'I. ',exchange = 'I'}%>
                                             <li style='width:99%;'>
-                                            <%if(it.is_correct==true){%>
+                                            <%if(exchange == item.choose){%>
                                               <a href='javascript:' class='jqRadio jqChecked' rel='q<%=index+1%>_<%=ind+1%>'></a>
                                               <%}else{%>
                                               <a href='javascript:' class='jqRadio ' rel='q<%=index+1%>_<%=ind+1%>'></a>
@@ -169,25 +189,45 @@
                                       <div class='div_question rightorfalse' id='div<%=index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=index+1%>.</div>
-                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;"><%=item.choose%></span> )</div>
+                                          <div id='divTitle<%=index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;">
+                                            
+                                            <%var correct = '' %>
+                                          <%item.xuanxiang.forEach(function(itemxx,indexxx){%>
+                                            
+                                            <%if(itemxx.is_correct==true){%>
+                                              <%if(indexxx==0){correct='A'}%>
+                                              <%if(indexxx==1){correct='B',console.log('000000000')}%>
+                                              <%if(indexxx==2){correct='C'}%>
+                                              <%if(indexxx==3){correct='D'}%>
+                                              <%if(indexxx==4){correct='E'}%>
+                                              <%if(indexxx==5){correct='F'}%>
+                                              <%if(indexxx==6){correct='G'}%>
+                                              <%if(indexxx==7){correct='H'}%>
+                                              <%if(indexxx==8){correct='I'}%>
+                                            <%}%>
+                                           
+                                          <%})%>
+                                          <%=correct%>
+
+                                          </span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=index+1%>'>
                                           <div class='div_table_clear_top'></div>
                                           <ul class='ulradiocheck'>
                                           <%item.xuanxiang.forEach(function(it,ind){%>
-                                            <%var chooseitem = ''%>
-                                            <%if(ind == 0){chooseitem = 'A. '}%>
-                                            <%if(ind == 1){chooseitem = 'B. '}%>
-                                            <%if(ind == 2){chooseitem = 'C. '}%>
-                                            <%if(ind == 3){chooseitem = 'D. '}%>
-                                            <%if(ind == 4){chooseitem = 'E. '}%>
-                                            <%if(ind == 5){chooseitem = 'F. '}%>
-                                            <%if(ind == 6){chooseitem = 'G. '}%>
-                                            <%if(ind == 7){chooseitem = 'H. '}%>
-                                            <%if(ind == 8){chooseitem = 'I. '}%>
+                                            <%var chooseitem = '',exchange = '' %>
+                                            <%if(ind == 0){chooseitem = 'A. ',exchange = 'A' }%>
+                                            <%if(ind == 1){chooseitem = 'B. ',exchange = 'B'}%>
+                                            <%if(ind == 2){chooseitem = 'C. ',exchange = 'C'}%>
+                                            <%if(ind == 3){chooseitem = 'D. ',exchange = 'D'}%>
+                                            <%if(ind == 4){chooseitem = 'E. ',exchange = 'E'}%>
+                                            <%if(ind == 5){chooseitem = 'F. ',exchange = 'F'}%>
+                                            <%if(ind == 6){chooseitem = 'G. ',exchange = 'G'}%>
+                                            <%if(ind == 7){chooseitem = 'H. ',exchange = 'H'}%>
+                                            <%if(ind == 8){chooseitem = 'I. ',exchange = 'I'}%>
                                             <li style='width:99%;'>
-                                            <%if(it.is_correct==true){%>
+                                            <%if(exchange==item.choose){%>
                                               <a href='javascript:' class='jqRadio jqChecked' rel='q<%=index+1%>_<%=ind+1%>'></a>
                                               <%}else{%>
                                               <a href='javascript:' class='jqRadio ' rel='q<%=index+1%>_<%=ind+1%>'></a>
@@ -215,25 +255,47 @@
                                       <div class='div_question' id='div<%=result.res_danxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;">
+                                            
+
+                                          <%var correct = '' %>
+                                          <%item.xuanxiang.forEach(function(itemxx,indexxx){%>
+                                            
+                                            <%if(itemxx.is_correct==true){%>
+                                              <%if(indexxx==0){correct='A'}%>
+                                              <%if(indexxx==1){correct+=',B'}%>
+                                              <%if(indexxx==2){correct+=',C'}%>
+                                              <%if(indexxx==3){correct+=',D'}%>
+                                              <%if(indexxx==4){correct+=',E'}%>
+                                              <%if(indexxx==5){correct+=',F'}%>
+                                              <%if(indexxx==6){correct+=',G'}%>
+                                              <%if(indexxx==7){correct+=',H'}%>
+                                              <%if(indexxx==8){correct+=',I'}%>
+                                            <%}%>
+                                           
+                                          <%})%>
+                                          <%=correct%>
+
+
+                                          </span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+index+1%>'>
                                           <div class='div_table_clear_top'></div>
                                           <ul class='ulradiocheck'>
                                           <%item.xuanxiang.forEach(function(it,ind){%>
-                                            <%var chooseitemdx = ''%>
-                                            <%if(ind == 0){chooseitemdx = 'A. '}%>
-                                            <%if(ind == 1){chooseitemdx = 'B. '}%>
-                                            <%if(ind == 2){chooseitemdx = 'C. '}%>
-                                            <%if(ind == 3){chooseitemdx = 'D. '}%>
-                                            <%if(ind == 4){chooseitemdx = 'E. '}%>
-                                            <%if(ind == 5){chooseitemdx = 'F. '}%>
-                                            <%if(ind == 6){chooseitemdx = 'G. '}%>
-                                            <%if(ind == 7){chooseitemdx = 'H. '}%>
-                                            <%if(ind == 8){chooseitemdx = 'I. '}%>
+                                            <%var chooseitemdx = '',exchangedx = ''%>
+                                            <%if(ind == 0){chooseitemdx = 'A. ',exchangedx=='A'}%>
+                                            <%if(ind == 1){chooseitemdx = 'B. ',exchangedx=='B'}%>
+                                            <%if(ind == 2){chooseitemdx = 'C. ',exchangedx=='C'}%>
+                                            <%if(ind == 3){chooseitemdx = 'D. ',exchangedx=='D'}%>
+                                            <%if(ind == 4){chooseitemdx = 'E. ',exchangedx=='E'}%>
+                                            <%if(ind == 5){chooseitemdx = 'F. ',exchangedx=='F'}%>
+                                            <%if(ind == 6){chooseitemdx = 'G. ',exchangedx=='G'}%>
+                                            <%if(ind == 7){chooseitemdx = 'H. ',exchangedx=='H'}%>
+                                            <%if(ind == 8){chooseitemdx = 'I. ',exchangedx=='I'}%>
                                             <li style='width:99%;'>
-                                              <%if(it.is_correct==true){%>
+                                              <%if(item.choose.indexOf(exchangedx)!=-1){%>
                                               <a href='javascript:' class='jqCheckbox jqChecked' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
                                               <%}else{%>
                                               <a href='javascript:' class='jqCheckbox' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
@@ -253,27 +315,47 @@
                                         <div class='div_question rightorfalse' id='div<%=result.res_danxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;"><%=item.choose%></span> )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;">
+                                            
+                                            <%var correct = '' %>
+                                          <%item.xuanxiang.forEach(function(itemxx,indexxx){%>
+                                            
+                                            <%if(itemxx.is_correct==true){%>
+                                              <%if(indexxx==0){correct='A'}%>
+                                              <%if(indexxx==1){correct+=',B'}%>
+                                              <%if(indexxx==2){correct+=',C'}%>
+                                              <%if(indexxx==3){correct+=',D'}%>
+                                              <%if(indexxx==4){correct+=',E'}%>
+                                              <%if(indexxx==5){correct+=',F'}%>
+                                              <%if(indexxx==6){correct+=',G'}%>
+                                              <%if(indexxx==7){correct+=',H'}%>
+                                              <%if(indexxx==8){correct+=',I'}%>
+                                            <%}%>
+                                           
+                                          <%})%>
+                                          <%=correct%>
+
+                                          </span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+index+1%>'>
                                           <div class='div_table_clear_top'></div>
                                           <ul class='ulradiocheck'>
                                           <%item.xuanxiang.forEach(function(it,ind){%>
-                                            <%var chooseitemdx = ''%>
-                                            <%if(ind == 0){chooseitemdx = 'A. '}%>
-                                            <%if(ind == 1){chooseitemdx = 'B. '}%>
-                                            <%if(ind == 2){chooseitemdx = 'C. '}%>
-                                            <%if(ind == 3){chooseitemdx = 'D. '}%>
-                                            <%if(ind == 4){chooseitemdx = 'E. '}%>
-                                            <%if(ind == 5){chooseitemdx = 'F. '}%>
-                                            <%if(ind == 6){chooseitemdx = 'G. '}%>
-                                            <%if(ind == 7){chooseitemdx = 'H. '}%>
-                                            <%if(ind == 8){chooseitemdx = 'I. '}%>
+                                            <%var chooseitemdx = '',exchangedx = ''%>
+                                            <%if(ind == 0){chooseitemdx = 'A. ',exchangedx = 'A'}%>
+                                            <%if(ind == 1){chooseitemdx = 'B. ',exchangedx = 'B'}%>
+                                            <%if(ind == 2){chooseitemdx = 'C. ',exchangedx = 'C'}%>
+                                            <%if(ind == 3){chooseitemdx = 'D. ',exchangedx = 'D'}%>
+                                            <%if(ind == 4){chooseitemdx = 'E. ',exchangedx = 'E'}%>
+                                            <%if(ind == 5){chooseitemdx = 'F. ',exchangedx = 'F'}%>
+                                            <%if(ind == 6){chooseitemdx = 'G. ',exchangedx = 'G'}%>
+                                            <%if(ind == 7){chooseitemdx = 'H. ',exchangedx = 'H'}%>
+                                            <%if(ind == 8){chooseitemdx = 'I. ',exchangedx = 'I'}%>
                                             <li style='width:99%;'>
-                                              <%if(it.is_correct==true){%>
+                                              <%if(item.choose.indexOf(exchangedx)!=-1){console.log('333333333333')%>
                                               <a href='javascript:' class='jqCheckbox jqChecked' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
-                                              <%}else{%>
+                                              <%}else{console.log('exchangedx',exchangedx,typeof(exchangedx),'item.choose',item.choose,typeof(item.choose)),console.log(exchangedx.indexOf(item.choose))%>
                                               <a href='javascript:' class='jqCheckbox' rel='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>'></a>
                                               <%}%>
                                               <input style='display:none;' type='checkbox' name='q<%=result.res_danxuan_arr.length+index+1%>' id='q<%=result.res_danxuan_arr.length+index+1%>_<%=ind+1%>' value='<%=it._id%>' daan="<%=chooseitemdx%>" timuid="<%=item._id%>"/>
@@ -297,26 +379,46 @@
                                         <div class='div_question' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
                                           <div class='div_title_question_all'>
                                             <div class='div_topic_question'><%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>.</div>
-                                            <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;"><%=item.choose%></span> )</div>
+                                            <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: blue;">
+                                              
+                                          <%var correct = '' %>
+                                          <%item.xuanxiang.forEach(function(itemxx,indexxx){%>
+                                            
+                                            <%if(itemxx.is_correct==true){%>
+                                              <%if(indexxx==0){correct='A'}%>
+                                              <%if(indexxx==1){correct='B'}%>
+                                              <%if(indexxx==2){correct='C'}%>
+                                              <%if(indexxx==3){correct='D'}%>
+                                              <%if(indexxx==4){correct='E'}%>
+                                              <%if(indexxx==5){correct='F'}%>
+                                              <%if(indexxx==6){correct='G'}%>
+                                              <%if(indexxx==7){correct='H'}%>
+                                              <%if(indexxx==8){correct='I'}%>
+                                            <%}%>
+                                           
+                                          <%})%>
+                                          <%=correct%>
+
+                                            </span> )</div>
                                             <div style='clear:both;'></div>
                                           </div>
                                           <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
                                             <div class='div_table_clear_top'></div>
                                             <ul class='ulradiocheck'>
                                             <%item.xuanxiang.forEach(function(it,ind){%>
-                                              <%var chooseitempd = ''%>
-                                              <%if(ind == 0){chooseitempd = 'A. '}%>
-                                              <%if(ind == 1){chooseitempd = 'B. '}%>
-                                              <%if(ind == 2){chooseitempd = 'C. '}%>
-                                              <%if(ind == 3){chooseitempd = 'D. '}%>
-                                              <%if(ind == 4){chooseitempd = 'E. '}%>
-                                              <%if(ind == 5){chooseitempd = 'F. '}%>
-                                              <%if(ind == 6){chooseitempd = 'G. '}%>
-                                              <%if(ind == 7){chooseitempd = 'H. '}%>
-                                              <%if(ind == 8){chooseitempd = 'I. '}%>
+                                              <%var chooseitempd = '',exchangepd = ''%>
+                                              <%if(ind == 0){chooseitempd = 'A. ',exchangepd='A'}%>
+                                              <%if(ind == 1){chooseitempd = 'B. ',exchangepd='B'}%>
+                                              <%if(ind == 2){chooseitempd = 'C. ',exchangepd='C'}%>
+                                              <%if(ind == 3){chooseitempd = 'D. ',exchangepd='D'}%>
+                                              <%if(ind == 4){chooseitempd = 'E. ',exchangepd='E'}%>
+                                              <%if(ind == 5){chooseitempd = 'F. ',exchangepd='F'}%>
+                                              <%if(ind == 6){chooseitempd = 'G. ',exchangepd='G'}%>
+                                              <%if(ind == 7){chooseitempd = 'H. ',exchangepd='H'}%>
+                                              <%if(ind == 8){chooseitempd = 'I. ',exchangepd='I'}%>
                                               <li style='width:99%;'>
                                                 
-                                                <%if(it.is_correct==true){%>
+                                                <%if(item.choose==exchangepd){%>
                                                 <a href='javascript:' class='jqRadio jqChecked' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
                                                 <%}else{%>
                                                 <a href='javascript:' class='jqRadio ' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
@@ -336,26 +438,46 @@
                                           <div class='div_question rightorfalse' id='div<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
                                         <div class='div_title_question_all'>
                                           <div class='div_topic_question'><%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>.</div>
-                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;"><%=item.choose%></span> )</div>
+                                          <div id='divTitle<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>' class='div_title_question'><%=item.timu%>( <span style="color: red;">
+                                            
+                                            <%var correct = '' %>
+                                          <%item.xuanxiang.forEach(function(itemxx,indexxx){%>
+                                            
+                                            <%if(itemxx.is_correct==true){%>
+                                              <%if(indexxx==0){correct='A'}%>
+                                              <%if(indexxx==1){correct='B'}%>
+                                              <%if(indexxx==2){correct='C'}%>
+                                              <%if(indexxx==3){correct='D'}%>
+                                              <%if(indexxx==4){correct='E'}%>
+                                              <%if(indexxx==5){correct='F'}%>
+                                              <%if(indexxx==6){correct='G'}%>
+                                              <%if(indexxx==7){correct='H'}%>
+                                              <%if(indexxx==8){correct='I'}%>
+                                            <%}%>
+                                           
+                                          <%})%>
+                                          <%=correct%>
+
+                                          </span> )</div>
                                           <div style='clear:both;'></div>
                                         </div>
                                         <div class='div_table_radio_question' id='divquestion<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>'>
                                           <div class='div_table_clear_top'></div>
                                           <ul class='ulradiocheck'>
                                           <%item.xuanxiang.forEach(function(it,ind){%>
-                                            <%var chooseitempd = ''%>
-                                            <%if(ind == 0){chooseitempd = 'A. '}%>
-                                            <%if(ind == 1){chooseitempd = 'B. '}%>
-                                            <%if(ind == 2){chooseitempd = 'C. '}%>
-                                            <%if(ind == 3){chooseitempd = 'D. '}%>
-                                            <%if(ind == 4){chooseitempd = 'E. '}%>
-                                            <%if(ind == 5){chooseitempd = 'F. '}%>
-                                            <%if(ind == 6){chooseitempd = 'G. '}%>
-                                            <%if(ind == 7){chooseitempd = 'H. '}%>
-                                            <%if(ind == 8){chooseitempd = 'I. '}%>
+                                            <%var chooseitempd = '',exchangepd = '' %>
+                                            <%if(ind == 0){chooseitempd = 'A. ',exchangepd='A'}%>
+                                            <%if(ind == 1){chooseitempd = 'B. ',exchangepd='B'}%>
+                                            <%if(ind == 2){chooseitempd = 'C. ',exchangepd='C'}%>
+                                            <%if(ind == 3){chooseitempd = 'D. ',exchangepd='D'}%>
+                                            <%if(ind == 4){chooseitempd = 'E. ',exchangepd='E'}%>
+                                            <%if(ind == 5){chooseitempd = 'F. ',exchangepd='F'}%>
+                                            <%if(ind == 6){chooseitempd = 'G. ',exchangepd='G'}%>
+                                            <%if(ind == 7){chooseitempd = 'H. ',exchangepd='H'}%>
+                                            <%if(ind == 8){chooseitempd = 'I. ',exchangepd='I'}%>
                                             <li style='width:99%;'>
                                               
-                                              <%if(it.is_correct==true){%>
+                                              <%if(item.choose==exchangepd){%>
                                               <a href='javascript:' class='jqRadio jqChecked' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>
                                               <%}else{%>
                                               <a href='javascript:' class='jqRadio ' rel='q<%=result.res_danxuan_arr.length+result.res_duoxuan_arr.length+index+1%>_<%=ind+1%>'></a>

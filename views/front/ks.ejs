@@ -793,11 +793,12 @@
                                         var layer3 = layui.layer
                                         layer3.open({
                                                 title: '考试结束',
-                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span><br>得分：<span style="color:red;">' + res.result.zongfen +'</span>',
+                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span><br></span>',
                                                 end:function(){
                                                   location.href = '/dxxxhjs/front/myexamlist?w=w' 
                                                 }
-                                            }); 
+                                            });
+                                            // 得分：<span style="color:red;"> + res.result.zongfen +
                                           //   layer.open({
                                           //     skin: 'layui-layer-molv', //样式类名
                                           //     title: '时间截止，本次考试结果',
@@ -843,11 +844,12 @@
                                         var layer4 = layui.layer
                                             layer4.open({
                                                 title: '考试结束',
-                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span><br>得分：<span style="color:red;">' + res.result.zongfen +'</span>',
+                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span><br></span>',
                                                 end:function(){
                                                   location.href = '/dxxxhjs/front/myexamlist?w=w' 
                                                 }
                                             }); 
+                                            //得分：<span style="color:red;">' + res.result.zongfen +'
                                           //   layer.open({
                                           //     skin: 'layui-layer-molv', //样式类名
                                           //     title: '时间截止，本次考试结果',
@@ -888,7 +890,7 @@
                                     ,btn: ['开始考试']
                                     ,btnAlign: 'c'
                                     ,moveType: 1 //拖拽模式，0或者1
-                                    ,content: '<p>1、点击“进入考试”，在登录界面准确填写本人校园卡号和密码，登录后开始考试；在此之前严禁打开其他无关应用程序，以免影响正常考试。</p><p>2、考试题型包括单项选择题、多项选择题以及判断题，共80道题，答题时间为50分钟。</p><p>3、本次考试与党校结业证书挂钩，考试成绩需达到合格及以上水平。</p><p>4、考生完成作答后，请点击“提交”，提交成功后方可离开考场。</p><p>5、考试期间如出现系统故障等考试内容以外的问题，请及时向监考老师反映，不得向其他考生询问。</p><p>6、请严格遵守考场纪律，严禁作弊，一经发现，结业考试成绩无效，并将严肃处理。</p>'
+                                    ,content: '<p>1、点击“进入考试”，在登录界面准确填写本人校园卡号和密码，登录后开始考试；在此之前严禁打开其他无关应用程序，以免影响正常考试。</p><p>2、考试题型包括单项选择题、多项选择题以及判断题，共80道题。</p><p>3、本次考试与党校结业证书挂钩，考试成绩需达到合格及以上水平。</p><p>4、考生完成作答后，请点击“提交”，提交成功后方可离开考场。</p><p>5、考试期间如出现系统故障等考试内容以外的问题，请及时向监考老师反映，不得向其他考生询问。</p><p>6、请严格遵守考场纪律，严禁作弊，一经发现，结业考试成绩无效，并将严肃处理。</p>'
                                     ,success: function(layero){
                                       // var btn = layero.find('.layui-layer-btn');
                                       // btn.find('.layui-layer-btn0').attr({
@@ -995,6 +997,7 @@
                                   temp_arr = []
                               }
                               if((danxuan_num==temp_danxuan.length) && (duoxuan_num==temp_duoxuan.length) && (panduan_num==temp_panduan.length)){
+                                console.log('题目选齐了')
                                 console.log('ajax 了')
                                 var randomStr = GetQueryString('code')
                                 console.log('check randomStr-->',randomStr)
@@ -1020,11 +1023,12 @@
                                         var layer2 = layui.layer
                                             layer2.open({
                                                 title: '考试结果',
-                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span><br>得分：<span style="color:red;">' + res.result.zongfen +'</span>',
+                                                content: '用时：<span style="color:red;">' + res.result.res_cha + '</span><br></span>',
                                                 end:function(){
                                                   location.href = '/dxxxhjs/front/myexamlist?w=w' 
                                                 }
                                             }); 
+                                          //得分：<span style="color:red;">' + res.result.zongfen +'
                                           //   layer.open({
                                           //     skin: 'layui-layer-molv', //样式类名
                                           //     title: '考试结果',
@@ -1046,6 +1050,7 @@
                                 }) 
                               }else{
                                 console.log('题目没有选齐')
+                                return false
                               }
                             })
                           })
@@ -1056,6 +1061,7 @@
                           $(function(){
                             intervalsave = setInterval(function(){
                               console.log('60秒后保存试卷')
+                              //console.log('exam','<%- JSON.stringify(result) %>')
                                $.ajax({
                                   url:'/dxxxhjs/front/saveexam',
                                   method: 'POST',
@@ -1078,7 +1084,7 @@
                                     console.log('save ajax err',err)
                                   }
                                 }) 
-                            },60000)
+                            },20000)
                           })
                         </script>
                         <script type="text/javascript">

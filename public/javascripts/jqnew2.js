@@ -2344,16 +2344,21 @@ function showProgressBar(d) {
 		}
 		var c = totalQ;
 		var e = joinedTopic;
+		console.log('c totalQ--->',c)
+		console.log('e joinedTopic--->',e)
 		if (progressBarType == 2) {
 			c = totalPage;
 			e = cur_page + 1;
 		}
 		var b = parseFloat(e) / c * 100;
 		b = b || 0;
+		console.log('b--->',b)
+		console.log('d--->',d)
 		if (b >= 70 && d && d._topic == totalQ) {
 			b = 100;
 		}
 		var a = b + "%";
+		console.log('a--->',a)
 		loadcss.style.height = a;
 		if (progressBarType == 1) {
 			loadprogress.innerHTML = "  " + b.toFixed(0) + "%";

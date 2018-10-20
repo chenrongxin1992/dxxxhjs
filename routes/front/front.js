@@ -5419,7 +5419,7 @@ router.post('/checkks',function(req,res){//reids版本checkks
 								else{
 									let nowTimeStamp = moment().format('X'),
 									createTimeStamp = doc.createTimeStamp,
-									cha = Number(nowTimeStamp) - Number(createTimeStamp),
+									cha = Number(nowTimeStamp) - Number(createTimeStamp) + 20,
 									res_cha = MillisecondToDate(cha)
 									console.log('check res_cha---->',res_cha,cha)
 									stu_exam.update({'_id':shijuan._id},{'zongfen':tempresult.zongfen,'is_end':1,'cha':res_cha,'tijiaoTimeStamp':nowTimeStamp},function(err){
@@ -5454,13 +5454,14 @@ router.get('/newkstest',function(req,res){
 	let alltime1 = alltime++
 	console.time('总时间' + alltime1)
 		
-		client.get('sess:-fO83CZYBCJY5QH2YxqE0wBsaQSIzW2R',function(rediserr,redisres2){
+		client.get('sess:SDq5dKIg7DyGDkxoCmr-u1BR2mZzVhgH',function(rediserr,redisres2){
 			
 			
 	      if(rediserr){
 	        next(new Error(rediserr))
 	      }
 	      if(!redisres2){
+	      	console.log('redis session error')
 	        return res.redirect(url)
 	      }
 	      if(redisres2 && redisres2!='undefined'){
