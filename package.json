@@ -17,6 +17,7 @@
     "excel-export": "^0.5.1",
     "express": "~4.15.2",
     "file-stream-rotator": "^0.2.1",
+    "log4js": "^3.0.6",
     "moment": "^2.20.1",
     "mongoose": "^5.0.0",
     "morgan": "~1.8.1",

@@ -17,6 +17,28 @@ var FileStreamRotator = require('file-stream-rotator')
 var logDirectory = path.join(__dirname, 'log')
 var fs = require('fs')
 
+//log4js
+const log4js = require('log4js')
+//通过configure()配置log4js
+log4js.configure({
+    appenders: {
+      fileLog: { 
+        type: 'dateFile', 
+        filename: './log/error-',
+        pattern: ".yyyy-MM-dd.log",
+        maxLogSize: 100000,
+        encoding: "utf-8",
+        alwaysIncludePattern: true 
+      }
+    },categories:{
+      file: { appenders: ['fileLog'], level: 'error' },
+      default: { appenders: ['fileLog'], level: 'error' }
+    },
+    replaceConsole: true
+});
+const logger1 = log4js.getLogger('normal');
+//logger1.level('INFO');//设置输出级别，具体输出级别有6个，见下方说明
+
 var app = express();
 
 // view engine setup
@@ -36,7 +58,7 @@ var accessLogStream = FileStreamRotator.getStream({
 
 // setup the logger
 app.use(logger('short', {stream: accessLogStream}))
-
+app.use(log4js.connectLogger(logger1, {level: log4js.levels.INFO}));
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 //

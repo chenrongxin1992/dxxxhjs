@@ -9,6 +9,10 @@ const async = require('async')
 const request = require('request')
 const schedule = require('node-schedule')
 
+
+router.get('/test_1022',function(req,res){
+	return res.json({'response':'1022'})
+})
 let MyServer = "http://116.13.96.53:81",
 	//CASserver = "https://auth.szu.edu.cn/cas.aspx/",
 	CASserver = 'https://authserver.szu.edu.cn/authserver/',
