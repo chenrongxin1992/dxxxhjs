@@ -1521,7 +1521,10 @@ router.get('/new_firststep',function(req,res){
 })
 //去掉空格
 function trim_str(str){
-    return str.replace(/\s|\xA0/g,"");    
+	//过滤内容中的引号 json解析会出问题
+	let s1 = str.replace(/\s|\xA0/g,""); 
+	let s2 = s1.toString().replace(new RegExp('(["\"])', 'g'),"\\\""); 
+    return s2 
 }
 router.get('/tktj',function(req,res){
 	console.log('in tktj router')
