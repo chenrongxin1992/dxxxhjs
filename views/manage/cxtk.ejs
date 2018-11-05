@@ -178,12 +178,45 @@ $(function(){
       } 
       else if(obj.event === 'edit'){
         console.log('编辑-->',JSON.stringify(data))
-        layer.alert('该功能尚在完善')
+        //layer.alert('该功能尚在完善')
+        console.log('监听详情-->',data.catid)
+        console.log('能取到_id吗-->',data._id)
+        let if_index = layer.open({
+          skin: 'layui-layer-molv',
+          type: 2,
+          title: '编辑',
+          shadeClose: false,
+          shade: [0.8, '#393D49'],
+          offset: '10px',
+          maxmin: true, //开启最大化最小化按钮
+          area: '850px',
+          maxHeight:'900px',
+          content: '/dxxxhjs/manage/iframe_bianji?_id=' + data._id,
+          success: function(layero, index) {
+            console.log('layero-->',layero)
+            console.log('index-->',index)
+            layer.iframeAuto(index);
+          },
+          end:function(){
+             table.reload('reload_tb', {
+              page:1,
+              where: {
+                  timu: $('#timu').val(),
+                  catname: $('#catname option:selected').val(),
+                  leixing: $('#leixing option:selected').val()
+              }
+            });
+          }
+        }); 
         //layer.alert('编辑行：<br>'+ JSON.stringify(data))
       }
     });
   });
 })
+function updatexuanxiang(obj){
+  console.log('updatexuanxiang',obj)
+  return obj
+}
 </script>
 <script type="text/html" id="xuanxiang0Tpl">
   {{#  if((d.xuanxiang0) && ((d.xuanxiang0.indexOf('true')) > 0)) { }}

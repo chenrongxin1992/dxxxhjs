@@ -951,6 +951,37 @@ router.get('/iframe_mb',function(req,res){
 			return res.render('manage/iframe_mb',{'detail':doc})
 		})
 })
+//编辑题目
+router.get('/iframe_bianji',function(req,res){
+	console.log('in iframe_bianji router')
+	let _id = req.query._id
+	console.log('_id-->',_id)
+	let search = cat.findOne({})
+		search.where('_id').equals(_id)
+		search.exec(function(err,doc){
+			if(err){
+				console.log('err-->',err)
+				return res.josn({'code':-1,'msg':err.stack})
+			}
+			console.log('doc-->',doc)
+			return res.render('manage/iframe_bianji',{'detail':doc})
+		})
+})
+//编辑题目确认
+router.post('/iframe_bianji_confirm',function(req,res){
+	console.log('in iframe_bianji_confirm router')
+	//console.log('body',req.body)
+	console.log('xuanxiang--->',JSON.parse(req.body.xuanxiang))
+	//return false
+	cat.update({'_id':req.body._id},{'catname':req.body.catname,'timu':req.body.timu,'xuanxiang':JSON.parse(req.body.xuanxiang)},function(error){
+	   	if(error){
+	   		console.log('sjsz eachLimit e ---->',error)
+	   		return res.json({'code':1,'msg':error})
+	   	}
+	   	return res.json({'code':0,'msg':'success'})
+	})
+
+})
 router.get('/iframe_mbbj',function(req,res){
 	console.log('in iframe_mbbj router')
 	let _id = req.query._id

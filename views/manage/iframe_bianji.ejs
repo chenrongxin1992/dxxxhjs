@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/dxxxhjs/stylesheets/layui.css" media="all">
+  </head>
+
+  <body>
+    <fieldset class="layui-elem-field">
+      <legend>编辑该题目</legend>
+      <div class="layui-field-box">
+        <form class="layui-form" action="">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">所属模块</label>
+              <div class="layui-input-inline">
+                <input type="text" name="catname" id="catname" class="layui-input"  value="<%=detail.catname%>">
+              </div>
+            </div>
+            <!-- <div class="layui-inline">
+              <label class="layui-form-label">是否启用</label>
+              <div class="layui-input-inline">
+                <input type="text" name="inused" id="inused" class="layui-input" disabled value="<%=detail.inused%>">
+              </div>
+            </div> -->
+          </div>
+
+          <div class="layui-form-item">
+            <label class="layui-form-label">题干</label>
+            <div class="layui-input-block">
+              <textarea name="timu" id="timu" class="layui-textarea"  ><%=detail.timu%></textarea>
+              
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">类型</label>
+              <div class="layui-input-inline">
+                <input type="text" name="leixing" id="leixing" class="layui-input" disabled value="<%=detail.leixing%>">
+              </div>
+            </div>
+            <!-- <div class="layui-inline">
+              <label class="layui-form-label">该题分值</label>
+              <div class="layui-input-inline">
+                <input type="text" name="feizhi" id="fenzhi" class="layui-input" disabled value="<%=detail.fenzhi%>">
+              </div>
+            </div> -->
+          </div>
+
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">答案</label>
+              <div class="layui-input-inline">
+                <input type="text" name="zqda" id="zqda" class="layui-input" disabled value="<%=detail.zqda%>">
+              </div>
+            </div>
+          </div>
+
+          <% var tem_i = 65;%>
+          <% detail.xuanxiang.forEach(function(item,index){ %>
+            <% var tem_str=''; tem_str='选项' + ' ' +String.fromCharCode(tem_i); tem_i++; %>
+              <div class="layui-form-item">
+                <label class="layui-form-label"><%=tem_str%></label>
+                <div class="layui-input-block">
+                  <input type="text" name="<%=tem_str%>" id="<%=item.id%>" class="layui-input"  value="<%=item.content%>">
+                </div>
+              </div>
+            <% }) %>
+
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-submit="" lay-filter="tijiao">确认修改</button>
+              <!-- <button type="reset" class="layui-btn layui-btn-primary">重置</button> -->
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </fieldset>
+
+<script src="/dxxxhjs/javascripts/jquery-3.1.1.js"></script>
+<script src="/dxxxhjs/javascripts/layui.js"></script>
+<script>
+'use strict'
+$(function(){
+'use strict'
+  layui.use(['layer','form'], function(){
+    let layer = layui.layer,
+        form = layui.form;
+
+    let _id = '<%-detail._id%>'
+    console.log('_id',_id)
+    //return false
+    let tempresult = '<%-JSON.stringify(detail.xuanxiang)%>'
+        tempresult = tempresult.replace(/\n/g,'<br />')
+        tempresult = JSON.parse(tempresult)
+
+    console.log('detail.xuanxiang',tempresult)
+
+    let xuanxiang_length = tempresult.length
+    //console.log('xuanxiang_length',xuanxiang_length.length)
+    //搜索
+    form.on('submit(tijiao)', function(data){
+      console.log('data-->',data)
+      //获取修改值
+      let catname = $('#catname').val(),
+          timu = $('#timu').val(),
+          leixing = $('#leixing').val(),
+          zqda = $('#zqda').val()
+
+      let xuanxiang_arr = []
+      tempresult.forEach(function(item,index){
+        item.content = $('#'+item.id).val()
+      })
+
+      console.log('new xuanxiang',tempresult)
+      //return false;
+      $.ajax({
+        url: '/dxxxhjs/manage/iframe_bianji_confirm', 
+        async: true,
+        dataType: 'json',
+        type: 'POST',
+        data: {
+          _id:_id,
+          catname:catname,
+          timu:timu,
+          leixing:leixing,
+          //zqda:zqda,
+          xuanxiang:JSON.stringify(tempresult)
+        },
+        success:function(result){
+          
+          if(result.code == 1){
+            console.log('failed update')
+          }else{
+            console.log('success update')
+            //更新父页面表格选项值
+            parent.updatexuanxiang(tempresult)
+            layer.open({
+              title: '提示',
+              content: '修改成功',
+              end:function(){
+                parent.parent.layer.closeAll()
+                    //layer.closeAll('iframe')
+              }
+            }); 
+          }
+          
+        },
+        error:function(err){
+          console.log('error',err)
+        }
+      })
+
+          
+      return false;
+    });
+  });
+})
+
+</script>
+  </body>
+</html>
